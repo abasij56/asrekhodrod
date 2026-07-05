@@ -164,6 +164,26 @@ return array(
 				array( 'zone' => 'main', 'block' => 'ak-page-content' ),
 			),
 		),
+		'carsinfo_3d2' => array(
+			'label'       => 'اطلاعات خودرو — 3D2',
+			'layout_mode' => 'system',
+			'zones'       => array(
+				'before_main' => $zone_before_main,
+				'main'        => array(
+					'label'    => 'قبل از محتوای اصلی',
+					'blocks'   => array( '*' ),
+					'multiple' => true,
+				),
+				'main_after'  => array(
+					'label'    => 'بعد از محتوای اصلی',
+					'blocks'   => array( '*' ),
+					'multiple' => true,
+				),
+				'sidebar'     => $zone_sidebar,
+				'after_main'  => $zone_after_main,
+			),
+			'defaults'    => array(),
+		),
 		'not_found'   => array(
 			'label'       => 'صفحه ۴۰۴',
 			'layout_mode' => 'blocks',

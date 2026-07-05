@@ -51,8 +51,9 @@ final class LayoutSchema {
 		'single_post' => 'تک‌نوشته',
 		'page_about'  => 'درباره ما',
 		'page_contact'=> 'تماس با ما',
-		'page_car'    => 'صفحه خودرو',
-		'not_found'   => 'صفحه ۴۰۴',
+		'page_car'      => 'صفحه خودرو',
+		'carsinfo_3d2'  => 'اطلاعات خودرو — 3D2',
+		'not_found'     => 'صفحه ۴۰۴',
 	);
 
 	/** @var array<string, string> */

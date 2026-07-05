@@ -1,0 +1,280 @@
+/* Car Info 3D2 — intro snap + normal scroll panel + footer */
+
+html.carinfo3d2-root {
+  scroll-snap-type: none;
+}
+
+body.carinfo3d2-page .ad-strip {
+  position: relative;
+  z-index: 2;
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+  width: min(100% - 2rem, var(--container));
+  margin-inline: auto;
+  padding: 2rem 0 2.5rem;
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 1rem 1rem 0 0;
+  box-shadow: 0 -10px 36px rgba(20, 24, 32, 0.07);
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel > * + * {
+  margin-top: 2.5rem;
+}
+
+/* Section 2+ with layout sidebar */
+body.carinfo3d2-page .carinfo3d2-body {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+body.carinfo3d2-page .carinfo3d2-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+body.carinfo3d2-page.carinfo3d2-page--has-sidebar .carinfo3d2-scroll-panel {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+}
+
+body.carinfo3d2-page .carinfo3d2-body-main {
+  min-width: 0;
+}
+
+body.carinfo3d2-page .carinfo3d2-sidebar {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+  min-width: 0;
+}
+
+body.carinfo3d2-page .carinfo3d2-sidebar .page-sidebar-stack,
+body.carinfo3d2-page .carinfo3d2-sidebar .sidebar-rail {
+  position: static;
+  top: auto;
+  max-height: none;
+  overflow: visible;
+}
+
+/* Reset immersive full-viewport slides inside the scroll panel */
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-hero-slide,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-overview-slide,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-specs-slide,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-gallery-slide,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-faq-slide,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-related-slide,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-comments-slide,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-hero,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-facts-section,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-section {
+  min-height: auto;
+  height: auto;
+  scroll-snap-align: none;
+  scroll-snap-stop: normal;
+  display: block;
+  padding: 0;
+  pointer-events: auto;
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-hero-slide::before,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-overview-slide::before,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-specs-slide::before,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-gallery-slide::before,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-faq-slide::before,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-related-slide::before,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-comments-slide::before {
+  display: none;
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-hero__grid,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-overview__panel,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-gallery__panel,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-related__panel,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-specs__panel,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-faq__panel,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-comments__panel,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-facts {
+  min-height: auto;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-hero__grid::before,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-hero__grid::after,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-overview__panel::before,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-overview__panel::after,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-gallery__panel::before,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-gallery__panel::after,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-specs__panel::before,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-specs__panel::after,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-faq__panel::before,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-faq__panel::after,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-related__panel::before,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-related__panel::after,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-comments__panel::before,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-comments__panel::after {
+  display: none;
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-specs__panel .ci-table-wrap,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-faq__panel .ci-faq__list,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-comments__panel .ak-comments--embedded.ak-comments--cinfo {
+  max-height: none;
+  overflow: visible;
+}
+
+/* Hero — light panel text (override carsinfo-page white-on-dark hero) */
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-hero {
+  background: transparent;
+  color: var(--ci3d-ink, #141820);
+  overflow: visible;
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-hero::before {
+  display: none;
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-hero__title {
+  color: inherit;
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-hero__subtitle {
+  color: rgba(20, 24, 32, 0.7);
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-hero .ci-score__main {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(20, 24, 32, 0.12);
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-hero .ci-score__of,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-hero .ci-score__row {
+  color: rgba(20, 24, 32, 0.55);
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-hero .ci-score__bar {
+  background: rgba(20, 24, 32, 0.1);
+}
+
+/* Overview — same horizontal inset as other blocks (.container inside panel) */
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-overview__grid {
+  display: block;
+  grid-template-columns: none;
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-overview__panel--empty,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-overview__video-slot {
+  display: none !important;
+}
+
+/* Video block — align player with other blocks in scroll panel */
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-section--video.ci-section {
+  background: transparent;
+  border: 0;
+  margin-bottom: 0;
+  padding: 0;
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-section--video .ci-video__player {
+  width: 100%;
+  margin-inline: auto;
+  border-radius: 0.85rem;
+  overflow: hidden;
+  background: rgba(20, 24, 32, 0.88);
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-section--video .ci-video__player iframe,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-section--video .ci-video__player video,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-section--video .ci-video__player .ak-video-player,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-section--video .ci-video__player .ak-video-player video {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin-inline: auto;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border: 0;
+}
+
+/* FAQ — tighter vertical rhythm in scroll panel */
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-faq__panel .ci-faq__list {
+  gap: 0.4rem;
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-faq__panel .ci-faq {
+  margin-bottom: 0;
+  padding: 0;
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-faq__panel .ci-faq__question {
+  padding: 0.65rem 0.85rem;
+  padding-inline-start: 2.1rem;
+  line-height: 1.45;
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-faq__panel .ci-faq__question::after {
+  top: 0.65rem;
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-faq__panel .ci-faq__answer {
+  padding: 0 0.85rem 0.75rem;
+  line-height: 1.65;
+}
+
+body.carinfo3d2-page .carinfo3d2-after-main {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+/* Layout zones inside scroll panel (before / after main content) */
+body.carinfo3d2-page .carinfo3d2-scroll-panel .carinfo3d2-zone {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+body.carinfo3d2-page .carinfo3d2-scroll-panel .carinfo3d2-zone > * + * {
+  margin-top: 1rem;
+}
+
+body.carinfo3d2-page .site-footer {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+@media (max-width: 1100px) {
+  body.carinfo3d2-page .carinfo3d2-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  body.carinfo3d2-page .carinfo3d2-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  body.carinfo3d2-page .carinfo3d2-scroll-panel {
+    padding: 1.5rem 0 2rem;
+  }
+
+  body.carinfo3d2-page .carinfo3d2-scroll-panel > * + * {
+    margin-top: 2rem;
+  }
+}

@@ -49,6 +49,26 @@ body.carinfo3d-page .main-nav {
   background: transparent;
 }
 
+@media (max-width: 767px) {
+  body.carinfo3d-page .site-header {
+    position: fixed;
+  }
+
+  body.carinfo3d-page .main-nav {
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(20, 24, 32, 0.08);
+    box-shadow: 0 12px 32px rgba(20, 24, 32, 0.12);
+  }
+
+  body.carinfo3d-page .main-nav__submenu {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(20, 24, 32, 0.08);
+    border-radius: 0.65rem;
+  }
+}
+
 /* Fixed 3D canvas — prototype car-intro-chile20-03 */
 body.carinfo3d-page .carinfo3d-scene {
   position: fixed;
@@ -1128,6 +1148,7 @@ body.carinfo3d-page .ci-comments__panel .ak-comments__jump {
   align-items: center;
   justify-content: center;
   padding: 1rem;
+  direction: rtl;
 }
 
 .car-lightbox[hidden] {
@@ -1158,14 +1179,14 @@ body.carinfo3d-page .ci-comments__panel .ak-comments__jump {
 }
 
 .car-lightbox__hit--prev {
-  left: 0;
-  right: auto;
+  inset-inline-start: 0;
+  inset-inline-end: auto;
   cursor: w-resize;
 }
 
 .car-lightbox__hit--next {
-  right: 0;
-  left: auto;
+  inset-inline-end: 0;
+  inset-inline-start: auto;
   cursor: e-resize;
 }
 
@@ -1213,14 +1234,20 @@ body.carinfo3d-page .ci-comments__panel .ak-comments__jump {
   display: none;
 }
 
+.car-lightbox__nav-icon {
+  display: block;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
 .car-lightbox__nav--prev {
-  left: 1rem;
-  right: auto;
+  inset-inline-start: 1rem;
+  inset-inline-end: auto;
 }
 
 .car-lightbox__nav--next {
-  right: 1rem;
-  left: auto;
+  inset-inline-end: 1rem;
+  inset-inline-start: auto;
 }
 
 .car-lightbox__nav:hover,
@@ -1240,8 +1267,23 @@ body.carinfo3d-page .ci-comments__panel .ak-comments__jump {
 }
 
 @media (max-width: 768px) {
+  body.carinfo3d-page .carinfo3d-section {
+    padding-top: calc(var(--ci3d-chrome-height) - 0.35rem);
+    padding-bottom: 2.5rem;
+  }
+
   body.carinfo3d-page .ci-3dmodel__inner {
-    padding-top: 1rem;
+    padding-top: 0;
+    margin-top: -1.25rem;
+  }
+
+  body.carinfo3d-page .ci-3dmodel__info {
+    max-width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  body.carinfo3d-page .ci-3dmodel__colors {
+    margin-top: 0.85rem;
   }
 
   body.carinfo3d-page .ci-3dmodel__title {

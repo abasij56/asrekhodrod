@@ -184,6 +184,7 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
+  direction: rtl;
 }
 
 .car-lightbox[hidden] {
@@ -214,14 +215,14 @@
 }
 
 .car-lightbox__hit--prev {
-  left: 0;
-  right: auto;
+  inset-inline-start: 0;
+  inset-inline-end: auto;
   cursor: w-resize;
 }
 
 .car-lightbox__hit--next {
-  right: 0;
-  left: auto;
+  inset-inline-end: 0;
+  inset-inline-start: auto;
   cursor: e-resize;
 }
 
@@ -269,14 +270,20 @@
   display: none;
 }
 
+.car-lightbox__nav-icon {
+  display: block;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
 .car-lightbox__nav--prev {
-  left: 1rem;
-  right: auto;
+  inset-inline-start: 1rem;
+  inset-inline-end: auto;
 }
 
 .car-lightbox__nav--next {
-  right: 1rem;
-  left: auto;
+  inset-inline-end: 1rem;
+  inset-inline-start: auto;
 }
 
 .car-lightbox__nav:hover,

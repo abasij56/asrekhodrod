@@ -7,14 +7,15 @@
       lightbox = document.createElement('div');
       lightbox.className = 'car-lightbox';
       lightbox.setAttribute('data-car-lightbox', '');
+      lightbox.setAttribute('dir', 'rtl');
       lightbox.hidden = true;
       document.body.appendChild(lightbox);
     }
 
     if (!lightbox.querySelector('.car-lightbox__figure')) {
       lightbox.innerHTML =
-        '<button type="button" class="car-lightbox__nav car-lightbox__nav--prev" data-car-lightbox-prev aria-label="تصویر قبلی"><span aria-hidden="true">&#10094;</span></button>' +
-        '<button type="button" class="car-lightbox__nav car-lightbox__nav--next" data-car-lightbox-next aria-label="تصویر بعدی"><span aria-hidden="true">&#10095;</span></button>' +
+        '<button type="button" class="car-lightbox__nav car-lightbox__nav--prev" data-car-lightbox-prev aria-label="تصویر قبلی"><svg class="car-lightbox__nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+        '<button type="button" class="car-lightbox__nav car-lightbox__nav--next" data-car-lightbox-next aria-label="تصویر بعدی"><svg class="car-lightbox__nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
         '<button type="button" class="car-lightbox__close" data-car-lightbox-close aria-label="بستن">&times;</button>' +
         '<figure class="car-lightbox__figure">' +
         '<button type="button" class="car-lightbox__hit car-lightbox__hit--prev" data-car-lightbox-prev aria-label="تصویر قبلی" tabindex="-1"></button>' +
@@ -24,8 +25,8 @@
     } else if (!lightbox.querySelector('.car-lightbox__nav--prev')) {
       lightbox.insertAdjacentHTML(
         'afterbegin',
-        '<button type="button" class="car-lightbox__nav car-lightbox__nav--prev" data-car-lightbox-prev aria-label="تصویر قبلی"><span aria-hidden="true">&#10094;</span></button>' +
-          '<button type="button" class="car-lightbox__nav car-lightbox__nav--next" data-car-lightbox-next aria-label="تصویر بعدی"><span aria-hidden="true">&#10095;</span></button>'
+        '<button type="button" class="car-lightbox__nav car-lightbox__nav--prev" data-car-lightbox-prev aria-label="تصویر قبلی"><svg class="car-lightbox__nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+          '<button type="button" class="car-lightbox__nav car-lightbox__nav--next" data-car-lightbox-next aria-label="تصویر بعدی"><svg class="car-lightbox__nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'
       );
     }
 
@@ -141,13 +142,13 @@
 
       if (event.key === 'ArrowLeft') {
         event.preventDefault();
-        step(-1);
+        step(1);
         return;
       }
 
       if (event.key === 'ArrowRight') {
         event.preventDefault();
-        step(1);
+        step(-1);
       }
     });
 

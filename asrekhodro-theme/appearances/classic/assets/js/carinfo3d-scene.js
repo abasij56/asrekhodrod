@@ -9,6 +9,51 @@ const INTRO_CAMERA_DISTANCE = 8.2;
 const INTRO_DEPRESSION_DEG = 15;
 const INTRO_AZIMUTH_DEG = 38;
 const INTRO_STAGE_ROTATION_DEFAULT_DEG = 32;
+const INTRO_MODEL_TARGET_SIZE = 4.2;
+const INTRO_CAMERA_FOV = 40;
+
+function getResponsiveSceneFactors() {
+  const width = window.innerWidth;
+
+  if (width <= 480) {
+    return {
+      modelTargetSize: 3.75,
+      cameraDistanceMul: 1.1,
+      fov: 41,
+    };
+  }
+
+  if (width <= 768) {
+    return {
+      modelTargetSize: 3.95,
+      cameraDistanceMul: 1.02,
+      fov: 40.5,
+    };
+  }
+
+  if (width <= 1100) {
+    return {
+      modelTargetSize: 4.05,
+      cameraDistanceMul: 1,
+      fov: 40,
+    };
+  }
+
+  return {
+    modelTargetSize: INTRO_MODEL_TARGET_SIZE,
+    cameraDistanceMul: 1,
+    fov: INTRO_CAMERA_FOV,
+  };
+}
+
+function isIntroViewport() {
+  const introSection = document.querySelector('#carinfo3d-main > .carinfo3d-section');
+  if (!introSection) {
+    return window.scrollY < 120;
+  }
+
+  return window.scrollY < introSection.offsetHeight * 0.65;
+}
 
 function degToRad(degrees) {
   return (degrees * Math.PI) / 180;
@@ -51,8 +96,6 @@ function buildCameraPosition(
 }
 
 const HERO_WORLD_BASE = {
-  cam: buildCameraPosition(INTRO_CAMERA_DISTANCE, INTRO_AZIMUTH_DEG, INTRO_DEPRESSION_DEG),
-  target: [...INTRO_TARGET],
   fog: 0xe8eef6,
   rim: 0xffffff,
   rotate: 0.9,
@@ -60,11 +103,19 @@ const HERO_WORLD_BASE = {
 };
 
 function getHeroWorld() {
+  const factors = getResponsiveSceneFactors();
+  const distance = INTRO_CAMERA_DISTANCE * factors.cameraDistanceMul;
+
   return {
-    ...HERO_WORLD_BASE,
-    cam: [...HERO_WORLD_BASE.cam],
-    target: [...HERO_WORLD_BASE.target],
+    cam: buildCameraPosition(distance, INTRO_AZIMUTH_DEG, INTRO_DEPRESSION_DEG),
+    target: [...INTRO_TARGET],
+    fog: HERO_WORLD_BASE.fog,
+    rim: HERO_WORLD_BASE.rim,
+    rotate: HERO_WORLD_BASE.rotate,
+    vibrancy: HERO_WORLD_BASE.vibrancy,
     stageRotation: degToRad(readIntroStageRotationDeg()),
+    fov: factors.fov,
+    modelTargetSize: factors.modelTargetSize,
   };
 }
 
@@ -99,6 +150,10 @@ const adBoards = {
   gap: AD_BOARD_GAP,
   rowY: 1.05,
 };
+
+function isCarInfo3d2Page() {
+  return document.body.classList.contains('carinfo3d2-page');
+}
 
 function shouldRun() {
   if (!document.body.classList.contains('carinfo3d-page')) {
@@ -143,7 +198,7 @@ function readBlockConfig() {
   };
 }
 
-function fitObjectToStage(object, targetSize = 4.2) {
+function fitObjectToStage(object, targetSize = INTRO_MODEL_TARGET_SIZE) {
   const box = new THREE.Box3().setFromObject(object);
   const size = box.getSize(new THREE.Vector3());
   const center = box.getCenter(new THREE.Vector3());
@@ -167,6 +222,92 @@ function hideHeroVisual() {
   getHeroVisual()?.classList.remove('is-visible');
 }
 
+// Generic paint detection — works across GLB naming conventions (ferrari.glb, Sketchfab exports, etc.)
+const PAINT_INCLUDE_RE = /body|paint|exterior|car_body|karosserie|chassis/i;
+const PAINT_EXCLUDE_RE =
+  /wheel|rim|tire|tyre|glass|window|windshield|light|lamp|plastic|metal|shadow|collision|interior|mirror|brake|clip|calip|general|chrome|trim|badge|logo|plate|under|shadowcaster|cliper|object_/i;
+const GLASS_RE = /glass|window|windshield/i;
+const DETAILS_RE = /wheel|rim|tire|tyre|trim|metal|chrome|hubcap/i;
+const FALLBACK_EXCLUDE_RE =
+  /shadow|collision|under|interior|light|lamp|plastic|general|glass|window|wheel|rim|tire|tyre|object_/i;
+
+function getMeshLabel(mesh) {
+  const parts = [mesh.name || ''];
+  const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+
+  materials.filter(Boolean).forEach((material) => {
+    parts.push(material.name || '');
+  });
+
+  return parts.join(' ');
+}
+
+function isPaintMesh(label) {
+  if (PAINT_EXCLUDE_RE.test(label)) {
+    return false;
+  }
+
+  return PAINT_INCLUDE_RE.test(label);
+}
+
+function isGlassMesh(label) {
+  return GLASS_RE.test(label);
+}
+
+function isDetailsMesh(label) {
+  return DETAILS_RE.test(label) && !isPaintMesh(label);
+}
+
+function countMeshTriangles(mesh) {
+  const geometry = mesh.geometry;
+  if (!geometry) {
+    return 0;
+  }
+
+  if (geometry.index) {
+    return geometry.index.count / 3;
+  }
+
+  return geometry.attributes.position ? geometry.attributes.position.count / 3 : 0;
+}
+
+function assignSharedMaterial(mesh, material) {
+  if (Array.isArray(mesh.material)) {
+    mesh.material = mesh.material.map((slot) => {
+      const slotLabel = `${mesh.name || ''} ${slot?.name || ''}`.trim();
+      return isPaintMesh(slotLabel) ? material : slot;
+    });
+    return mesh.material.some((slot) => slot === material);
+  }
+
+  mesh.material = material;
+  return true;
+}
+
+function findFallbackPaintMesh(model) {
+  let bestMesh = null;
+  let bestTriangles = 0;
+
+  model.traverse((child) => {
+    if (!child.isMesh) {
+      return;
+    }
+
+    const label = getMeshLabel(child);
+    if (FALLBACK_EXCLUDE_RE.test(label)) {
+      return;
+    }
+
+    const triangles = countMeshTriangles(child);
+    if (triangles > bestTriangles) {
+      bestTriangles = triangles;
+      bestMesh = child;
+    }
+  });
+
+  return bestMesh;
+}
+
 // Prototype car paint — raw GLB materials look flat and foggy.
 function createBodyMaterial(color = DEFAULT_BODY_COLOR) {
   carPaint.selectedBodyColor.set(color);
@@ -183,6 +324,10 @@ function createBodyMaterial(color = DEFAULT_BODY_COLOR) {
 }
 
 function applyCarMaterials(model, bodyColor = DEFAULT_BODY_COLOR) {
+  carPaint.bodyMaterial = null;
+  carPaint.detailsMaterial = null;
+  carPaint.glassMaterial = null;
+
   const bodyMaterial = createBodyMaterial(bodyColor);
   const detailsMaterial = new THREE.MeshStandardMaterial({
     color: 0xffffff,
@@ -200,27 +345,49 @@ function applyCarMaterials(model, bodyColor = DEFAULT_BODY_COLOR) {
     opacity: 0.85,
   });
 
-  const byName = (name) => model.getObjectByName(name);
+  let paintedMeshCount = 0;
 
-  const body = byName('body');
-  if (body) {
-    body.material = bodyMaterial;
-    carPaint.bodyMaterial = bodyMaterial;
-  }
+  model.traverse((child) => {
+    if (!child.isMesh) {
+      return;
+    }
 
-  ['rim_fl', 'rim_fr', 'rim_rr', 'rim_rl', 'trim'].forEach((name) => {
-    const part = byName(name);
-    if (part) {
-      part.material = detailsMaterial;
+    const label = getMeshLabel(child);
+
+    if (isGlassMesh(label)) {
+      child.material = glassMaterial;
+      carPaint.glassMaterial = glassMaterial;
+      return;
+    }
+
+    if (isDetailsMesh(label)) {
+      child.material = detailsMaterial;
       carPaint.detailsMaterial = detailsMaterial;
+      return;
+    }
+
+    if (isPaintMesh(label) && assignSharedMaterial(child, bodyMaterial)) {
+      paintedMeshCount += 1;
     }
   });
 
-  const glass = byName('glass');
-  if (glass) {
-    glass.material = glassMaterial;
-    carPaint.glassMaterial = glassMaterial;
+  if (paintedMeshCount > 0) {
+    carPaint.bodyMaterial = bodyMaterial;
+    return;
   }
+
+  const fallbackMesh = findFallbackPaintMesh(model);
+  if (fallbackMesh) {
+    fallbackMesh.material = bodyMaterial;
+    carPaint.bodyMaterial = bodyMaterial;
+    console.warn(
+      '[carinfo3d] paint mesh not found by name; using largest mesh:',
+      getMeshLabel(fallbackMesh)
+    );
+    return;
+  }
+
+  console.warn('[carinfo3d] no paintable mesh found in model');
 }
 
 function setCarBodyColor(hex) {
@@ -546,7 +713,100 @@ function groupHeroWithFacts() {
   }
 }
 
+function isCarInfo3d2LayoutZone(element) {
+  return element instanceof HTMLElement && element.classList.contains('carinfo3d2-zone');
+}
+
+function init3d2ScrollPanel() {
+  if (!isCarInfo3d2Page()) {
+    return;
+  }
+
+  const main = document.getElementById('carinfo3d-main');
+  if (!main) {
+    return;
+  }
+
+  const intro =
+    main.querySelector(':scope > .carinfo3d-section') ??
+    main.firstElementChild;
+  if (!(intro instanceof HTMLElement)) {
+    return;
+  }
+
+  const zoneMain = main.querySelector(':scope > .carinfo3d2-zone--main');
+  const zoneMainAfter = main.querySelector(':scope > .carinfo3d2-zone--main-after');
+
+  const contentNodes = [];
+  let sibling = intro.nextElementSibling;
+  while (sibling) {
+    if (!isCarInfo3d2LayoutZone(sibling)) {
+      contentNodes.push(sibling);
+    }
+    sibling = sibling.nextElementSibling;
+  }
+
+  if (!contentNodes.length && !zoneMain && !zoneMainAfter) {
+    return;
+  }
+
+  const sidebarTemplate = document.getElementById('carinfo3d2-sidebar-template');
+  const hasSidebar = Boolean(
+    sidebarTemplate?.content?.querySelector('.page-sidebar-stack'),
+  );
+
+  const panel = document.createElement('div');
+  panel.className = hasSidebar
+    ? 'carinfo3d2-scroll-panel'
+    : 'container carinfo3d2-scroll-panel';
+
+  if (zoneMain instanceof HTMLElement) {
+    panel.appendChild(zoneMain);
+  }
+
+  contentNodes.forEach((node) => {
+    panel.appendChild(node);
+  });
+
+  if (zoneMainAfter instanceof HTMLElement) {
+    panel.appendChild(zoneMainAfter);
+  }
+
+  if (hasSidebar && sidebarTemplate instanceof HTMLTemplateElement) {
+    const body = document.createElement('div');
+    body.className = 'container carinfo3d2-body';
+
+    const grid = document.createElement('div');
+    grid.className = 'carinfo3d2-grid';
+
+    const mainCol = document.createElement('div');
+    mainCol.className = 'carinfo3d2-body-main';
+    mainCol.appendChild(panel);
+
+    const aside = document.createElement('aside');
+    aside.className = 'carinfo3d2-sidebar';
+    aside.setAttribute('role', 'complementary');
+    aside.setAttribute('aria-label', 'ستون جانبی');
+    aside.appendChild(sidebarTemplate.content.cloneNode(true));
+
+    grid.appendChild(mainCol);
+    grid.appendChild(aside);
+    body.appendChild(grid);
+    main.appendChild(body);
+    sidebarTemplate.remove();
+  } else {
+    main.appendChild(panel);
+  }
+}
+
 function getImmersiveSections() {
+  if (isCarInfo3d2Page()) {
+    return [
+      ...document.querySelectorAll('#carinfo3d-main > .carinfo3d-section'),
+      ...document.querySelectorAll('.carinfo3d2-scroll-panel > *'),
+    ].filter((section) => section instanceof HTMLElement);
+  }
+
   return [...document.querySelectorAll(IMMERSIVE_SECTION_SELECTOR)];
 }
 
@@ -611,6 +871,18 @@ function getSectionWorldKey(section) {
 
   if (section.classList.contains('ci-comments-slide')) {
     return 'comments';
+  }
+
+  if (section.classList.contains('ci-facts-section')) {
+    return 'hero';
+  }
+
+  if (section.classList.contains('ci-hero')) {
+    return 'hero';
+  }
+
+  if (section.classList.contains('ci-section--video')) {
+    return 'overview';
   }
 
   return 'hero';
@@ -725,7 +997,7 @@ async function loadGltfModel(url, dracoPath, bodyColor = DEFAULT_BODY_COLOR) {
   });
 
   applyCarMaterials(model, bodyColor);
-  fitObjectToStage(model);
+  fitObjectToStage(model, INTRO_MODEL_TARGET_SIZE);
   return model;
 }
 
@@ -759,7 +1031,7 @@ function initScene(container) {
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.08).texture;
 
   const camera = new THREE.PerspectiveCamera(
-    40,
+    heroWorld.fov ?? INTRO_CAMERA_FOV,
     window.innerWidth / window.innerHeight,
     0.1,
     120
@@ -819,6 +1091,9 @@ function initScene(container) {
   stageGroup.add(rearGrid);
 
   initAdBoards(scene, renderer);
+
+  let stageModel = null;
+  let stageModelBaseScale = 1;
 
   const ringMat = new THREE.MeshBasicMaterial({
     color: 0xb8c4d4,
@@ -917,6 +1192,9 @@ function initScene(container) {
       .then((model) => {
         hideHeroVisual();
         stageGroup.add(model);
+        stageModel = model;
+        stageModelBaseScale = model.scale.x || 1;
+        applyResponsiveModelScale();
         applyCarVibrancy(carVibrancy);
       })
       .catch((error) => {
@@ -929,11 +1207,29 @@ function initScene(container) {
     showHeroVisual();
   }
 
+  function applyResponsiveModelScale() {
+    if (!stageModel) {
+      return;
+    }
+
+    const targetSize = getResponsiveSceneFactors().modelTargetSize;
+    const scaleFactor = targetSize / INTRO_MODEL_TARGET_SIZE;
+    stageModel.scale.setScalar(stageModelBaseScale * scaleFactor);
+  }
+
   function onResize() {
+    const introWorld = getHeroWorld();
+
     camera.aspect = window.innerWidth / window.innerHeight;
+    camera.fov = introWorld.fov ?? INTRO_CAMERA_FOV;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
     setChromeHeight();
+    applyResponsiveModelScale();
+
+    if (!userOrbiting && isIntroViewport()) {
+      targetCam.set(...introWorld.cam);
+    }
   }
 
   window.addEventListener('resize', onResize);
@@ -979,6 +1275,9 @@ function boot() {
   }
 
   document.documentElement.classList.add('carinfo3d-root');
+  if (isCarInfo3d2Page()) {
+    document.documentElement.classList.add('carinfo3d2-root');
+  }
   setChromeHeight();
   initIntroScroll();
 
@@ -988,11 +1287,17 @@ function boot() {
   }
 
   try {
-    groupHeroWithFacts();
-    mountOverviewVideo();
+    if (isCarInfo3d2Page()) {
+      init3d2ScrollPanel();
+    } else {
+      groupHeroWithFacts();
+      mountOverviewVideo();
+    }
     initScene(container);
     initImmersiveSlides();
-    initSmoothSectionScroll();
+    if (!isCarInfo3d2Page()) {
+      initSmoothSectionScroll();
+    }
     scrollToIntroTop('auto');
   } catch (error) {
     console.warn('[carinfo3d] Scene init failed:', error);

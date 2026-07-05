@@ -94,7 +94,7 @@ class ClassicAppearance {
 		}
 
 		if ( is_page_template( 'page-car.php' ) || is_singular( 'carsinfo' ) || CinfoBlocks::page_has_cinfo_blocks() ) {
-			if ( ! CarInfo3d::is_active() ) {
+			if ( ! CarInfo3d::is_3d_template() ) {
 				wp_enqueue_style(
 					'asrekhodro-car-page',
 					Appearance::asset_url( 'css/car-page.css' ),
@@ -115,13 +115,29 @@ class ClassicAppearance {
 			}
 		}
 
-		if ( CarInfo3d::is_active() ) {
+		if ( CarInfo3d::is_3d_template() ) {
 			wp_enqueue_style(
 				'asrekhodro-carinfo3d',
 				Appearance::asset_url( 'css/carinfo3d.css' ),
 				array( 'asrekhodro-style' ),
 				ASREKHODRO_THEME_VERSION
 			);
+
+			if ( CarInfo3d::is_3d2() ) {
+				wp_enqueue_style(
+					'asrekhodro-car-page',
+					Appearance::asset_url( 'css/car-page.css' ),
+					array( 'asrekhodro-style' ),
+					ASREKHODRO_THEME_VERSION
+				);
+
+				wp_enqueue_style(
+					'asrekhodro-carinfo3d2',
+					Appearance::asset_url( 'css/carinfo3d2.css' ),
+					array( 'asrekhodro-carinfo3d', 'asrekhodro-car-page' ),
+					ASREKHODRO_THEME_VERSION
+				);
+			}
 
 			wp_enqueue_script(
 				'asrekhodro-car-page',

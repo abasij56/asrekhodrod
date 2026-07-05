@@ -13,6 +13,8 @@ final class CarInfo3d {
 
 	public const TEMPLATE = 'page-carinfo3d.php';
 
+	public const TEMPLATE_3D2 = 'page-carinfo3d2.php';
+
 	public static function init(): void {
 		add_filter( 'body_class', array( self::class, 'body_class' ) );
 		add_filter( 'timber/context', array( self::class, 'filter_timber_context' ) );
@@ -133,7 +135,7 @@ final class CarInfo3d {
 	 * @return array<string, mixed>
 	 */
 	public static function filter_timber_context( array $context ): array {
-		if ( ! self::is_active() ) {
+		if ( ! self::is_3d_template() ) {
 			return $context;
 		}
 
@@ -145,6 +147,38 @@ final class CarInfo3d {
 		$context['carinfo3d_ads_json'] = self::collect_ads_json_from_post( $post );
 
 		return $context;
+	}
+
+	public static function template_slug( ?int $post_id = null ): string {
+		if ( $post_id === null ) {
+			$post_id = get_queried_object_id();
+		}
+
+		if ( $post_id <= 0 ) {
+			return '';
+		}
+
+		return (string) get_page_template_slug( $post_id );
+	}
+
+	public static function is_3d_template( ?int $post_id = null ): bool {
+		if ( ! is_singular( 'carsinfo' ) && $post_id === null ) {
+			return false;
+		}
+
+		return in_array(
+			self::template_slug( $post_id ),
+			array( self::TEMPLATE, self::TEMPLATE_3D2 ),
+			true
+		);
+	}
+
+	public static function is_3d2( ?int $post_id = null ): bool {
+		return self::template_slug( $post_id ) === self::TEMPLATE_3D2;
+	}
+
+	public static function is_immersive( ?int $post_id = null ): bool {
+		return self::template_slug( $post_id ) === self::TEMPLATE;
 	}
 
 	public static function collect_ads_json_from_post( \Timber\Post $post ): string {
@@ -210,7 +244,7 @@ final class CarInfo3d {
 	}
 
 	public static function is_active(): bool {
-		return is_singular( 'carsinfo' ) && get_page_template_slug() === self::TEMPLATE;
+		return self::is_3d_template();
 	}
 
 	/**
@@ -218,15 +252,39 @@ final class CarInfo3d {
 	 * @return array<int, string>
 	 */
 	public static function body_class( array $classes ): array {
-		if ( self::is_active() ) {
+		if ( self::is_3d_template() ) {
 			$classes[] = 'carinfo3d-page';
+		}
+
+		if ( self::is_3d2() ) {
+			$classes[] = 'carinfo3d2-page';
+
+			if ( self::layout_has_sidebar() ) {
+				$classes[] = 'carinfo3d2-page--has-sidebar';
+			}
 		}
 
 		return $classes;
 	}
 
+	public static function layout_has_sidebar(): bool {
+		$sidebar = LayoutResolver::zones_for_page( 'carsinfo_3d2' )['sidebar'] ?? array();
+
+		foreach ( $sidebar as $placement ) {
+			if ( is_array( $placement ) && ! empty( $placement['partial'] ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public static function uses_3d_scene(): bool {
+		return self::is_3d_template();
+	}
+
 	public static function print_import_map(): void {
-		if ( ! self::is_active() ) {
+		if ( ! self::is_3d_template() ) {
 			return;
 		}
 

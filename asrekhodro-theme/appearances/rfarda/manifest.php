@@ -81,6 +81,36 @@ return array(
 				array( 'zone' => 'sidebar', 'block' => 'ak-sidebar-ads' ),
 			),
 		),
+		'carsinfo_3d2' => array(
+			'label'    => 'اطلاعات خودرو — 3D2',
+			'zones'    => array(
+				'before_main' => array(
+					'label'    => 'بالای صفحه',
+					'blocks'   => array( 'ak-ad-strip' ),
+					'multiple' => false,
+				),
+				'main'        => array(
+					'label'    => 'قبل از محتوای اصلی',
+					'blocks'   => array( '*' ),
+					'multiple' => true,
+				),
+				'main_after'  => array(
+					'label'    => 'بعد از محتوای اصلی',
+					'blocks'   => array( '*' ),
+					'multiple' => true,
+				),
+				'sidebar'     => array(
+					'label'  => 'سایدبار',
+					'blocks' => array( '*' ),
+				),
+				'after_main'  => array(
+					'label'    => 'قبل از فوتر',
+					'blocks'   => array( '*' ),
+					'multiple' => true,
+				),
+			),
+			'defaults' => array(),
+		),
 	),
 	'blocks' => array(),
 );
