@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AsreKhodro Import — Performance &amp; 30-Minute Target</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4f;
+      --text: #e6edf3;
+      --muted: #8b9cb3;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --orange: #d29922;
+      --red: #f85149;
+      --code-bg: #0d1117;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      margin: 0;
+      padding: 2rem 1rem 4rem;
+    }
+    .wrap { max-width: 920px; margin: 0 auto; }
+    h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
+    .subtitle { color: var(--muted); margin-bottom: 2rem; }
+    h2 {
+      font-size: 1.25rem;
+      margin-top: 2.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--accent);
+    }
+    h3 { font-size: 1rem; margin-top: 1.5rem; color: var(--green); }
+    p, li { color: var(--text); }
+    li { margin: 0.35rem 0; }
+    code {
+      background: var(--code-bg);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      font-size: 0.9em;
+      border: 1px solid var(--border);
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+    pre code { background: none; border: none; padding: 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.6rem 0.75rem;
+      text-align: left;
+    }
+    th { background: var(--surface); color: var(--accent); }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin: 1rem 0;
+    }
+    .card.warn { border-color: var(--orange); }
+    .card.ok { border-color: var(--green); }
+    .card.accent { border-color: var(--accent); }
+    nav.toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    nav.toc ul { margin: 0.5rem 0 0; padding-left: 1.25rem; }
+    nav.toc a { color: var(--accent); text-decoration: none; }
+    nav.toc a:hover { text-decoration: underline; }
+    .verdict {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--green);
+    }
+    .highlight { color: var(--orange); font-weight: 600; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Import performance — can 50k finish in 30 minutes?</h1>
+  <p class="subtitle">AsreKhodro Importer v0.3.0 · 50,000 posts · honest analysis + path to speed</p>
+
+  <nav class="toc">
+    <strong>Contents</strong>
+    <ul>
+      <li><a href="#verdict">Direct answer</a></li>
+      <li><a href="#why-slow">Why the current plugin is slow</a></li>
+      <li><a href="#per-post">Real cost per post</a></li>
+      <li><a href="#math">Where 2–8 hours comes from</a></li>
+      <li><a href="#target">What 30 minutes requires</a></li>
+      <li><a href="#optimizations">Six optimizations (ranked)</a></li>
+      <li><a href="#timelines">Realistic time targets</a></li>
+      <li><a href="#recommendation">Recommended path</a></li>
+      <li><a href="#fast-mode">Proposed <code>--fast</code> mode</a></li>
+      <li><a href="#next-step">Next step</a></li>
+    </ul>
+  </nav>
+
+  <!-- VERDICT -->
+  <h2 id="verdict">Direct answer</h2>
+  <div class="card ok">
+    <p class="verdict">2–8 hours is correct for the plugin <em>as it works today</em> — but it is not the physical limit.</p>
+    <p>With targeted code changes, <strong>30 minutes for 50,000 items is realistic</strong> on a decent dedicated server. Default WordPress APIs cannot reach ~28 posts/second when every post triggers attachments, meta, slug sync, and cache purges.</p>
+  </div>
+
+  <!-- WHY SLOW -->
+  <h2 id="why-slow">Why the current plugin is slow</h2>
+  <p>Each post goes through <code>class-importer.php → import_one_post()</code>. The work is not one database row — it is a chain of WordPress operations and hooks.</p>
+
+  <h2 id="per-post">Real cost per post</h2>
+  <table>
+    <thead>
+      <tr><th>Step</th><th>Typical cost</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>wp_insert_post</code> (large HTML body)</td>
+        <td>~30–60 ms</td>
+      </tr>
+      <tr>
+        <td><code>save_post_meta</code> — 5–8 × <code>update_post_meta</code></td>
+        <td>~20–40 ms</td>
+      </tr>
+      <tr>
+        <td><code>NewsPermalinks::sync_post</code> — extra <code>wp_update_post</code></td>
+        <td>~20–40 ms</td>
+      </tr>
+      <tr>
+        <td><code>ExternalMedia::register_url</code> — creates an <strong>attachment post</strong></td>
+        <td>~30–60 ms</td>
+      </tr>
+      <tr>
+        <td><code>set_post_thumbnail</code> + meta</td>
+        <td>~10–20 ms</td>
+      </tr>
+      <tr>
+        <td>Hooks (ACF, LiteSpeed Cache, etc.)</td>
+        <td><span class="highlight">Variable — often very large</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <p><strong>Total: ~120–250 ms per post</strong> in typical conditions.</p>
+
+  <h2 id="math">Where 2–8 hours comes from</h2>
+  <ul>
+    <li>50,000 × 150 ms ≈ <strong>125 minutes</strong> for posts alone</li>
+    <li>+ post categories phase (~50k assignments, batch 25–100)</li>
+    <li>+ tags phase (~47k posts with tags)</li>
+    <li>+ LiteSpeed “Purge all caches” on many saves → can <strong>double or triple</strong> total time</li>
+  </ul>
+  <div class="card warn">
+    <strong>Not a mistake in the estimate</strong> — it reflects the current implementation. It is also <strong>not necessary</strong> if the importer is optimized.
+  </div>
+
+  <!-- 30 MIN TARGET -->
+  <h2 id="target">What 30 minutes requires</h2>
+  <p>To finish 50,000 items in 30 minutes you need roughly <strong>28 posts per second</strong>. WordPress’s normal insert APIs cannot do that on typical hardware. You must bypass the heaviest parts where safe.</p>
+
+  <h2 id="optimizations">Six optimizations (ranked by impact)</h2>
+
+  <h3>1. Don’t create an attachment per post — biggest win</h3>
+  <p>Today the importer creates ~49,991 extra <code>wp_posts</code> rows (attachments) plus featured images. The theme reads <code>_asrekhodro_image_url</code> via <code>ImporterBridge</code> — attachments are <strong>not required</strong> to display images on the front end.</p>
+  <p><strong>Action:</strong> Skip <code>register_external_thumbnail()</code> during bulk import; save only <code>_asrekhodro_image_url</code> meta.</p>
+  <p><strong>Effect:</strong> Cuts post phase time by ~40–50%.</p>
+
+  <h3>2. Bulk SQL for posts + postmeta</h3>
+  <p>Replace per-row <code>wp_insert_post</code> with multi-row INSERT where safe, and batch <code>wp_postmeta</code>:</p>
+  <pre><code>INSERT INTO wp_posts (post_author, post_date, post_date_gmt, post_content, post_title, ...)
+VALUES (...), (...), (...);   -- e.g. 1000 rows per query
+
+INSERT INTO wp_postmeta (post_id, meta_key, meta_value)
+VALUES (...), (...), (...);</code></pre>
+  <p>MySQL can handle <strong>5,000–20,000 rows/sec</strong> easily. Effect: <strong>5–10× faster</strong> than looping <code>wp_insert_post</code>.</p>
+
+  <h3>3. Bulk taxonomy</h3>
+  <p>Skip <code>wp_set_post_terms</code> per post. Bulk-insert into <code>wp_term_relationships</code> after ensuring terms exist in <code>wp_terms</code> / <code>wp_term_taxonomy</code>.</p>
+  <p><strong>Effect:</strong> Categories + tags in minutes instead of hours.</p>
+
+  <h3>4. Disable LiteSpeed + heavy hooks during import</h3>
+  <pre><code>wp plugin deactivate litespeed-cache</code></pre>
+  <p>Re-enable after import completes.</p>
+
+  <h3>5. Defer slug uniqueness during bulk</h3>
+  <p>Use <code>content-{id}</code> as initial slug; run one SQL pass at the end to rebuild proper slugs from titles if needed.</p>
+
+  <h3>6. MySQL session tuning (during import only)</h3>
+  <pre><code>SET autocommit=0;
+SET unique_checks=0;
+SET foreign_key_checks=0;
+-- bulk inserts
+COMMIT;
+SET autocommit=1;
+SET unique_checks=1;</code></pre>
+
+  <h2 id="timelines">Realistic time targets</h2>
+  <table>
+    <thead>
+      <tr><th>Approach</th><th>Time for 50k</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Current plugin, batch 2000, LiteSpeed on</td>
+        <td>4–10 hours</td>
+      </tr>
+      <tr>
+        <td>Current plugin, LiteSpeed off</td>
+        <td>2–4 hours</td>
+      </tr>
+      <tr>
+        <td>+ Skip attachment creation</td>
+        <td>60–90 min</td>
+      </tr>
+      <tr>
+        <td>+ Bulk SQL posts + postmeta</td>
+        <td>20–40 min</td>
+      </tr>
+      <tr>
+        <td>+ Bulk taxonomy</td>
+        <td><strong>15–25 min</strong></td>
+      </tr>
+      <tr>
+        <td>Full raw SQL pipeline (no WP APIs)</td>
+        <td>5–10 min (higher risk, needs validation)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 id="recommendation">Recommended path (safe + fast)</h2>
+  <div class="card accent">
+    <p><strong>Best balance:</strong> Keep <code>wp_insert_post</code> for the main post row (dates, status, slug safety), but remove the expensive surrounding work:</p>
+    <ul>
+      <li>No attachment / featured image during bulk</li>
+      <li>Bulk <code>wp_postmeta</code> inserts</li>
+      <li>Bulk <code>wp_term_relationships</code></li>
+      <li>No cache purges during run</li>
+      <li>Optional overnight pass for attachments or slug polish</li>
+    </ul>
+  </div>
+
+  <h2 id="fast-mode">Proposed CLI: <code>--fast</code> mode</h2>
+  <pre><code>wp asrekhodro-import run --fast --batch=5000 --taxonomy-batch=500</code></pre>
+  <p><code>--fast</code> would enable:</p>
+  <ul>
+    <li>Skip attachment / featured image — only <code>_asrekhodro_image_url</code></li>
+    <li>Bulk INSERT for <code>wp_postmeta</code></li>
+    <li>Bulk INSERT for <code>wp_term_relationships</code></li>
+    <li>Suppress LiteSpeed / cache plugin purges during import</li>
+    <li>Optional post-import job for attachments or slug regeneration</li>
+  </ul>
+
+  <h2 id="next-step">Next step</h2>
+  <div class="card ok">
+    <p><strong>To implement:</strong> Switch to Agent mode and request:</p>
+    <blockquote style="margin:0.5rem 0;padding-left:1rem;border-left:3px solid var(--green);color:var(--muted);">
+      Add <code>--fast</code> mode to <code>wp asrekhodro-import run</code>: skip attachment creation, bulk postmeta, bulk term relationships, disable cache purges. Goal: 50k in under 30 minutes.
+    </blockquote>
+    <p>Benchmark one chunk first (e.g. 2,500 posts) before running the full 50k.</p>
+  </div>
+
+  <p style="margin-top:3rem;color:var(--muted);font-size:0.85rem;">
+    Related: <code>asrekhodro-import-cli-guide.html</code> · AsreKhodro migration · June 2026
+  </p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>عصر خودرو | معرفی — Prototype v03</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --brand: #c41e2a;
+      --ink: #141820;
+      --ink-soft: #3a4458;
+      --muted: rgba(20,24,32,.55);
+      --accent-design: #5a6270;
+      --accent-perf: #c41e2a;
+      --accent-tech: #0088cc;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-snap-type: y mandatory;
+    }
+
+    body {
+      font-family: "Vazirmatn", Tahoma, sans-serif;
+      color: var(--ink);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      background: #eef2f8;
+    }
+
+    /* ── Fixed 3D canvas (all sections) ── */
+    #scene-3d {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: auto;
+    }
+    #scene-3d canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      cursor: grab;
+    }
+    #scene-3d canvas:active { cursor: grabbing; }
+
+    /* ── Chrome ── */
+    .top-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 2rem;
+      pointer-events: none;
+    }
+    .top-bar * { pointer-events: auto; }
+    .logo {
+      font-weight: 900;
+      font-size: .85rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+    .logo span { color: var(--brand); }
+    .cta-mini {
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      color: var(--ink);
+      border: 1px solid rgba(20,24,32,.2);
+      padding: .45rem 1rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,.65);
+      backdrop-filter: blur(8px);
+      transition: background .25s, border-color .25s;
+    }
+    .cta-mini:hover {
+      background: var(--brand);
+      color: #fff;
+      border-color: var(--brand);
+    }
+
+    .world-nav {
+      position: fixed;
+      left: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+    }
+    .world-nav a {
+      display: block;
+      width: 4px;
+      height: 48px;
+      border-radius: 2px;
+      background: rgba(20,24,32,.15);
+      transition: height .3s, background .3s, width .3s;
+      text-indent: -9999px;
+      overflow: hidden;
+    }
+    .world-nav a.active { height: 72px; width: 6px; }
+    .world-nav a[data-world="hero"].active,
+    .world-nav a[data-world="hero"]:hover { background: #141820; }
+    .world-nav a[data-world="design"].active,
+    .world-nav a[data-world="design"]:hover { background: var(--accent-design); }
+    .world-nav a[data-world="performance"].active,
+    .world-nav a[data-world="performance"]:hover { background: var(--accent-perf); }
+    .world-nav a[data-world="technology"].active,
+    .world-nav a[data-world="technology"]:hover { background: var(--accent-tech); }
+    .world-nav a[data-world="specs"].active,
+    .world-nav a[data-world="specs"]:hover { background: var(--brand); }
+
+    .scroll-hint,
+    .drag-hint {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      font-size: .65rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: rgba(20,24,32,.35);
+      pointer-events: none;
+    }
+    .scroll-hint { bottom: 2rem; animation: pulse 2s ease infinite; }
+    .drag-hint { bottom: 4.5rem; }
+    @keyframes pulse {
+      0%, 100% { opacity: .35; transform: translateX(-50%) translateY(0); }
+      50% { opacity: .8; transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ── Sections ── */
+    .section {
+      min-height: 100vh;
+      scroll-snap-align: start;
+      position: relative;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      padding: 5rem 2rem 4rem;
+      background: transparent;
+      pointer-events: none;
+    }
+
+    .section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      transition: background .9s ease;
+    }
+
+    .section[data-world="hero"]::before {
+      background: radial-gradient(ellipse 75% 60% at 50% 45%, rgba(255,255,255,.08) 0%, rgba(238,242,248,.42) 100%);
+    }
+    .section[data-world="design"]::before {
+      background: linear-gradient(135deg, rgba(255,255,255,.55) 0%, rgba(238,242,248,.35) 100%);
+    }
+    .section[data-world="performance"]::before {
+      background: linear-gradient(160deg, rgba(255,255,255,.5) 0%, rgba(255,240,242,.35) 100%);
+    }
+    .section[data-world="technology"]::before {
+      background: linear-gradient(200deg, rgba(255,255,255,.52) 0%, rgba(232,244,255,.38) 100%);
+    }
+    .section[data-world="specs"]::before {
+      background: linear-gradient(180deg, rgba(255,255,255,.4) 0%, rgba(238,242,248,.55) 100%);
+    }
+
+    .section__inner {
+      width: min(1100px, 100%);
+      position: relative;
+      z-index: 2;
+    }
+
+    .section a,
+    .section button { pointer-events: auto; }
+
+    .section__label {
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .section__title {
+      font-size: clamp(2.5rem, 8vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -.02em;
+      margin-bottom: 1.25rem;
+      text-shadow: 0 1px 24px rgba(255,255,255,.8);
+    }
+
+    .section__title em {
+      font-style: normal;
+      color: var(--brand);
+    }
+
+    .section__lead {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      font-weight: 300;
+      color: var(--ink-soft);
+      max-width: 32rem;
+      line-height: 1.8;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .hero .section__inner { text-align: center; }
+    .hero .section__lead { margin-inline: auto; }
+    .hero__badge {
+      display: inline-block;
+      margin-top: 2rem;
+      padding: .5rem 1.25rem;
+      border: 1px solid rgba(20,24,32,.12);
+      border-radius: 999px;
+      font-size: .8rem;
+      font-weight: 600;
+      background: rgba(255,255,255,.7);
+      backdrop-filter: blur(10px);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .glass-panel {
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(255,255,255,.9);
+      border-radius: 14px;
+      padding: 2rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 12px 40px rgba(20,24,32,.06);
+    }
+
+    .stat-row {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2.5rem;
+      flex-wrap: wrap;
+    }
+    .stat-row div strong {
+      display: block;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+    .stat-row div span {
+      font-size: .75rem;
+      color: var(--muted);
+      letter-spacing: .05em;
+    }
+
+    .perf-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    .perf-card {
+      background: rgba(255,255,255,.75);
+      border: 1px solid rgba(255,255,255,.95);
+      padding: 2rem 1.5rem;
+      border-radius: 12px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 8px 28px rgba(20,24,32,.05);
+      transition: border-color .3s, transform .3s, box-shadow .3s;
+    }
+    .perf-card:hover {
+      border-color: rgba(196,30,42,.35);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(196,30,42,.1);
+    }
+    .perf-card h3 {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--brand);
+      margin-bottom: .5rem;
+    }
+    .perf-card p {
+      font-size: .9rem;
+      color: var(--ink-soft);
+      line-height: 1.6;
+    }
+
+    .tech-list {
+      list-style: none;
+      margin-top: 2.5rem;
+    }
+    .tech-list li {
+      display: flex;
+      align-items: baseline;
+      gap: 1.5rem;
+      padding: 1.25rem 0;
+      border-bottom: 1px solid rgba(20,24,32,.08);
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      font-weight: 600;
+    }
+    .tech-list li span {
+      font-size: .7rem;
+      font-weight: 400;
+      color: var(--accent-tech);
+      letter-spacing: .15em;
+      min-width: 2.5rem;
+    }
+
+    .world-specs { text-align: center; }
+
+    .spec-table {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: rgba(20,24,32,.06);
+      margin: 3rem 0;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(20,24,32,.05);
+    }
+    .spec-table div {
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(10px);
+      padding: 1.75rem 1rem;
+    }
+    .spec-table strong {
+      display: block;
+      font-size: 1.5rem;
+      margin-bottom: .35rem;
+    }
+    .spec-table span {
+      font-size: .75rem;
+      color: var(--muted);
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: .75rem;
+      padding: 1rem 2.5rem;
+      background: var(--brand);
+      color: #fff;
+      font-family: inherit;
+      font-size: .95rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform .25s, box-shadow .25s;
+    }
+    .btn-primary:hover {
+      transform: scale(1.04);
+      box-shadow: 0 12px 40px rgba(196,30,42,.35);
+    }
+
+    .footer-note {
+      margin-top: 3rem;
+      font-size: .7rem;
+      color: rgba(20,24,32,.4);
+    }
+
+    @media (max-width: 768px) {
+      .world-nav { display: none; }
+      .split { grid-template-columns: 1fr; }
+      .perf-grid { grid-template-columns: 1fr; }
+      .spec-table { grid-template-columns: repeat(2, 1fr); }
+      .section { padding: 4rem 1.25rem 3rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="scene-3d" aria-hidden="true"></div>
+
+  <header class="top-bar">
+    <div class="logo">عصر <span>خودرو</span></div>
+    <a href="#" class="cta-mini">درخواست تست‌درایو</a>
+  </header>
+
+  <nav class="world-nav" aria-label="بخش‌های صفحه">
+    <a href="#hero" data-world="hero" class="active">معرفی</a>
+    <a href="#design" data-world="design">طراحی</a>
+    <a href="#performance" data-world="performance">عملکرد</a>
+    <a href="#technology" data-world="technology">فناوری</a>
+    <a href="#specs" data-world="specs">مشخصات</a>
+  </nav>
+
+  <p class="drag-hint">بکشید تا فضا بچرخد</p>
+  <p class="scroll-hint" id="scroll-hint">اسکرول کنید</p>
+
+  <section class="section hero" id="hero" data-world="hero">
+    <div class="section__inner">
+      <p class="section__label reveal">معرفی اختصاصی</p>
+      <h1 class="section__title reveal">آرion<br /><em>۱۴۰۵</em></h1>
+      <p class="section__lead reveal">
+        کراس‌اوور شهری با طراحی جسور — فضای سه‌بعدی روشن و چرخان
+        در پس‌زمینه تمام بخش‌ها.
+      </p>
+      <span class="hero__badge reveal">Prototype v03 — مدل پررنگ + فضای 3D</span>
+    </div>
+  </section>
+
+  <section class="section" id="design" data-world="design">
+    <div class="section__inner split">
+      <div class="glass-panel">
+        <p class="section__label reveal">دنیای اول — طراحی</p>
+        <h2 class="section__title reveal" style="font-size:clamp(2rem,6vw,4rem)">خطوط<br />مینیمال</h2>
+        <p class="section__lead reveal">
+          چراغ‌های LED ماتریسی، سقف شیشه‌ای پانوراما و بدنه aerodynamic
+          با نسبت طلایی ۴.۳ به ۱.۸ متر.
+        </p>
+        <div class="stat-row reveal">
+          <div><strong>۴.۳m</strong><span>طول</span></div>
+          <div><strong>۱.۸m</strong><span>عرض</span></div>
+          <div><strong>۱.۶m</strong><span>ارتفاع</span></div>
+        </div>
+      </div>
+      <div class="glass-panel reveal">
+        <p class="section__lead" style="max-width:none">
+          در این بخش‌ها مدل خودرو کم‌رنگ و محو در پس‌زمینه می‌چرخد —
+          همراه با گرید و حلقه‌های wireframe در یک فضای واحد.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="performance" data-world="performance">
+    <div class="section__inner">
+      <p class="section__label reveal">دنیای دوم — عملکرد</p>
+      <h2 class="section__title reveal">قدرت<br /><em>توربو</em></h2>
+      <p class="section__lead reveal">
+        موتور ۱.۵ لیتری توربو با گیربکس ۷ سرعته دوکلاچ — شتاب ۰ تا ۱۰۰ در ۸.۲ ثانیه.
+      </p>
+      <div class="perf-grid">
+        <article class="perf-card reveal">
+          <h3>۱۵۰</h3>
+          <p>اسب بخش — حداکثر توان در ۵۵۰۰ دور</p>
+        </article>
+        <article class="perf-card reveal">
+          <h3>۲۱۰</h3>
+          <p>نیوتن‌متر گشتاور — از ۱۵۰۰ دور در دقیقه</p>
+        </article>
+        <article class="perf-card reveal">
+          <h3>۶.۸</h3>
+          <p>لیتر در ۱۰۰ کیلومتر — مصرف ترکیبی</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="technology" data-world="technology">
+    <div class="section__inner">
+      <p class="section__label reveal">دنیای سوم — فناوری</p>
+      <h2 class="section__title reveal">هوش<br />متصل</h2>
+      <p class="section__lead reveal">
+        کابین دیجیتال با HUD، دستیار صوتی فارسی و سطح ۲.۵ خودران.
+      </p>
+      <ul class="tech-list">
+        <li class="reveal"><span>۰۱</span> دوربین ۳۶۰° + پارک خودکار</li>
+        <li class="reveal"><span>۰۲</span> ۶ ایربگ + ترمز اضطراری خودکار</li>
+        <li class="reveal"><span>۰۳</span> Apple CarPlay / Android Auto</li>
+        <li class="reveal"><span>۰۴</span> به‌روزرسانی OTA نرم‌افزار</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section world-specs" id="specs" data-world="specs">
+    <div class="section__inner">
+      <p class="section__label reveal">خلاصه مشخصات</p>
+      <h2 class="section__title reveal" style="font-size:clamp(2rem,5vw,3.5rem)">آماده<br />کاوش؟</h2>
+      <div class="spec-table reveal">
+        <div><strong>۵</strong><span>سرنشین</span></div>
+        <div><strong>FWD</strong><span>محور جلو</span></div>
+        <div><strong>۵۲L</strong><span>باک بنزین</span></div>
+        <div><strong>۴۸۰L</strong><span>صندوق عقب</span></div>
+      </div>
+      <button class="btn-primary reveal" type="button">مشاهده بررسی کامل ←</button>
+      <p class="footer-note reveal">Prototype v03 · فضای 3D روشن · عصر خودرو ۱۴۰۵</p>
+    </div>
+  </section>
+
+  <script>
+    const sections = document.querySelectorAll(".section");
+    const navLinks = document.querySelectorAll(".world-nav a");
+    const scrollHint = document.getElementById("scroll-hint");
+
+    const revealObs = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add("visible")),
+      { threshold: 0.15 }
+    );
+    document.querySelectorAll(".reveal").forEach((el) => revealObs.observe(el));
+
+    const sectionObs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          const id = e.target.id;
+          navLinks.forEach((a) => a.classList.toggle("active", a.getAttribute("href") === "#" + id));
+          if (id !== "hero") scrollHint.style.opacity = "0";
+          window.dispatchEvent(new CustomEvent("worldchange", { detail: e.target.dataset.world }));
+        });
+      },
+      { threshold: 0.45 }
+    );
+    sections.forEach((s) => sectionObs.observe(s));
+  </script>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+    import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+    import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+    import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+    const container = document.getElementById("scene-3d");
+    let currentWorld = "hero";
+    let carModel = null;
+    let carVibrancy = 1;
+    let targetCarVibrancy = 1;
+
+    const WORLDS = {
+      hero:        { cam: [5.5, 1.8, 5.5], target: [0, 0.5, 0], fog: 0xe8eef6, rim: 0xffffff, rotate: 0.9, vibrancy: 1 },
+      design:      { cam: [9, 2.5, 3],   target: [0, 0.5, 0], fog: 0xeef2f8, rim: 0xd0d8e8, rotate: 0.5, vibrancy: 0 },
+      performance: { cam: [5, 2, 9],     target: [0, 0.5, 0], fog: 0xf0eaec, rim: 0xffccd2, rotate: 0.65, vibrancy: 0 },
+      technology:  { cam: [-6, 4, 6],    target: [0, 0.5, 0], fog: 0xe8f4ff, rim: 0xb8e0ff, rotate: 0.55, vibrancy: 0 },
+      specs:       { cam: [1, 6, 10],    target: [0, 0.5, 0], fog: 0xf2f4f8, rim: 0xffb8c0, rotate: 0.35, vibrancy: 0 }
+    };
+
+    let targetCam = new THREE.Vector3(...WORLDS.hero.cam);
+    let targetLook = new THREE.Vector3(...WORLDS.hero.target);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0xeef2f8);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.25;
+    container.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xeef2f8);
+    scene.fog = new THREE.Fog(0xe8eef6, 18, 42);
+
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.08).texture;
+
+    const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 120);
+    camera.position.set(...WORLDS.hero.cam);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.set(0, 0.5, 0);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.enableZoom = false;
+    controls.enablePan = false;
+    controls.minPolarAngle = Math.PI / 5;
+    controls.maxPolarAngle = Math.PI / 2.1;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = WORLDS.hero.rotate;
+
+    let userOrbiting = false;
+    controls.addEventListener("start", () => {
+      userOrbiting = true;
+      controls.autoRotate = false;
+    });
+    controls.addEventListener("end", () => {
+      userOrbiting = false;
+      targetCam.copy(camera.position);
+      targetLook.copy(controls.target);
+      window.setTimeout(() => { if (!userOrbiting) controls.autoRotate = true; }, 3000);
+    });
+
+    // همه عناصر صحنه در یک گروه — با هم می‌چرخند
+    const stageGroup = new THREE.Group();
+    scene.add(stageGroup);
+
+    // Bright studio floor
+    const ground = new THREE.Mesh(
+      new THREE.CircleGeometry(22, 80).rotateX(-Math.PI / 2),
+      new THREE.MeshStandardMaterial({
+        color: 0xf8fafc,
+        roughness: 0.55,
+        metalness: 0.08,
+        emissive: 0xf0f4fa,
+        emissiveIntensity: 0.15
+      })
+    );
+    ground.receiveShadow = true;
+    stageGroup.add(ground);
+
+    const grid = new THREE.GridHelper(44, 88, 0xc8d0dc, 0xdce4ee);
+    grid.position.y = 0.01;
+    stageGroup.add(grid);
+
+    const rearGrid = new THREE.GridHelper(30, 60, 0xd0d8e4, 0xe4eaf2);
+    rearGrid.rotation.x = Math.PI / 2;
+    rearGrid.position.set(0, 8, -12);
+    stageGroup.add(rearGrid);
+
+    const AD_POSTER = {
+      src: "./assets/ads/hero-poster.jpg",
+      title: "عصر خودرو",
+      subtitle: "تجربه immersive معرفی خودرو",
+      color: "#c41e2a"
+    };
+
+    function makePosterTexture({ title, subtitle, color }) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1024;
+      canvas.height = 576;
+      const ctx = canvas.getContext("2d");
+      const g = ctx.createLinearGradient(0, 0, 1024, 576);
+      g.addColorStop(0, "#0f1724");
+      g.addColorStop(1, color);
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, 1024, 576);
+      ctx.strokeStyle = "rgba(255,255,255,0.22)";
+      ctx.lineWidth = 4;
+      ctx.strokeRect(32, 32, 960, 512);
+      ctx.fillStyle = "rgba(255,255,255,0.92)";
+      ctx.font = "bold 80px Tahoma, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(title, 512, 240);
+      ctx.font = "36px Tahoma, sans-serif";
+      ctx.fillStyle = "rgba(255,255,255,0.65)";
+      ctx.fillText(subtitle, 512, 330);
+      ctx.font = "22px Tahoma, sans-serif";
+      ctx.fillStyle = "rgba(255,255,255,0.35)";
+      ctx.fillText("۱۴۰۵", 512, 480);
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    const adFrameMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 });
+    const adFrame = new THREE.Mesh(new THREE.PlaneGeometry(14.3, 8.05), adFrameMat);
+    adFrame.position.set(0, 5.5, -11.93);
+    stageGroup.add(adFrame);
+
+    const adPosterMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 1 });
+    const adPoster = new THREE.Mesh(new THREE.PlaneGeometry(13.6, 7.65), adPosterMat);
+    adPoster.position.set(0, 5.5, -11.9);
+    stageGroup.add(adPoster);
+
+    function loadAdPoster() {
+      const applyTex = (tex) => {
+        adPosterMat.map = tex;
+        adPosterMat.needsUpdate = true;
+      };
+      if (AD_POSTER.src) {
+        new THREE.TextureLoader().load(AD_POSTER.src, applyTex, undefined, () => applyTex(makePosterTexture(AD_POSTER)));
+      } else {
+        applyTex(makePosterTexture(AD_POSTER));
+      }
+    }
+    loadAdPoster();
+
+    // Wireframe rings
+    const ringGroup = new THREE.Group();
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: 0xb8c4d4,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.45
+    });
+    [[6, 0.04, 16], [4.2, 0.03, 12], [2.8, 0.025, 8]].forEach(([r, tube, seg], i) => {
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(r, tube, 8, seg), ringMat.clone());
+      ring.rotation.x = Math.PI / 2;
+      ring.position.y = 0.15 + i * 0.08;
+      ring.material.opacity = 0.35 - i * 0.08;
+      ringGroup.add(ring);
+    });
+    stageGroup.add(ringGroup);
+
+    // Floating light pillars
+    const pillarMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      roughness: 0.3,
+      metalness: 0.1,
+      emissive: 0xf8fafc,
+      emissiveIntensity: 0.4,
+      transparent: true,
+      opacity: 0.7
+    });
+    [[-8, 3, -6], [8, 2.5, -5], [-6, 2, 7], [7, 3.5, 6]].forEach(([x, h, z]) => {
+      const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, h, 12), pillarMat);
+      pillar.position.set(x, h / 2, z);
+      stageGroup.add(pillar);
+    });
+
+    const keyLight = new THREE.DirectionalLight(0xffffff, 2.2);
+    keyLight.position.set(6, 12, 8);
+    keyLight.castShadow = true;
+    scene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0xe8f0ff, 1.1);
+    fillLight.position.set(-8, 6, 4);
+    scene.add(fillLight);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xdce4f0, 0.9));
+
+    const rimLight = new THREE.DirectionalLight(0xffffff, 0.6);
+    rimLight.position.set(-4, 4, -6);
+    scene.add(rimLight);
+
+    const bodyMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xc41e2a, metalness: 1.0, roughness: 0.4,
+      clearcoat: 1.0, clearcoatRoughness: 0.03,
+      transparent: true, opacity: 1
+    });
+    const detailsMaterial = new THREE.MeshStandardMaterial({
+      color: 0xffffff, metalness: 1.0, roughness: 0.35,
+      transparent: true, opacity: 1
+    });
+    const glassMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xffffff, metalness: 0.2, roughness: 0,
+      transmission: 1.0, transparent: true, opacity: 0.85
+    });
+
+    const colorVibrant = new THREE.Color(0xc41e2a);
+    const colorFaded = new THREE.Color(0xb8c2d0);
+    const colorDetailsVibrant = new THREE.Color(0xffffff);
+    const colorDetailsFaded = new THREE.Color(0xd0d8e4);
+
+    function applyCarVibrancy(t) {
+      adPosterMat.opacity = t;
+      adFrameMat.opacity = THREE.MathUtils.lerp(0, 0.55, t);
+      adPoster.visible = adFrame.visible = t > 0.04;
+      if (!carModel) return;
+      bodyMaterial.color.copy(colorFaded).lerp(colorVibrant, t);
+      bodyMaterial.opacity = THREE.MathUtils.lerp(0.18, 1, t);
+      bodyMaterial.clearcoat = THREE.MathUtils.lerp(0.2, 1, t);
+      detailsMaterial.color.copy(colorDetailsFaded).lerp(colorDetailsVibrant, t);
+      detailsMaterial.opacity = THREE.MathUtils.lerp(0.15, 1, t);
+      glassMaterial.opacity = THREE.MathUtils.lerp(0.12, 0.85, t);
+      glassMaterial.transmission = THREE.MathUtils.lerp(0.5, 1, t);
+    }
+
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath("https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/draco/gltf/");
+    const loader = new GLTFLoader();
+    loader.setDRACOLoader(dracoLoader);
+
+    loader.load(
+      "https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/models/gltf/ferrari.glb",
+      (gltf) => {
+        carModel = gltf.scene.children[0];
+        carModel.traverse((n) => { if (n.isMesh) n.castShadow = true; });
+        const byName = (name) => carModel.getObjectByName(name);
+        if (byName("body")) byName("body").material = bodyMaterial;
+        ["rim_fl", "rim_fr", "rim_rr", "rim_rl", "trim"].forEach((n) => {
+          const o = byName(n);
+          if (o) o.material = detailsMaterial;
+        });
+        if (byName("glass")) byName("glass").material = glassMaterial;
+        stageGroup.add(carModel);
+        applyCarVibrancy(carVibrancy);
+      }
+    );
+
+    window.addEventListener("worldchange", (e) => {
+      currentWorld = e.detail;
+      const w = WORLDS[e.detail];
+      if (!w) return;
+      targetCarVibrancy = w.vibrancy;
+      targetCam.set(...w.cam);
+      targetLook.set(...w.target);
+      controls.autoRotateSpeed = w.rotate;
+      scene.fog.color.setHex(w.fog);
+      rimLight.color.setHex(w.rim);
+    });
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    const clock = new THREE.Clock();
+    renderer.setAnimationLoop(() => {
+      const t = clock.getElapsedTime();
+      if (!userOrbiting) stageGroup.rotation.y = t * 0.1;
+      carVibrancy += (targetCarVibrancy - carVibrancy) * 0.06;
+      applyCarVibrancy(carVibrancy);
+      if (!userOrbiting) {
+        camera.position.lerp(targetCam, 0.035);
+        controls.target.lerp(targetLook, 0.035);
+      }
+      controls.update();
+      renderer.render(scene, camera);
+    });
+  </script>
+</body>
+</html>

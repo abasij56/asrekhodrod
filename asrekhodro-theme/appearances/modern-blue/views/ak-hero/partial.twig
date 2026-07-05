@@ -1,0 +1,58 @@
+{% if hero_main %}
+{% if section_title|default('')|trim != '' %}
+  {% include 'partials/section-head.twig' with { heading_id: 'hero-section-heading' } %}
+{% endif %}
+<section class="mb-hero" data-hero-slider data-hero-interval="15000" aria-labelledby="hero-heading">
+  <div class="mb-hero__grid" data-hero-main>
+    <div class="mb-hero__copy">
+      <span class="mb-hero__eyebrow">
+        <svg class="mb-hero__eyebrow-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/></svg>
+        خبر ویژه روز
+      </span>
+
+      <h1 class="mb-hero__title" id="hero-heading">
+        <a data-hero-title-link href="{{ hero_main.link }}"><span data-hero-title>{{ hero_main.title }}</span></a>
+      </h1>
+
+      <p class="mb-hero__lead" data-hero-excerpt>
+        {{ hero_main.excerpt }}
+      </p>
+
+      <div class="mb-hero__cta">
+        <a data-hero-cta href="{{ hero_main.link }}" class="btn btn--primary">ادامه مطلب</a>
+        {% if news_archive_url is defined and news_archive_url %}
+          <a href="{{ news_archive_url }}" class="btn btn--outline">آرشیو اخبار</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="mb-hero__media">
+      <a data-hero-image-link href="{{ hero_main.link }}" class="mb-hero__img-wrap" tabindex="-1" aria-hidden="true">
+        <img data-hero-image src="{{ hero_main.image }}" width="1200" height="800" alt="{{ hero_main.title }}" loading="eager" decoding="async" />
+      </a>
+    </div>
+  </div>
+
+  {% if hero_side_items|length %}
+    <div class="mb-hero__stats" aria-label="اخبار مهم">
+      {% for item in hero_side_items|slice(0, 5) %}
+        <article class="mb-hero__stat-card{% if loop.first %} is-active{% endif %}" data-hero-item>
+          <button type="button" class="mb-hero__stat-link mb-hero__stat-trigger" data-hero-trigger aria-pressed="{{ loop.first ? 'true' : 'false' }}">
+            <span class="mb-hero__stat-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h14"/></svg>
+            </span>
+            {% if item.badge %}
+              <span class="mb-hero__stat-kicker">{{ item.badge }}</span>
+            {% endif %}
+            <h3 class="mb-hero__stat-title">{{ item.title }}</h3>
+            <time class="mb-hero__stat-meta" datetime="{{ item.date_iso }}">{{ item.date }}</time>
+          </button>
+        </article>
+      {% endfor %}
+    </div>
+  {% endif %}
+  {% if hero_side_panels_json|default('') %}
+    <script type="application/json" data-hero-slides>{{ hero_side_panels_json|raw }}</script>
+  {% endif %}
+</section>
+{% endif %}

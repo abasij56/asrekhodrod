@@ -1,0 +1,18 @@
+<div class="container ticker-wrap">
+  <aside class="ticker" aria-label="آخرین خبرهای فوری">
+    <div class="ticker__inner">
+      <div class="ticker__label">خبر فوری</div>
+      <div class="ticker__track">
+        <div class="ticker__marquee">
+          <ul class="ticker__list">
+          {% for post in ticker_posts %}
+            <li><a href="{{ post.link }}">{{ post.title }}</a></li>
+          {% else %}
+            <li><a href="#">به عصر خودرو خوش آمدید</a></li>
+          {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>

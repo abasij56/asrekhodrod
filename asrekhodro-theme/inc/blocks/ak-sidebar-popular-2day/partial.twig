@@ -1,0 +1,8 @@
+{% if popular_2day_posts|default([])|length > 0 %}
+  {% include 'partials/widget-popular-posts.twig' with {
+    widget_id: 'popular-week',
+    title: section_title|default('پربازدید های هفته'),
+    posts: popular_2day_posts,
+    archive_url: popular_2day_archive_url|default('')
+  } only %}
+{% endif %}

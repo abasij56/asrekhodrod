@@ -1,0 +1,24 @@
+{% set zone_placements = layout_zones[zone] ?? [] %}
+{% if zone == 'sidebar' %}
+  {% if zone_placements|filter(p => p.partial)|length > 0 %}
+  <div class="page-sidebar-stack" role="complementary" aria-label="ستون جانبی">
+    {% for placement in zone_placements %}
+      {% if placement.partial %}
+        {% if placement.block == 'ak-picture-frame' and picture_frame_items|default([])|length == 0 %}
+        {% else %}
+          {% include 'partials/layout-placement.twig' with { placement: placement } %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+{% else %}
+  {% for placement in zone_placements %}
+    {% if placement.partial %}
+      {% if placement.block == 'ak-picture-frame' and picture_frame_items|default([])|length == 0 %}
+      {% else %}
+        {% include 'partials/layout-placement.twig' with { placement: placement } %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+{% endif %}

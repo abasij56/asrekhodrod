@@ -1,0 +1,32 @@
+{% import 'partials/macros.twig' as ak %}
+
+<section class="cb-section cb-videos" aria-labelledby="cb-videos-heading">
+  <header class="cb-section__head cb-section__head--dark">
+    <h2 id="cb-videos-heading" class="cb-section__title">ویدئو</h2>
+    <a href="{{ cb_videos_url }}" class="cb-section__more">مشاهده همه</a>
+  </header>
+  <div class="cb-videos__grid">
+    {% for video in cb_videos %}
+      <article class="cb-video-card{{ loop.first ? ' cb-video-card--lead' : '' }}">
+        <a href="{{ video.link }}">
+          <div class="cb-video-card__media">
+            {% if video.thumbnail %}
+              <img src="{{ video.thumbnail.src(loop.first ? 'large' : 'medium') }}" alt="{{ video.title }}" loading="lazy" decoding="async" />
+            {% else %}
+              {{ ak.post_image(video, 640, 360) }}
+            {% endif %}
+            <span class="cb-video-card__play" aria-hidden="true"></span>
+          </div>
+          <div class="cb-video-card__body">
+            {% set vcat = video.terms('video_category')|first %}
+            {% if vcat %}<span class="cb-video-card__tag">{{ vcat.name }}</span>{% endif %}
+            <h3>{{ video.title }}</h3>
+            {% if loop.first and video.post_excerpt %}
+              <p>{{ video.post_excerpt|striptags|slice(0, 120) }}…</p>
+            {% endif %}
+          </div>
+        </a>
+      </article>
+    {% endfor %}
+  </div>
+</section>

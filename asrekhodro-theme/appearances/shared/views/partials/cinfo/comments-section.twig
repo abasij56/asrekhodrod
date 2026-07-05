@@ -1,0 +1,20 @@
+{% if comments_has_content %}
+  <section
+    class="ci-comments-slide ci-section--comments {{ section_modifier_class|default('') }}"
+    id="{{ block.anchor|default(comments_default_anchor) }}"
+  >
+    <div class="container ci-comments__inner">
+      <div class="ci-comments__panel">
+        {% include 'partials/comments-section.twig' with {
+          comments_post: post,
+          comments_open: comments_open,
+          comments_count: comments_count,
+          comments_variant: 'embedded',
+          comments_section_id: (block.anchor|default(comments_default_anchor)) ~ '-panel',
+          comments_custom_title: comments_title,
+          comments_modifier_class: 'ak-comments--cinfo'
+        } %}
+      </div>
+    </div>
+  </section>
+{% endif %}

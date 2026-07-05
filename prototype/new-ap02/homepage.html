@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Cars Theme — Full car infography platform with interactive specs, comparisons, and stunning visual data." />
+<title>Cars Theme — Full Car Infography</title>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<!-- AOS -->
+<link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+
+<style>
+:root{
+  --bg:#ffffff;
+  --bg-soft:#f4f7fb;
+  --silver:#e6ecf2;
+  --gray:#8a95a5;
+  --ink:#0d1320;
+  --ink-soft:#2a3344;
+  --accent:#00b3ff;       /* electric blue */
+  --accent-2:#00f0ff;     /* neon cyan */
+  --accent-deep:#0066ff;
+  --glow: 0 0 24px rgba(0,179,255,.35);
+  --border: 1px solid rgba(13,19,32,.08);
+  --radius: 18px;
+  --shadow-sm: 0 4px 14px rgba(13,19,32,.06);
+  --shadow-md: 0 14px 40px rgba(13,19,32,.10);
+  --grad-bg: linear-gradient(180deg,#ffffff 0%,#f1f7ff 100%);
+  --grad-accent: linear-gradient(135deg,var(--accent) 0%, var(--accent-2) 100%);
+  --font-body:'Inter',system-ui,sans-serif;
+  --font-head:'Orbitron',sans-serif;
+}
+[data-theme="dark"]{
+  --bg:#0b101a;
+  --bg-soft:#111826;
+  --silver:#1c2536;
+  --gray:#8593aa;
+  --ink:#eaf2ff;
+  --ink-soft:#c2cce0;
+  --border:1px solid rgba(255,255,255,.08);
+  --grad-bg:linear-gradient(180deg,#0b101a 0%,#0e1626 100%);
+  --shadow-sm:0 4px 14px rgba(0,0,0,.4);
+  --shadow-md:0 14px 40px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  background:var(--grad-bg);
+  color:var(--ink);
+  line-height:1.6;
+  overflow-x:hidden;
+  transition:background .3s,color .3s;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,h4{font-family:var(--font-head);letter-spacing:.5px;line-height:1.15;color:var(--ink)}
+.container{max-width:1280px;margin:0 auto;padding:0 24px}
+section{padding:90px 0;position:relative}
+.section-title{font-size:clamp(1.8rem,3vw,2.6rem);text-align:center;margin-bottom:14px}
+.section-sub{text-align:center;color:var(--gray);max-width:640px;margin:0 auto 50px}
+
+/* === NAV === */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  backdrop-filter: blur(16px);
+  background:rgba(255,255,255,.7);
+  border-bottom:var(--border);
+  transition:background .3s;
+}
+[data-theme="dark"] .nav{background:rgba(11,16,26,.7)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:72px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--font-head);font-weight:900;font-size:1.25rem}
+.logo i{color:var(--accent);font-size:1.5rem;filter:drop-shadow(0 0 8px rgba(0,179,255,.5))}
+.nav-links{display:flex;align-items:center;gap:32px;list-style:none}
+.nav-links a{font-weight:500;font-size:.95rem;position:relative;transition:color .2s}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:-6px;height:2px;width:0;background:var(--grad-accent);transition:width .3s}
+.nav-links a:hover{color:var(--accent)}
+.nav-links a:hover::after{width:100%}
+.nav-actions{display:flex;align-items:center;gap:14px}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:11px 22px;border-radius:50px;font-weight:600;font-size:.9rem;
+  cursor:pointer;border:none;transition:all .25s;font-family:var(--font-body);
+}
+.btn-primary{background:var(--grad-accent);color:#fff;box-shadow:var(--glow)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,179,255,.5)}
+.btn-outline{background:transparent;color:var(--ink);border:2px solid var(--accent)}
+.btn-outline:hover{background:var(--accent);color:#fff;box-shadow:var(--glow)}
+.theme-toggle{
+  background:transparent;border:var(--border);width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);
+  transition:transform .3s;
+}
+.theme-toggle:hover{transform:rotate(20deg);color:var(--accent)}
+.hamburger{display:none;background:none;border:none;font-size:1.4rem;color:var(--ink);cursor:pointer}
+
+/* === HERO === */
+.hero{padding-top:160px;padding-bottom:60px;position:relative;overflow:hidden}
+.hero::before{
+  content:"";position:absolute;top:-100px;right:-100px;width:500px;height:500px;
+  background:radial-gradient(circle,rgba(0,179,255,.15) 0%,transparent 70%);z-index:0;
+}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;z-index:1}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:50px;
+  background:rgba(0,179,255,.08);color:var(--accent);font-size:.8rem;font-weight:600;
+  border:1px solid rgba(0,179,255,.2);margin-bottom:20px;
+}
+.hero h1{font-size:clamp(2.2rem,5vw,4rem);margin-bottom:20px}
+.hero h1 .grad{background:var(--grad-accent);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.lead{color:var(--gray);font-size:1.1rem;max-width:520px;margin-bottom:32px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+.hero-img-wrap{position:relative;animation:float 6s ease-in-out infinite}
+.hero-img-wrap img{border-radius:24px;box-shadow:var(--shadow-md)}
+.hero-img-wrap::after{
+  content:"";position:absolute;inset:-2px;border-radius:26px;
+  background:var(--grad-accent);z-index:-1;filter:blur(28px);opacity:.4;
+}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+
+/* === STATS === */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:60px;position:relative;z-index:2}
+.stat-card{
+  background:rgba(255,255,255,.55);backdrop-filter:blur(16px);
+  border:var(--border);border-radius:var(--radius);padding:28px;
+  text-align:center;transition:all .3s;position:relative;overflow:hidden;
+}
+[data-theme="dark"] .stat-card{background:rgba(255,255,255,.05)}
+.stat-card:hover{transform:translateY(-6px);border-color:var(--accent);box-shadow:var(--glow)}
+.stat-card i{font-size:1.8rem;color:var(--accent);margin-bottom:10px;filter:drop-shadow(0 0 8px rgba(0,179,255,.4))}
+.stat-num{font-family:var(--font-head);font-size:2.2rem;font-weight:900;color:var(--ink)}
+.stat-label{color:var(--gray);font-size:.85rem;text-transform:uppercase;letter-spacing:1.5px;margin-top:4px}
+
+/* === MODELS === */
+.models-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.model-card{
+  background:var(--bg);border-radius:var(--radius);overflow:hidden;
+  border:var(--border);transition:all .35s;
+}
+.model-card:hover{transform:translateY(-10px);border-color:var(--accent);box-shadow:0 18px 50px rgba(0,179,255,.25)}
+.model-img{height:220px;overflow:hidden;position:relative}
+.model-img img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.model-card:hover .model-img img{transform:scale(1.08)}
+.model-body{padding:22px}
+.model-body h3{font-size:1.3rem;margin-bottom:12px}
+.model-specs{display:flex;justify-content:space-between;margin:14px 0 18px;color:var(--gray);font-size:.85rem}
+.model-specs div{text-align:center}
+.model-specs span{display:block;color:var(--ink);font-weight:700;font-size:1.05rem;font-family:var(--font-head)}
+.model-btn{
+  width:100%;padding:11px;border-radius:10px;background:transparent;color:var(--accent);
+  border:1.5px solid var(--accent);font-weight:600;cursor:pointer;transition:all .25s;
+}
+.model-btn:hover{background:var(--grad-accent);color:#fff;box-shadow:var(--glow)}
+
+/* === INFOGRAPHY / CHART === */
+.chart-card{
+  background:var(--bg);border:var(--border);border-radius:var(--radius);
+  padding:30px;box-shadow:var(--shadow-sm);
+}
+.chart-toggles{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+.toggle-btn{
+  padding:9px 18px;border-radius:50px;border:1.5px solid var(--silver);
+  background:transparent;color:var(--ink-soft);font-weight:600;cursor:pointer;
+  font-size:.85rem;transition:all .2s;
+}
+.toggle-btn.active,.toggle-btn:hover{background:var(--grad-accent);color:#fff;border-color:transparent;box-shadow:var(--glow)}
+.chart-wrap{position:relative;height:360px}
+.data-table{width:100%;margin-top:26px;border-collapse:collapse;font-size:.9rem;overflow:hidden;border-radius:12px}
+.data-table th,.data-table td{padding:14px;text-align:center;border-bottom:1px solid var(--silver)}
+.data-table thead{background:var(--bg-soft)}
+.data-table th{font-family:var(--font-head);font-size:.8rem;letter-spacing:1px;color:var(--ink)}
+.data-table tbody tr:hover{background:rgba(0,179,255,.05)}
+
+/* === FEATURES === */
+.features-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.feat-list{list-style:none;display:flex;flex-direction:column;gap:18px}
+.feat-list li{display:flex;align-items:flex-start;gap:16px;padding:16px 18px;border-radius:14px;background:var(--bg);border:var(--border);transition:all .25s}
+.feat-list li:hover{transform:translateX(6px);border-color:var(--accent)}
+.feat-list i{color:var(--accent);font-size:1.2rem;background:rgba(0,179,255,.1);width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex-shrink:0}
+.feat-list h4{font-family:var(--font-body);font-size:1rem;font-weight:700;margin-bottom:2px}
+.feat-list p{color:var(--gray);font-size:.85rem}
+
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:24px}
+.gauge{
+  --p:94;
+  width:240px;height:240px;border-radius:50%;
+  background:conic-gradient(var(--accent) calc(var(--p)*1%), var(--silver) 0);
+  display:grid;place-items:center;position:relative;
+  box-shadow:var(--shadow-md);
+}
+.gauge::before{content:"";position:absolute;inset:18px;border-radius:50%;background:var(--bg)}
+.gauge-inner{position:relative;text-align:center}
+.gauge-inner .num{font-family:var(--font-head);font-size:2.8rem;font-weight:900;background:var(--grad-accent);-webkit-background-clip:text;background-clip:text;color:transparent}
+.gauge-inner .lbl{color:var(--gray);font-size:.8rem;text-transform:uppercase;letter-spacing:2px}
+.gauge-cap{text-align:center;color:var(--gray);font-size:.9rem;max-width:280px}
+.tooltip{position:relative;cursor:help;border-bottom:1px dashed var(--accent)}
+.tooltip:hover::after{
+  content:attr(data-tip);position:absolute;bottom:130%;left:50%;transform:translateX(-50%);
+  background:var(--ink);color:#fff;padding:8px 12px;border-radius:8px;font-size:.75rem;white-space:nowrap;z-index:5;
+}
+
+/* === CTA === */
+.cta{
+  text-align:center;border-radius:24px;padding:80px 30px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#f0f8ff 0%,#e8f4ff 100%);
+  border:var(--border);
+}
+[data-theme="dark"] .cta{background:linear-gradient(135deg,#111826 0%,#0e1a2e 100%)}
+.cta::before{
+  content:"";position:absolute;inset:0;opacity:.35;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(0,179,255,.18) 0, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(0,240,255,.18) 0, transparent 40%);
+  background-size:60px 60px;
+}
+.cta::after{
+  content:"";position:absolute;inset:0;opacity:.15;
+  background:
+    linear-gradient(60deg, transparent 49.5%, var(--accent) 49.5% 50.5%, transparent 50.5%) 0 0/40px 70px,
+    linear-gradient(-60deg, transparent 49.5%, var(--accent) 49.5% 50.5%, transparent 50.5%) 0 0/40px 70px;
+}
+.cta-inner{position:relative;z-index:1}
+.cta h2{font-size:clamp(1.8rem,3.5vw,2.8rem);margin-bottom:14px}
+.cta p{color:var(--gray);margin-bottom:30px;max-width:520px;margin-left:auto;margin-right:auto}
+.cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* === FOOTER === */
+footer{background:var(--bg-soft);border-top:var(--border);padding:60px 0 20px;margin-top:60px}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 2fr;gap:40px;margin-bottom:40px}
+.footer-grid h4{font-family:var(--font-head);font-size:.95rem;margin-bottom:18px;letter-spacing:1.5px}
+.footer-grid p,.footer-grid a{color:var(--gray);font-size:.9rem}
+.footer-grid ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-grid a:hover{color:var(--accent)}
+.socials{display:flex;gap:12px;margin-top:14px}
+.socials a{
+  width:38px;height:38px;border-radius:50%;border:var(--border);
+  display:grid;place-items:center;transition:all .25s;
+}
+.socials a:hover{background:var(--grad-accent);color:#fff;border-color:transparent;transform:translateY(-3px)}
+.newsletter{display:flex;gap:8px;margin-top:12px}
+.newsletter input{
+  flex:1;padding:11px 14px;border-radius:10px;border:var(--border);background:var(--bg);
+  color:var(--ink);font-family:var(--font-body);outline:none;
+}
+.newsletter input:focus{border-color:var(--accent)}
+.newsletter button{padding:11px 18px;border-radius:10px;background:var(--grad-accent);color:#fff;border:none;font-weight:600;cursor:pointer}
+.copyright{text-align:center;padding-top:24px;border-top:var(--border);color:var(--gray);font-size:.85rem}
+
+/* === RESPONSIVE === */
+@media (max-width: 980px){
+  .hero-grid,.features-grid{grid-template-columns:1fr;gap:40px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .models-grid{grid-template-columns:repeat(2,1fr)}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:30px}
+  .hero{padding-top:130px}
+}
+@media (max-width: 640px){
+  section{padding:70px 0}
+  .nav-links{
+    position:fixed;top:72px;left:0;right:0;flex-direction:column;
+    background:var(--bg);padding:30px;gap:22px;border-bottom:var(--border);
+    transform:translateY(-150%);transition:transform .35s;
+  }
+  .nav-links.open{transform:translateY(0)}
+  .hamburger{display:block}
+  .nav-actions .btn-outline{display:none}
+  .models-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr}
+  .chart-wrap{height:300px}
+  .gauge{width:200px;height:200px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="container nav-inner">
+    <a href="#home" class="logo"><i class="fa-solid fa-car-side"></i>Cars Theme</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#models">Models</a></li>
+      <li><a href="#specs">Specs</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+      <button class="btn btn-outline"><i class="fa-solid fa-code-compare"></i>Compare</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="container">
+    <div class="hero-grid">
+      <div data-aos="fade-right">
+        <span class="hero-eyebrow"><i class="fa-solid fa-bolt"></i> Full Car Infography Platform</span>
+        <h1>Drive the <span class="grad">Future</span> — Visualize Every Spec.</h1>
+        <p class="lead">Explore detailed car data, performance benchmarks, and side-by-side visual comparisons in one sleek, interactive dashboard built for true automotive enthusiasts.</p>
+        <div class="hero-cta">
+          <button class="btn btn-primary"><i class="fa-solid fa-gauge-high"></i>Explore Data</button>
+          <button class="btn btn-outline"><i class="fa-solid fa-play"></i>Watch Demo</button>
+        </div>
+      </div>
+      <div class="hero-img-wrap" data-aos="fade-left">
+        <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1200&q=80" alt="Sports car" loading="lazy">
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat-card" data-aos="fade-up">
+        <i class="fa-solid fa-stopwatch"></i>
+        <div class="stat-num"><span class="counter" data-target="3.2" data-decimals="1">0</span>s</div>
+        <div class="stat-label">0–60 mph</div>
+      </div>
+      <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+        <i class="fa-solid fa-horse-head"></i>
+        <div class="stat-num"><span class="counter" data-target="650">0</span></div>
+        <div class="stat-label">Horsepower</div>
+      </div>
+      <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+        <i class="fa-solid fa-gears"></i>
+        <div class="stat-num"><span class="counter" data-target="500">0</span></div>
+        <div class="stat-label">Torque (lb-ft)</div>
+      </div>
+      <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+        <i class="fa-solid fa-gauge-high"></i>
+        <div class="stat-num"><span class="counter" data-target="210">0</span></div>
+        <div class="stat-label">Top Speed (mph)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODELS -->
+<section id="models">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">Featured Models</h2>
+    <p class="section-sub" data-aos="fade-up">Discover the latest generation of high-performance, fully-electric, data-rich machines.</p>
+    <div class="models-grid">
+      <article class="model-card" data-aos="fade-up">
+        <div class="model-img"><img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=80" alt="Cyber GT" loading="lazy"></div>
+        <div class="model-body">
+          <h3>Cyber GT</h3>
+          <div class="model-specs">
+            <div><span>520 mi</span>Range</div>
+            <div><span>1020 HP</span>Power</div>
+            <div><span>1.9s</span>0–60</div>
+          </div>
+          <button class="model-btn">View Infographics →</button>
+        </div>
+      </article>
+      <article class="model-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="model-img"><img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=900&q=80" alt="Aether EV" loading="lazy"></div>
+        <div class="model-body">
+          <h3>Aether EV</h3>
+          <div class="model-specs">
+            <div><span>610 mi</span>Range</div>
+            <div><span>780 HP</span>Power</div>
+            <div><span>2.4s</span>0–60</div>
+          </div>
+          <button class="model-btn">View Infographics →</button>
+        </div>
+      </article>
+      <article class="model-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="model-img"><img src="https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=900&q=80" alt="Nova R" loading="lazy"></div>
+        <div class="model-body">
+          <h3>Nova R</h3>
+          <div class="model-specs">
+            <div><span>440 mi</span>Range</div>
+            <div><span>890 HP</span>Power</div>
+            <div><span>2.1s</span>0–60</div>
+          </div>
+          <button class="model-btn">View Infographics →</button>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- INFOGRAPHY -->
+<section id="specs" style="background:var(--bg-soft)">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">Compare Performance Metrics</h2>
+    <p class="section-sub" data-aos="fade-up">Interactive head-to-head data on the world's most advanced EVs.</p>
+
+    <div class="chart-card" data-aos="zoom-in">
+      <div class="chart-toggles">
+        <button class="toggle-btn active" data-metric="hp">Horsepower</button>
+        <button class="toggle-btn" data-metric="range">Range (mi)</button>
+        <button class="toggle-btn" data-metric="zero">0–60 (s)</button>
+      </div>
+      <div class="chart-wrap"><canvas id="perfChart"></canvas></div>
+
+      <table class="data-table">
+        <thead><tr><th>Model</th><th>Horsepower</th><th>Range (mi)</th><th>0–60 (s)</th></tr></thead>
+        <tbody>
+          <tr><td>Tesla Model S</td><td>1020</td><td>405</td><td>1.99</td></tr>
+          <tr><td>Porsche Taycan</td><td>750</td><td>282</td><td>2.6</td></tr>
+          <tr><td>Lucid Air</td><td>1111</td><td>516</td><td>1.89</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="gallery">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">Next-Gen Technology</h2>
+    <p class="section-sub" data-aos="fade-up">Cutting-edge features engineered for the road ahead.</p>
+
+    <div class="features-grid">
+      <ul class="feat-list" data-aos="fade-right">
+        <li><i class="fa-solid fa-check"></i><div><h4>AI Infotainment</h4><p>Adaptive cockpit that learns your habits.</p></div></li>
+        <li><i class="fa-solid fa-check"></i><div><h4>Laser Headlights</h4><p>800m beam with adaptive shaping.</p></div></li>
+        <li><i class="fa-solid fa-check"></i><div><h4>1,000 km Range</h4><p>Solid-state battery efficiency.</p></div></li>
+        <li><i class="fa-solid fa-check"></i><div><h4>0–100 in 2.8s</h4><p>Tri-motor torque vectoring.</p></div></li>
+      </ul>
+
+      <div class="gauge-wrap" data-aos="fade-left">
+        <div class="gauge" style="--p:94">
+          <div class="gauge-inner"><div class="num">94%</div><div class="lbl">Efficiency</div></div>
+        </div>
+        <p class="gauge-cap"><span class="tooltip" data-tip="Energy efficiency = useful output ÷ total input">Battery Efficiency</span> measured across a 1000km mixed cycle.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section>
+  <div class="container">
+    <div class="cta" data-aos="zoom-in">
+      <div class="cta-inner">
+        <h2>Ready to Explore Every Car Detail?</h2>
+        <p>Get full access to interactive car infographics, advanced comparisons, and exclusive model data.</p>
+        <div class="cta-btns">
+          <button class="btn btn-primary"><i class="fa-solid fa-rocket"></i>Start Exploring</button>
+          <button class="btn btn-outline"><i class="fa-solid fa-envelope"></i>Contact Us</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="logo" style="margin-bottom:14px"><i class="fa-solid fa-car-side"></i>Cars Theme</div>
+        <p>The premium WordPress theme for full car infography, performance dashboards and interactive comparisons.</p>
+      </div>
+      <div>
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#models">Models</a></li>
+          <li><a href="#specs">Specs</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Follow</h4>
+        <div class="socials">
+          <a href="#" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+        </div>
+      </div>
+      <div>
+        <h4>Newsletter</h4>
+        <p>Get the latest car infographics in your inbox.</p>
+        <form class="newsletter" onsubmit="event.preventDefault();this.querySelector('input').value='';alert('Subscribed!')">
+          <input type="email" placeholder="your@email.com" required>
+          <button type="submit">Subscribe</button>
+        </form>
+      </div>
+    </div>
+    <div class="copyright">© <span id="year"></span> Cars Theme. Crafted for speed.</div>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+AOS.init({duration:800,once:true,offset:80});
+
+// Year
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// Hamburger
+const hb = document.getElementById('hamburger');
+const nl = document.getElementById('navLinks');
+hb.addEventListener('click',()=>nl.classList.toggle('open'));
+nl.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>nl.classList.remove('open')));
+
+// Theme toggle
+const tt = document.getElementById('themeToggle');
+tt.addEventListener('click',()=>{
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur==='dark'?'':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  tt.innerHTML = next==='dark'?'<i class="fa-solid fa-sun"></i>':'<i class="fa-solid fa-moon"></i>';
+  if(chart){ chart.options.scales.y.ticks.color = next==='dark'?'#c2cce0':'#2a3344';
+             chart.options.scales.x.ticks.color = next==='dark'?'#c2cce0':'#2a3344';
+             chart.update(); }
+});
+
+// Counters
+const counters = document.querySelectorAll('.counter');
+const animateCounter = el => {
+  const target = parseFloat(el.dataset.target);
+  const dec = parseInt(el.dataset.decimals||0);
+  const dur = 1600; const start = performance.now();
+  const step = now => {
+    const p = Math.min((now-start)/dur,1);
+    const eased = 1 - Math.pow(1-p,3);
+    el.textContent = (target*eased).toFixed(dec);
+    if(p<1) requestAnimationFrame(step);
+    else el.textContent = target.toFixed(dec);
+  };
+  requestAnimationFrame(step);
+};
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){ animateCounter(e.target); io.unobserve(e.target); }
+  });
+},{threshold:.5});
+counters.forEach(c=>io.observe(c));
+
+// Chart.js
+const data = {
+  hp:    {label:'Horsepower',    values:[1020,750,1111]},
+  range: {label:'Range (mi)',    values:[405,282,516]},
+  zero:  {label:'0–60 (s)',      values:[1.99,2.6,1.89]}
+};
+const labels = ['Tesla Model S','Porsche Taycan','Lucid Air'];
+const ctx = document.getElementById('perfChart').getContext('2d');
+const grad = ctx.createLinearGradient(0,0,0,360);
+grad.addColorStop(0,'#00f0ff'); grad.addColorStop(1,'#0066ff');
+
+let chart = new Chart(ctx,{
+  type:'bar',
+  data:{labels, datasets:[{
+    label:data.hp.label, data:data.hp.values,
+    backgroundColor:grad, borderRadius:12, borderSkipped:false, barThickness:60
+  }]},
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#0d1320'}},
+    scales:{
+      y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#2a3344'}},
+      x:{grid:{display:false},ticks:{color:'#2a3344',font:{weight:'600'}}}
+    },
+    animation:{duration:900,easing:'easeOutQuart'}
+  }
+});
+
+document.querySelectorAll('.toggle-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.toggle-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    const m = data[b.dataset.metric];
+    chart.data.datasets[0].label = m.label;
+    chart.data.datasets[0].data = m.values;
+    chart.update();
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+{% if section_title is not defined %}{% set section_title = 'مجلات روز' %}{% endif %}
+
+<section class="magazines"{% if section_title|trim != '' %} aria-labelledby="magazines-heading"{% endif %}>
+  <div class="container">
+    {% include 'partials/section-head.twig' with {
+      heading_id: 'magazines-heading',
+      section_link_url: magazines_archive_url,
+      section_link_label: 'آرشیو ←'
+    } %}
+    <div class="magazines-carousel" data-ak-magazines>
+      <div class="magazines-carousel__viewport">
+        <ul class="magazines-carousel__track">
+          {% for item in magazines %}
+            <li class="magazine-item magazines-carousel__slide">
+              <a href="{{ item.link }}">
+                <div class="magazine-item__cover">
+                  <img src="{{ item.image }}" width="300" height="400" alt="{{ item.title }}" loading="lazy" decoding="async" />
+                </div>
+                <h3>{{ item.title }}</h3>
+                <time datetime="{{ item.date_iso }}">{{ item.date }}</time>
+              </a>
+            </li>
+          {% else %}
+            <li class="magazines-carousel__empty"><p>مجله‌ای ثبت نشده است.</p></li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="magazines-carousel__controls kiosk-carousel__controls" hidden>
+        <button type="button" class="kiosk-carousel__btn kiosk-carousel__btn--prev" data-magazines-prev aria-label="قبلی">
+          <svg class="kiosk-carousel__btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="magazines-carousel__dots" data-magazines-dots></div>
+        <button type="button" class="kiosk-carousel__btn kiosk-carousel__btn--next" data-magazines-next aria-label="بعدی">
+          <svg class="kiosk-carousel__btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

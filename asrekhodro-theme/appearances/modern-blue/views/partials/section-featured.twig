@@ -1,0 +1,65 @@
+{% import 'partials/macros.twig' as ak %}
+{% if section_title is not defined %}{% set section_title = 'اخبار ویژه' %}{% endif %}
+
+<section class="mb-featured"{% if section_title|trim != '' %} aria-labelledby="featured-heading"{% endif %}>
+  {% if section_title|trim != '' %}
+  <header class="mb-featured__head">
+    <h2 id="featured-heading" class="mb-featured__title">{{ section_title }}</h2>
+    <p class="mb-featured__sub">جدیدترین خبرها، تحلیل‌ها و گزارش‌های ویژه از دنیای خودرو.</p>
+    {% if news_archive_url is defined and news_archive_url %}
+      <a href="{{ news_archive_url }}" class="mb-featured__archive">مشاهده همه ←</a>
+    {% endif %}
+  </header>
+  {% endif %}
+
+  {% if featured_posts|length > 0 %}
+    {% set featured_primary = featured_posts|slice(0, 9) %}
+
+    {% for row in featured_primary|batch(3, false) %}
+      <div class="mb-featured__grid">
+        {% for post in row %}
+          {% set cat = post.terms('category')|first %}
+          <article class="mb-featured__card">
+            <a href="{{ post.link }}" class="mb-featured__card-link">
+              <div class="mb-featured__media">
+                {{ ak.post_image(post, 900, 560) }}
+              </div>
+              <div class="mb-featured__body">
+                <h3 class="mb-featured__card-title">{{ post.title }}</h3>
+                <div class="mb-featured__specs">
+                  <div>
+                    <span>{{ ak_post_date(post) }}</span>
+                    تاریخ
+                  </div>
+                  <div>
+                    <span>{{ cat ? cat.name : 'اخبار' }}</span>
+                    دسته
+                  </div>
+                  <div>
+                    <span>{{ post.meta('_asrekhodro_over_title')|default(post.meta('_asrekhodro_author')|default('ویژه')) }}</span>
+                    برچسب
+                  </div>
+                </div>
+                <span class="mb-featured__btn">مشاهده خبر ←</span>
+              </div>
+            </a>
+          </article>
+        {% endfor %}
+      </div>
+
+      {% if loop.first and content_row_ad is defined and content_row_ad|length > 0 %}
+        <div class="ad-banner ad-banner--row mb-featured__ad" role="complementary">
+          <div class="ad-banner__inner">
+            <a
+              href="{{ content_row_ad[0].link }}"
+              class="ad-banner__slot"
+              target="{{ content_row_ad[0].link_target|default('_blank') }}"
+              rel="{{ content_row_ad[0].link_rel|default('noopener noreferrer') }}"
+              {% if content_row_ad[0].image %} style="background-image:url('{{ content_row_ad[0].image }}')"{% endif %}
+            ></a>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+</section>

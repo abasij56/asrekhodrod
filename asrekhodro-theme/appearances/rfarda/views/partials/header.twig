@@ -1,0 +1,16 @@
+<header class="site-header site-header--rfarda">
+  <div class="container">
+    <div class="rfarda-header__center">
+      {% include 'partials/site-logo.twig' with { class: 'rfarda-logo', variant: 'header' } %}
+      <button class="nav-toggle rfarda-nav-toggle" id="nav-toggle" type="button" aria-label="باز کردن منو" aria-expanded="false" aria-controls="main-nav">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <nav class="main-nav rfarda-nav" id="main-nav" aria-label="منوی اصلی">
+      <ul class="main-nav__list rfarda-nav__list">
+        {% include 'partials/main-nav-items.twig' with { items: main_nav_items|default([]) } %}
+      </ul>
+    </nav>
+  </div>
+</header>

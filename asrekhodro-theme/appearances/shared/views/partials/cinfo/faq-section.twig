@@ -1,0 +1,27 @@
+{% if faq_has_content and faq_items|length > 0 %}
+  <section
+    class="ci-faq-slide ci-section--faq {{ section_modifier_class }}"
+    id="{{ block.anchor|default(faq_default_anchor) }}"
+  >
+    <div class="container ci-faq__inner">
+      <div class="ci-faq__panel">
+        {% if faq_title %}
+          <h2 class="ci-faq__title">{{ faq_title }}</h2>
+        {% endif %}
+
+        <div class="ci-faq__list">
+          {% for item in faq_items %}
+            <details class="ci-faq"{% if faq_open_first and loop.first %} open{% endif %}>
+              {% if item.question %}
+                <summary class="ci-faq__question">{{ item.question }}</summary>
+              {% endif %}
+              {% if item.answer %}
+                <p class="ci-faq__answer">{{ item.answer|nl2br }}</p>
+              {% endif %}
+            </details>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </section>
+{% endif %}

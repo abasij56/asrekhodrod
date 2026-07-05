@@ -1,0 +1,22 @@
+{% set filter = filter|default(news_date_filter|default({})) %}
+{% if filter.years|default([])|length %}
+  <form
+    class="news-archive-date-filter date-filter"
+    method="get"
+    action="{{ filter.action_url|default('') }}"
+    data-ak-news-date-filter
+    data-month-lengths="{{ filter.month_lengths_json|default('{}')|e('html_attr') }}"
+  >
+    <div class="news-archive-date-filter__head date-filter__head">
+      <h2 class="news-archive-date-filter__title date-filter__title">فیلتر تاریخ</h2>
+      {% if filter.is_active|default(false) %}
+        <a class="news-archive-date-filter__clear date-filter__clear" href="{{ filter.clear_url }}">حذف فیلتر</a>
+      {% endif %}
+    </div>
+
+    {% include 'partials/date-filter-form-fields.twig' with {
+      filter: filter,
+      fields_class: 'news-archive-date-filter__fields'
+    } %}
+  </form>
+{% endif %}

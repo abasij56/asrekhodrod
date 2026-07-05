@@ -1,0 +1,48 @@
+{% if gallery_has_content and gallery_images|length > 0 %}
+  <section
+    class="ci-gallery-slide ci-section--gallery {{ section_modifier_class }}"
+    id="{{ block.anchor|default(gallery_default_anchor) }}"
+  >
+    <div class="container ci-gallery__inner">
+      <div class="ci-gallery__panel">
+        {% if gallery_title %}
+          <h2 class="ci-gallery__title">{{ gallery_title }}</h2>
+        {% endif %}
+
+        <div class="ci-gallery-wrap" data-car-gallery>
+          {% for group in gallery_groups %}
+            {% if group.title %}
+              <h3 class="ci-gallery__group-title">{{ group.title }}</h3>
+            {% endif %}
+
+            {% if group.images|length > 0 %}
+              <ul class="ci-gallery">
+                {% for image in group.images %}
+                  <li class="ci-gallery__item">
+                    <button
+                      type="button"
+                      class="ci-gallery__thumb"
+                      data-car-gallery-open
+                      data-full-src="{{ image.full_url }}"
+                      data-full-alt="{{ image.alt }}"
+                      aria-label="بزرگنمایی تصویر"
+                    >
+                      <img
+                        src="{{ image.thumb_url }}"
+                        alt=""
+                        width="{{ image.width }}"
+                        height="{{ image.height }}"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </button>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </section>
+{% endif %}

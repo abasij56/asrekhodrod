@@ -1,0 +1,6 @@
+<h2{% if id %} id="{{ id }}"{% endif %} class="rfarda-col-head{{ variant|default('') == 'lead' ? ' rfarda-col-head--lead' : '' }}">
+  <span class="rfarda-col-head__text">{{ title }}</span>
+  {% if url %}
+    <a href="{{ url }}" class="rfarda-col-head__chevron" aria-label="{{ link_label|default('مشاهده ' ~ title) }}">›</a>
+  {% endif %}
+</h2>

@@ -1,0 +1,33 @@
+{% set filter = filter|default({}) %}
+{% set compact = compact|default(false) %}
+{% if filter.years|default([])|length %}
+  <div class="date-filter__fields {{ fields_class|default('') }}{% if compact %} date-filter__fields--compact{% endif %}">
+    <label class="date-filter__field date-filter__field--year">
+      <select class="date-filter__select" name="jyear" data-news-date-year required aria-label="سال">
+        <option value="">{{ compact ? 'سال' : 'انتخاب سال' }}</option>
+        {% for option in filter.years %}
+          <option value="{{ option.value }}"{% if option.selected %} selected{% endif %}>{{ option.label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label class="date-filter__field date-filter__field--month">
+      <select class="date-filter__select" name="jmonth" data-news-date-month aria-label="ماه">
+        <option value="">{{ compact ? 'ماه' : 'همه ماه‌ها' }}</option>
+        {% for option in filter.months %}
+          <option value="{{ option.value }}"{% if option.selected %} selected{% endif %}>{{ option.label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label class="date-filter__field date-filter__field--day">
+      <select class="date-filter__select" name="jday" data-news-date-day{% if filter.month|default(0) <= 0 %} disabled{% endif %} aria-label="روز">
+        {% for option in filter.days|default([]) %}
+          <option value="{{ option.value }}"{% if option.selected %} selected{% endif %}>{{ option.value == 0 and compact ? 'روز' : option.label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <button type="submit" class="btn btn--primary date-filter__submit">نمایش</button>
+  </div>
+{% endif %}

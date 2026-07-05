@@ -1,0 +1,8 @@
+{% if section_title|default('')|trim != '' %}
+<div class="section-head">
+  <h2{% if heading_id|default('') %} id="{{ heading_id }}"{% endif %}>{{ section_title }}</h2>
+  {% if section_link_url|default('') %}
+    <a href="{{ section_link_url }}">{{ section_link_label|default('مشاهده همه ←') }}</a>
+  {% endif %}
+</div>
+{% endif %}

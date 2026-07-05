@@ -1,0 +1,19 @@
+{
+  "active": "remote",
+  "connections": {
+    "local": {
+      "description": "Local SQL Server (previous default — Windows auth via sqlcmd)",
+      "server": ".",
+      "database": "AsreKhodroFront"
+    },
+    "remote": {
+      "description": "Legacy production SQL Server",
+      "server": "87.107.154.141",
+      "database": "AsreKhodroFront",
+      "user": "sa",
+      "password": "YOUR_PASSWORD_HERE",
+      "encrypt": true,
+      "trustServerCertificate": true
+    }
+  }
+}

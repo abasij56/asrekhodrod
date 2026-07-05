@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>جداسازی ظاهر از داده — تم عصر خودرو</title>
+  <style>
+    :root {
+      --bg: #f8f9fb;
+      --card: #ffffff;
+      --text: #1a1d26;
+      --muted: #5c6370;
+      --accent: #c41e3a;
+      --border: #e4e7ec;
+      --code-bg: #f1f3f6;
+      --good: #0d7a4e;
+      --warn: #b45309;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, "Vazirmatn", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      font-size: 16px;
+    }
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #1a1d26 0%, #2d3344 100%);
+      color: #fff;
+      padding: 2.5rem 1.25rem;
+      margin-bottom: 2rem;
+    }
+    header .wrap { padding: 0; }
+    header h1 { margin: 0 0 0.5rem; font-size: 1.75rem; }
+    header p { margin: 0; opacity: 0.85; font-size: 0.95rem; }
+    h2 {
+      margin: 2.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--accent);
+      font-size: 1.35rem;
+    }
+    h3 { margin: 1.5rem 0 0.75rem; font-size: 1.1rem; color: #2d3344; }
+    p { margin: 0.75rem 0; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .highlight {
+      border-right: 4px solid var(--accent);
+      background: #fff5f6;
+    }
+    .good { border-right-color: var(--good); background: #f0fdf6; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.95rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.65rem 0.85rem;
+      text-align: right;
+    }
+    th { background: #eef0f4; font-weight: 600; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    code, pre {
+      font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+      font-size: 0.88rem;
+      direction: ltr;
+      text-align: left;
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    ul, ol { margin: 0.5rem 0; padding-right: 1.5rem; }
+    li { margin: 0.35rem 0; }
+    .tag {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      margin-left: 0.35rem;
+      vertical-align: middle;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    .summary-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .summary-item strong { display: block; color: var(--accent); margin-bottom: 0.35rem; }
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>جداسازی ظاهر از داده</h1>
+    <p>تحلیل معماری تم Asre Khodro — Appearance Package Pattern</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="card highlight">
+    <p><strong>نظر کلی:</strong> بله، این ایده کاملاً امکان‌پذیر است و از نظر معماری هم منطقی است — شبیه الگوی «پوسته / Skin» یا «Presentation Package». در وردپرس هم نمونه‌های نزدیک دارد (child theme، Block themes، یا تم‌های چندحالته).</p>
+    <p>اما جداسازی ۱۰۰٪ تمیز در وردپرس سخت است؛ با این حال می‌توانید به <strong>۸۰–۹۰٪ جداسازی عملی</strong> برسید که برای هدف شما کافی است.</p>
+  </div>
+
+  <h2>وضعیت فعلی تم</h2>
+  <p>الان ساختار تقریباً این‌طور است:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>لایه داده (Core)</th>
+        <th>لایه ظاهر (Presentation)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>PostTypes</code>, <code>ImporterBridge</code>, <code>NewsPermalinks</code>, <code>CarsInfo</code></td>
+        <td><code>views/*.twig</code></td>
+      </tr>
+      <tr>
+        <td><code>Homepage::get_context()</code>, <code>RfPage</code>, <code>CarbuzzPage</code></td>
+        <td><code>assets/css</code>, <code>assets/js</code></td>
+      </tr>
+      <tr>
+        <td><code>ContactForm</code>, <code>AjaxSearch</code>, <code>PostViews</code></td>
+        <td><code>Setup::enqueue_assets()</code></td>
+      </tr>
+      <tr>
+        <td><code>AcfFields</code> (تنظیمات)</td>
+        <td><code>Blocks</code>, <code>CarBlocks</code> + Twig بلوک‌ها</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>جریان فعلی در <code>front-page.php</code>:</p>
+  <pre>$context = array_merge( $context, Homepage::get_context() );
+Timber\Timber::render( 'front-page.twig', $context );</pre>
+
+  <p>یعنی <strong>داده از Homepage می‌آید</strong> و <strong>چیدمان از Twig</strong>. این پایه خوبی برای جداسازی است.</p>
+
+  <div class="card">
+    <p>نکته: کلاس‌هایی مثل <code>RfPage</code> و <code>CarbuzzPage</code> الان هم داده می‌گیرند هم برای یک layout خاص طراحی شده‌اند — در واقع <strong>نیمه‌ظاهر</strong> هستند. <code>page-rf.php</code> و <code>page-carbuzz.php</code> عملاً دو «ظاهر جایگزین» هستند که هنوز به‌صورت یک سیستم واحد مدیریت نمی‌شوند.</p>
+  </div>
+
+  <h2>معماری پیشنهادی</h2>
+  <pre>asrekhodro-theme/
+├── core/                    ← همیشه لود می‌شود
+│   ├── inc/
+│   │   ├── PostTypes.php
+│   │   ├── ImporterBridge.php
+│   │   ├── HomepageData.php   ← فقط داده، بدون دانستن Twig
+│   │   └── ...
+│   └── contracts/
+│       └── AppearanceInterface.php
+│
+├── appearances/
+│   ├── classic/             ← ظاهر ۱
+│   │   ├── views/
+│   │   ├── assets/
+│   │   ├── ClassicAppearance.php
+│   │   └── manifest.php
+│   │
+│   └── modern/              ← ظاهر ۲
+│       ├── views/
+│       ├── assets/
+│       └── ModernAppearance.php
+│
+├── functions.php
+└── inc/Theme.php</pre>
+
+  <h3>جریان کار</h3>
+  <ol>
+    <li>در ACF Options یک فیلد مثل <code>active_appearance</code> با مقادیر <code>classic</code> / <code>modern</code></li>
+    <li>در <code>Theme::init()</code> مقدار را بخوانید (یک بار، با object cache)</li>
+    <li>کلاس ظاهر فعال:
+      <ul>
+        <li><code>Timber::$dirname</code> را به <code>appearances/{name}/views</code> تنظیم کند</li>
+        <li>فقط CSS/JS همان پوشه را enqueue کند</li>
+        <li>در صورت نیاز template controllerهای خودش را ثبت کند</li>
+      </ul>
+    </li>
+    <li>لایه core فقط ViewModel یا context استاندارد برگرداند</li>
+  </ol>
+
+  <h3>قرارداد بین لایه‌ها</h3>
+  <p>به‌جای اینکه هر ظاهر <code>Homepage::get_context()</code> کامل را بگیرد (که ممکن است ۱۰+ query بزند):</p>
+  <pre>// core
+interface SectionDataProvider {
+    public function hero(): array;
+    public function news_list(int $count): PostQuery;
+    public function magazines(int $count): PostQuery;
+}
+
+// appearance/classic → فقط hero + news_list + magazines
+// appearance/minimal → فقط hero + news_list  ← سریع‌تر!</pre>
+  <p>این جایی است که جداسازی می‌تواند <strong>عملکرد را بهتر</strong> کند، نه بدتر.</p>
+
+  <h2>چه چیزهایی کاملاً جدا نمی‌شوند؟</h2>
+  <table>
+    <thead>
+      <tr><th>موضوع</th><th>چرا</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>add_image_size()</code> در Setup</td><td>سایز تصویر به URL نهایی وابسته است؛ معمولاً در core می‌ماند</td></tr>
+      <tr><td>ثبت منوها</td><td>داده است، ولی ظاهر تصمیم می‌گیرد کدام منو کجا رندر شود</td></tr>
+      <tr><td>ACF Blocks در ادیتور</td><td>اگر هر ظاهر بلوک متفاوت دارد، باید blockها هم per-appearance ثبت شوند</td></tr>
+      <tr><td>ImporterBridge Twig functions</td><td>helper داده‌اند؛ در core می‌مانند</td></tr>
+      <tr><td>Permalink / Redirect</td><td>کاملاً مستقل از ظاهر — در core</td></tr>
+    </tbody>
+  </table>
+
+  <h2>تأثیر بر عملکرد <span class="tag">۲۰۰ هزار پست</span> <span class="tag">هدف &lt; ۱ ثانیه</span></h2>
+
+  <div class="card good">
+    <p><strong>خبر خوب:</strong> تعداد کل پست‌ها در دیتابیس به‌تنهایی سرعت صفحه را تعیین نمی‌کند. مهم است: چند query در هر request، آیا cache دارید، حجم HTML/CSS/JS، و TTFB سرور.</p>
+  </div>
+
+  <h3>سوییچ ظاهر چقدر هزینه دارد؟</h3>
+  <table>
+    <thead>
+      <tr><th>عملیات</th><th>هزینه تقریبی</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>خواندن <code>active_appearance</code> از options</td><td>~۰.۱ms (با object cache)</td></tr>
+      <tr><td>لود PHP فقط ظاهر فعال</td><td>ناچیز</td></tr>
+      <tr><td>enqueue فقط assetهای ظاهر فعال</td><td>همان چیزی که الان هم دارید</td></tr>
+      <tr><td>وجود پوشه دوم روی دیسک</td><td><strong>صفر</strong> — اگر لود نشود</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>دو پوشه ظاهر روی دیسک، اگر فقط یکی فعال باشد، تقریباً هیچ تأثیری روی runtime ندارد.</strong></p>
+
+  <h3>چیزهایی که واقعاً سرعت را می‌کشند</h3>
+  <p>الان <code>Homepage::get_context()</code> چندین query پشت‌سرهم دارد (ticker، hero، featured، news_list، magazines، videos، reviews). این <strong>مستقل از ظاهر</strong> است.</p>
+
+  <p>برای هدف زیر ۱ ثانیه، معمولاً لازم است:</p>
+  <ol>
+    <li><strong>Full Page Cache</strong> (Redis + Varnish/Nginx FastCGI cache یا WP Rocket)</li>
+    <li><strong>Object Cache</strong> برای queryهای وردپرس</li>
+    <li><strong>Fragment cache</strong> برای بخش‌های homepage</li>
+    <li><strong>CDN</strong> برای media و static assets</li>
+    <li>هر ظاهر فقط داده‌ای بگیرد که واقعاً نمایش می‌دهد</li>
+  </ol>
+
+  <div class="card highlight">
+    <p>جداسازی ظاهر اگر درست انجام شود، می‌تواند query اضافی را کم کند؛ ولی <strong>بدون page cache، هیچ معماری به‌تنهایی زیر ۱ ثانیه را تضمین نمی‌کند.</strong></p>
+  </div>
+
+  <h2>مزایا و معایب</h2>
+
+  <h3>مزایا</h3>
+  <ul>
+    <li>تعویض کل ظاهر با یک option</li>
+    <li>توسعه موازی دو طراحی بدون دست زدن به core</li>
+    <li>تست A/B ظاهر</li>
+    <li>کد تمیزتر و قابل نگهداری‌تر</li>
+    <li>امکان lazy-load داده per-appearance</li>
+  </ul>
+
+  <h3>معایب / ریسک‌ها</h3>
+  <ul>
+    <li><strong>هزینه نگهداری دوبرابر</strong> — هر فیچر UI باید در هر ظاهر پیاده یا shared شود</li>
+    <li>قرارداد context باید stable باشد</li>
+    <li>ACF blocks و page templates نیاز به abstraction دارند</li>
+    <li>migration از ساختار فعلی refactor تدریجی می‌خواهد</li>
+  </ul>
+
+  <h2>توصیه عملی</h2>
+
+  <h3>مرحله ۱ — جداسازی نرم (کم‌ریسک)</h3>
+  <ul>
+    <li><code>views/</code> و <code>assets/</code> را به <code>appearances/classic/</code> منتقل کنید</li>
+    <li>یک <code>AppearanceResolver</code> بسازید</li>
+    <li><code>Setup::enqueue_assets()</code> را به کلاس ظاهر منتقل کنید</li>
+    <li>core دست نخورده بماند</li>
+  </ul>
+
+  <h3>مرحله ۲ — قرارداد داده</h3>
+  <ul>
+    <li><code>Homepage</code> را به <code>HomepageData</code> تبدیل کنید با متدهای granular</li>
+    <li>هر ظاهر فقط آنچه لازم دارد را بخواهد</li>
+  </ul>
+
+  <h3>مرحله ۳ — ظاهر دوم</h3>
+  <ul>
+    <li>وقتی قرارداد stable شد، <code>appearances/modern/</code> را بسازید</li>
+    <li>option سوییچ را اضافه کنید</li>
+  </ul>
+
+  <h2>جمع‌بندی</h2>
+  <div class="summary-grid">
+    <div class="summary-item">
+      <strong>امکان‌پذیر است؟</strong>
+      بله — با الگوی Appearance Package
+    </div>
+    <div class="summary-item">
+      <strong>سوییچ با option؟</strong>
+      بله — مسیر Twig + enqueue + controllers
+    </div>
+    <div class="summary-item">
+      <strong>۲۰۰k پست مشکل؟</strong>
+      نه به‌خاطر دو پوشه؛ مشکل از query و نبود cache است
+    </div>
+    <div class="summary-item">
+      <strong>زیر ۱ ثانیه؟</strong>
+      با cache بله؛ بدون cache سخت است
+    </div>
+    <div class="summary-item">
+      <strong>ارزش دارد؟</strong>
+      اگر دو طراحی متفاوت می‌خواهید بله
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>نقطه طلایی:</strong> داده را به ViewModelهای کوچک و مستقل بشکنید و ظاهر فقط مصرف‌کننده آن‌ها باشد — نه اینکه هر ظاهر نسخه کپی‌شده‌ای از <code>Homepage.php</code> داشته باشد.</p>
+  </div>
+
+  <footer>
+    <p>سند تحلیل معماری — تم Asre Khodro — ژوئن ۲۰۲۶</p>
+  </footer>
+
+</main>
+</body>
+</html>

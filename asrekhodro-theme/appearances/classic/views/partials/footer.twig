@@ -1,0 +1,114 @@
+{% set footer_bg = options.footer_background_color|default('') %}
+{% set show_brand = options.footer_show_brand_column is not defined or options.footer_show_brand_column %}
+{% set show_brand_text = options.footer_show_brand_text is not defined or options.footer_show_brand_text %}
+{% set footer_tagline = options.footer_logo_tagline|default('') %}
+{% set footer_brand_heading = options.footer_brand_heading|default(site.name) %}
+{% set footer_about_title = options.footer_about_title|default('') %}
+{% set footer_categories_title = options.footer_categories_title|default('') %}
+{% set footer_contact_title = options.footer_contact_title|default('') %}
+{% set show_about = options.footer_show_about_column is not defined or options.footer_show_about_column %}
+{% set show_categories = options.footer_show_categories_column is not defined or options.footer_show_categories_column %}
+{% set show_contact_col = options.footer_show_contact_column is not defined or options.footer_show_contact_column %}
+{% set show_social = options.footer_show_social is not defined or options.footer_show_social %}
+{% set copyright_raw = options.footer_copyright_text|default('© %year% عصر خودرو — تمامی حقوق محفوظ است.') %}
+{% set copyright_text = copyright_raw|replace({'%year%': "now"|date("Y"), '%site_name%': site.name}) %}
+{% set show_certificates = options.footer_show_certificates is not defined or options.footer_show_certificates %}
+{% set certificates = footer_certificates|default([]) %}
+{% set has_certificates = show_certificates and certificates|length %}
+{% set about_links = footer_about_links|default([]) %}
+{% set categories_links = footer_categories_links|default([]) %}
+{% set has_contact_info = options.contact_address|default('') or options.contact_phone|default('') or options.contact_email|default('') %}
+
+<footer class="site-footer"{% if footer_bg %} style="background-color: {{ footer_bg }};"{% endif %}>
+  <div class="container">
+    <div class="footer-grid">
+      {% if show_brand %}
+        <div class="footer-brand">
+          {% include 'partials/site-logo.twig' with {
+            variant: 'footer',
+            tagline: footer_tagline,
+            brand_heading: footer_brand_heading
+          } %}
+          {% if show_brand_text and options.footer_text|default('') %}
+            <p>{{ options.footer_text }}</p>
+          {% endif %}
+        </div>
+      {% endif %}
+      {% if show_about and (footer_about_title or about_links|length) %}
+        <div class="footer-col">
+          {% if footer_about_title %}
+            <h4>{{ footer_about_title }}</h4>
+          {% endif %}
+          {% if about_links|length %}
+            <ul>
+              {% for link in about_links %}
+                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      {% endif %}
+      {% if show_categories and (footer_categories_title or categories_links|length) %}
+        <div class="footer-col">
+          {% if footer_categories_title %}
+            <h4>{{ footer_categories_title }}</h4>
+          {% endif %}
+          {% if categories_links|length %}
+            <ul>
+              {% for link in categories_links %}
+                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      {% endif %}
+      {% if show_contact_col and (footer_contact_title or has_contact_info or has_certificates) %}
+        <div class="footer-col">
+          {% if footer_contact_title %}
+            <h4>{{ footer_contact_title }}</h4>
+          {% endif %}
+          {% if has_contact_info %}
+            <address>
+              <ul>
+                {% if options.contact_address|default('') %}<li>{{ options.contact_address }}</li>{% endif %}
+                {% if options.contact_phone|default('') %}<li><a href="tel:{{ options.contact_phone }}">{{ options.contact_phone }}</a></li>{% endif %}
+                {% if options.contact_email|default('') %}<li><a href="mailto:{{ options.contact_email }}">{{ options.contact_email }}</a></li>{% endif %}
+              </ul>
+            </address>
+          {% endif %}
+          {% if has_certificates %}
+            <div class="footer-certificates" aria-label="مجوزها">
+              <ul class="footer-certificates__grid">
+                {% for cert in certificates %}
+                  <li class="footer-certificates__item">
+                    {% if cert.url|default('') %}
+                      <a class="footer-certificates__link" href="{{ cert.url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ cert.alt }}">
+                        <img src="{{ cert.image }}" alt="{{ cert.alt }}" loading="lazy" decoding="async" />
+                      </a>
+                    {% else %}
+                      <span class="footer-certificates__badge">
+                        <img src="{{ cert.image }}" alt="{{ cert.alt }}" loading="lazy" decoding="async" />
+                      </span>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+    <div class="footer-bottom">
+      <span>{{ copyright_text }}</span>
+      <div class="footer-bottom__aside">
+        {% if show_social and footer_social_links|default([])|length %}
+          <div class="footer-bottom__social" aria-label="شبکه‌های اجتماعی">
+            {% for item in footer_social_links %}
+              <a href="{{ item.url }}" aria-label="{{ item.label }}" rel="noopener noreferrer">{{ item.svg|raw }}</a>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</footer>

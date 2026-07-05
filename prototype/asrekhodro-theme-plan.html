@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>عصر خودرو — طرح توسعه تم وردپرس</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --brand: #e10600;
+      --brand-soft: #fff0f0;
+      --accent: #0066cc;
+      --ink: #0d0d0d;
+      --ink-soft: #3d3d3d;
+      --ink-muted: #6b6b6b;
+      --line: #e5e5e5;
+      --surface: #ffffff;
+      --surface-alt: #f7f7f8;
+      --surface-dark: #0a0a0b;
+      --radius: 12px;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Vazirmatn", Tahoma, sans-serif;
+      background: var(--surface-alt);
+      color: var(--ink);
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .doc-header {
+      background: linear-gradient(135deg, var(--surface-dark) 0%, #1a1a2e 100%);
+      color: #fff;
+      padding: 3rem 0;
+      border-bottom: 4px solid var(--brand);
+    }
+
+    .container {
+      width: min(100% - 2rem, 960px);
+      margin-inline: auto;
+    }
+
+    .doc-header h1 {
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .doc-header .meta {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+    }
+
+    .doc-header .badge {
+      display: inline-block;
+      background: var(--brand);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      margin-bottom: 1rem;
+    }
+
+    main { padding: 2.5rem 0 4rem; }
+
+    section {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    section h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 3px solid var(--brand);
+      display: inline-block;
+    }
+
+    section h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 1.25rem 0 0.6rem;
+      color: var(--ink-soft);
+    }
+
+    p, li { color: var(--ink-soft); font-size: 0.95rem; }
+    p { margin-bottom: 0.75rem; }
+
+    ul, ol { padding-right: 1.25rem; margin-bottom: 0.75rem; }
+    li { margin-bottom: 0.35rem; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin: 1rem 0;
+    }
+
+    th, td {
+      border: 1px solid var(--line);
+      padding: 0.65rem 0.85rem;
+      text-align: right;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--surface-alt);
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    code, pre {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.82rem;
+      direction: ltr;
+      text-align: left;
+    }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      padding: 1.25rem;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      margin: 1rem 0;
+      line-height: 1.5;
+    }
+
+    .callout {
+      background: var(--brand-soft);
+      border-right: 4px solid var(--brand);
+      padding: 1rem 1.25rem;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      margin: 1rem 0;
+    }
+
+    .callout strong { color: var(--brand); }
+
+    .callout-info {
+      background: #e8f2fc;
+      border-right-color: var(--accent);
+    }
+
+    .callout-info strong { color: var(--accent); }
+
+    .phase-grid {
+      display: grid;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .phase-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      padding: 0.85rem 1rem;
+      background: var(--surface-alt);
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+    }
+
+    .phase-num {
+      width: 36px;
+      height: 36px;
+      background: var(--brand);
+      color: #fff;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .phase-item strong { color: var(--ink); font-size: 0.92rem; }
+    .phase-item span:last-child {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      white-space: nowrap;
+    }
+
+    .decisions {
+      list-style: none;
+      padding: 0;
+    }
+
+    .decisions li {
+      background: var(--surface-alt);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 0.85rem 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .decisions li strong { color: var(--ink); }
+
+    .toc {
+      background: var(--surface-alt);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--line);
+    }
+
+    .toc h2 {
+      font-size: 1rem;
+      border: none;
+      margin-bottom: 0.75rem;
+      padding: 0;
+    }
+
+    .toc ol { margin: 0; }
+    .toc a { color: var(--ink-soft); font-weight: 500; }
+
+    footer.doc-footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      border-top: 1px solid var(--line);
+    }
+
+    @media print {
+      body { background: #fff; }
+      section { box-shadow: none; break-inside: avoid; }
+      .doc-header { background: #111; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="doc-header">
+    <div class="container">
+      <span class="badge">سند برنامه‌ریزی — پیش از توسعه</span>
+      <h1>طرح توسعه تم وردپرس عصر خودرو</h1>
+      <p class="meta">
+        مسیر: <code>awp/wp-content/themes/asrekhodro-theme</code> ·
+        مبنا: <code>prototype/</code> ·
+        همگام با: <code>asrekhodro-importer</code> ·
+        تاریخ: خرداد ۱۴۰۵
+      </p>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <nav class="toc" aria-label="فهرست">
+      <h2>فهرست مطالب</h2>
+      <ol>
+        <li><a href="#goal">هدف</a></li>
+        <li><a href="#phase-0">فاز ۰ — همگام‌سازی با Importer</a></li>
+        <li><a href="#phase-1">فاز ۱ — زیرساخت تم</a></li>
+        <li><a href="#phase-2">فاز ۲ — Post Types</a></li>
+        <li><a href="#phase-3">فاز ۳ — بلوک‌های صفحه اصلی</a></li>
+        <li><a href="#phase-4">فاز ۴ — جستجوی AJAX</a></li>
+        <li><a href="#phase-5">فاز ۵ — عملکرد زیر ۱ ثانیه</a></li>
+        <li><a href="#phase-6">فاز ۶ — Lazy Loading</a></li>
+        <li><a href="#phase-7">فاز ۷ — فیلدهای ACF</a></li>
+        <li><a href="#phase-8">فاز ۸ — قالب‌های داخلی</a></li>
+        <li><a href="#roadmap">ترتیب پیاده‌سازی</a></li>
+        <li><a href="#decisions">تصمیم‌های مورد نیاز</a></li>
+      </ol>
+    </nav>
+
+    <section id="goal">
+      <h2>هدف</h2>
+      <p>
+        ساخت تم وردپرس در مسیر <strong>asrekhodro-theme</strong> که:
+      </p>
+      <ul>
+        <li>ظاهر و ساختار <strong>prototype</strong> (صفحه استاتیک تأیید مدیریت) را پیاده کند</li>
+        <li>داده‌های واردشده توسط <strong>AsreKhodro Importer</strong> را بخواند</li>
+        <li>سریع باشد (هدف: TTFB + رندر صفحه اصلی زیر ~۱ ثانیه با کش)</li>
+        <li>قابل ویرایش با <strong>ACF Blocks</strong> و قالب‌بندی <strong>Timber (Twig)</strong></li>
+      </ul>
+    </section>
+
+    <section id="phase-0">
+      <h2>فاز ۰ — همگام‌سازی با Importer (بحرانی)</h2>
+      <p>وضعیت فعلی importer:</p>
+      <table>
+        <thead>
+          <tr><th>منبع</th><th>وردپرس امروز</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>اخبار</td><td><code>post</code></td></tr>
+          <tr><td>دسته‌بندی‌ها</td><td><code>category</code></td></tr>
+          <tr><td>برچسب‌ها</td><td><code>post_tag</code></td></tr>
+          <tr><td>نظرات</td><td>comments</td></tr>
+          <tr><td>متا</td><td><code>_asrekhodro_content_id</code>, <code>_asrekhodro_image_url</code>, <code>_asrekhodro_author</code>, …</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <strong>قرارداد مشترک:</strong> تم و importer نباید نام فیلد جداگانه اختراع کنند — هر دو از یک قرارداد متا/ACF استفاده می‌کنند.
+      </div>
+
+      <h3>متا / فیلدهای پیشنهادی مشترک</h3>
+      <pre>_asrekhodro_content_id      → شناسه قدیمی (redirect، re-import)
+_asrekhodro_image_url       → تصویر خارجی (lazy load)
+_asrekhodro_content_type_id → نگاشت به CPT
+overTitle / underTitle      → ACF یا post meta</pre>
+
+      <h3>Importer نسخه ۰.۲ (ارتقای کوچک)</h3>
+      <ol>
+        <li>نگاشت <code>contentTypeId</code> → CPT (بر اساس asrekhodro.com)</li>
+        <li>ذخیره <code>overTitle</code> و <code>underTitle</code> در meta/ACF</li>
+        <li>اختیاری: redirect آدرس‌های قدیمی <code>/News/{contentId}/...</code></li>
+      </ol>
+    </section>
+
+    <section id="phase-1">
+      <h2>فاز ۱ — زیرساخت تم</h2>
+      <table>
+        <thead>
+          <tr><th>لایه</th><th>انتخاب</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>قالب‌بندی</td><td>Timber 2 (Twig)</td></tr>
+          <tr><td>فیلدها</td><td>ACF Pro (options + blocks + CPT fields)</td></tr>
+          <tr><td>بلوک‌ها</td><td>ACF Blocks (یک بلوک per بخش صفحه اصلی)</td></tr>
+          <tr><td>Build</td><td>Composer (<code>timber/timber</code>)</td></tr>
+          <tr><td>CSS/JS</td><td>انتقال از <code>prototype/assets/</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3>ساختار پوشه</h3>
+      <pre>asrekhodro-theme/
+├── composer.json
+├── functions.php
+├── style.css
+├── inc/
+│   ├── Setup.php
+│   ├── PostTypes.php
+│   ├── ImporterBridge.php
+│   ├── Search/Ajax.php
+│   ├── Cache/TimberCache.php
+│   └── Blocks/
+├── templates/          # PHP controllers
+├── views/              # Twig
+├── assets/css/style.css
+├── assets/js/app.js
+└── acf-json/</pre>
+    </section>
+
+    <section id="phase-2">
+      <h2>فاز ۲ — Post Types و Taxonomies</h2>
+      <table>
+        <thead>
+          <tr><th>CPT</th><th>کاربرد</th><th>Taxonomies</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>news</code> (یا <code>post</code>)</td><td>اخبار اصلی</td><td>category, post_tag</td></tr>
+          <tr><td><code>video</code></td><td>ویدئوهای عصر خودرو</td><td>video_category</td></tr>
+          <tr><td><code>magazine</code></td><td>مجلات روز</td><td>—</td></tr>
+          <tr><td><code>car_price</code></td><td>قیمت خودرو</td><td>car_brand</td></tr>
+          <tr><td><code>review</code></td><td>تست و بررسی</td><td>category</td></tr>
+          <tr><td><code>ad_slot</code></td><td>جایگاه تبلیغ (اختیاری)</td><td>ad_position</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="phase-3">
+      <h2>فاز ۳ — صفحه اصلی به‌صورت ACF Blocks</h2>
+      <p>صفحه اول = صفحه ویرایشگر با بلوک‌ها (یا <code>front-page.php</code> + block template).</p>
+      <table>
+        <thead>
+          <tr><th>بلوک</th><th>بخش prototype</th><th>منبع داده</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>ak/ad-strip</code></td><td>۳ تبلیغ زیر منو</td><td>ACF repeater یا CPT تبلیغ</td></tr>
+          <tr><td><code>ak/ticker</code></td><td>خبر فوری</td><td>آخرین اخبار (قابل override دستی)</td></tr>
+          <tr><td><code>ak/hero</code></td><td>تصویر بزرگ + ۴ خبر متنی</td><td>۱ featured + ۴ پست انتخابی</td></tr>
+          <tr><td><code>ak/featured-grid</code></td><td>اخبار ویژه</td><td>دسته / انتخاب دستی</td></tr>
+          <tr><td><code>ak/news-list</code></td><td>آخرین اخبار (۲ ستون)</td><td>Query: ۴۰ خبر آخر</td></tr>
+          <tr><td><code>ak/magazines</code></td><td>مجلات روز</td><td>CPT magazine</td></tr>
+          <tr><td><code>ak/videos</code></td><td>ویدئوها</td><td>CPT video</td></tr>
+          <tr><td><code>ak/car-market</code></td><td>قیمت خودرو</td><td>CPT car_price یا repeater</td></tr>
+          <tr><td><code>ak/reviews</code></td><td>تست و بررسی</td><td>CPT review</td></tr>
+          <tr><td><code>ak/newsletter</code></td><td>خبرنامه</td><td>ACF + فرم</td></tr>
+        </tbody>
+      </table>
+      <p><strong>چیدمان سراسری</strong> (خارج از بلوک): هدر، لوگو، منو، سایدبار تبلیغات، فوتر — از Theme Options ACF.</p>
+    </section>
+
+    <section id="phase-4">
+      <h2>فاز ۴ — جستجوی AJAX</h2>
+      <ul>
+        <li>Endpoint: <code>admin-ajax.php</code> یا REST <code>ak/v1/search</code></li>
+        <li>جستجو در: news, video, review, car_price</li>
+        <li>فیلدها: title, excerpt, <code>_asrekhodro_image_url</code></li>
+        <li>UI: جستجوی هدر prototype → dropdown نتایج (debounce 300ms)</li>
+        <li>اختیاری: لینک URLهای قدیمی از <code>_asrekhodro_content_id</code></li>
+      </ul>
+    </section>
+
+    <section id="phase-5">
+      <h2>فاز ۵ — عملکرد (هدف زیر ۱ ثانیه)</h2>
+      <table>
+        <thead>
+          <tr><th>تکنیک</th><th>هدف</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Timber Twig cache</td><td>کامپایل و کش قالب‌ها</td></tr>
+          <tr><td>Object cache (Redis)</td><td>کش نتایج query بلوک‌ها</td></tr>
+          <tr><td>Transient per block</td><td>مثلاً news-list با TTL ۵ دقیقه</td></tr>
+          <tr><td>بدون jQuery (در صورت امکان)</td><td>JS سبک‌تر</td></tr>
+          <tr><td>Critical CSS</td><td>inline برای above-the-fold</td></tr>
+          <tr><td>Defer JS</td><td><code>app.js</code> با defer</td></tr>
+          <tr><td>Lazy images</td><td><code>loading="lazy"</code> + <code>decoding="async"</code></td></tr>
+          <tr><td>تصاویر خارجی</td><td>بدون دانلود در import — URL مستقیم</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-info">
+        <strong>نکته:</strong> زیر ۱ ثانیه به هاست، Redis و CDN تصاویر بستگی دارد. تم برای این هدف ساخته می‌شود؛ تنظیم production (OPcache، page cache) مرحله ops جداست.
+      </div>
+    </section>
+
+    <section id="phase-6">
+      <h2>فاز ۶ — Lazy Loading</h2>
+      <h3>تصاویر</h3>
+      <ul>
+        <li>لیست‌ها: <code>loading="lazy"</code> + ابعاد ثابت (163×109 برای news-list)</li>
+        <li>Hero: <code>loading="eager"</code> + <code>fetchpriority="high"</code></li>
+        <li>اختیاری: Intersection Observer برای fade-in</li>
+      </ul>
+      <h3>لیست اخبار</h3>
+      <ul>
+        <li><strong>اولین بار:</strong> ۲۰ آیتم (یا ۴۰ — قابل تنظیم در بلوک)</li>
+        <li><strong>Load more:</strong> AJAX بار بعدی در گرید ۲ ستونه</li>
+      </ul>
+    </section>
+
+    <section id="phase-7">
+      <h2>فاز ۷ — طرح فیلدهای ACF</h2>
+      <h3>Theme Options</h3>
+      <ul>
+        <li>لوگو، شبکه‌های اجتماعی، متن فوتر، media base URL، جایگاه تبلیغات</li>
+      </ul>
+      <h3>هر پست news (همگام با importer)</h3>
+      <ul>
+        <li><code>over_title</code>, <code>under_title</code></li>
+        <li><code>legacy_content_id</code></li>
+        <li><code>external_image_url</code></li>
+      </ul>
+      <h3>هر بلوک</h3>
+      <ul>
+        <li>عنوان، تعداد، فیلتر دسته، انتخاب دستی پست</li>
+      </ul>
+      <p>Field groups در <code>acf-json/</code> برای version control.</p>
+    </section>
+
+    <section id="phase-8">
+      <h2>فاز ۸ — قالب‌های beyond homepage</h2>
+      <table>
+        <thead>
+          <tr><th>قالب</th><th>کاربرد</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>single-news.twig</code></td><td>مقاله (overTitle، body، مرتبط)</td></tr>
+          <tr><td><code>archive-category.twig</code></td><td>آرشیو دسته</td></tr>
+          <tr><td><code>single-video.twig</code></td><td>embed ویدئو</td></tr>
+          <tr><td><code>search.twig</code></td><td>نتایج جستجو</td></tr>
+          <tr><td><code>404.twig</code></td><td>صفحه خطا</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="roadmap">
+      <h2>ترتیب پیاده‌سازی (پس از تأیید)</h2>
+      <div class="phase-grid">
+        <div class="phase-item"><span class="phase-num">۱</span><strong>Scaffold تم + Timber + CSS/JS prototype</strong><span>—</span></div>
+        <div class="phase-item"><span class="phase-num">۲</span><strong>ImporterBridge + helpers تصویر/خلاصه</strong><span>—</span></div>
+        <div class="phase-item"><span class="phase-num">۳</span><strong>Layout پایه (header, nav, ads, footer, sidebar)</strong><span>—</span></div>
+        <div class="phase-item"><span class="phase-num">۴</span><strong>بلوک‌های صفحه اصلی: ticker, hero, featured, news-list</strong><span>—</span></div>
+        <div class="phase-item"><span class="phase-num">۵</span><strong>بلوک‌های باقی‌مانده: magazines, video, market, reviews, newsletter</strong><span>—</span></div>
+        <div class="phase-item"><span class="phase-num">۶</span><strong>جستجوی AJAX</strong><span>—</span></div>
+        <div class="phase-item"><span class="phase-num">۷</span><strong>قالب single/archive</strong><span>—</span></div>
+        <div class="phase-item"><span class="phase-num">۸</span><strong>Importer v0.2 (CPT + meta اضافی)</strong><span>—</span></div>
+        <div class="phase-item"><span class="phase-num">۹</span><strong>کش + polish lazy load</strong><span>—</span></div>
+      </div>
+    </section>
+
+    <section id="decisions">
+      <h2>تصمیم‌های مورد نیاز قبل از شروع</h2>
+      <ol class="decisions">
+        <li><strong>CPT vs post:</strong> اخبار به‌صورت <code>post</code> بماند یا CPT جدید <code>news</code>؟</li>
+        <li><strong>ACF Pro:</strong> لایسنس ACF Pro موجود است؟ (برای blocks لازم است)</li>
+        <li><strong>تبلیغات:</strong> مدیریت با ACF options repeater یا CPT <code>ad_slot</code>؟</li>
+        <li><strong>لیست اخبار:</strong> ۴۰ آیتم یکجا یا ۲۰ + «بارگذاری بیشتر»؟</li>
+        <li><strong>Importer v0.2:</strong> همزمان با تم یا فقط تم در فاز اول؟</li>
+        <li><strong>URLهای قدیمی:</strong> redirect <code>/News/{id}/...</code> به permalink جدید؟</li>
+      </ol>
+      <div class="callout">
+        پس از تأیید شما و پاسخ به موارد بالا، شروع از <strong>فاز ۱ تا ۴</strong> (زیرساخت تم + بلوک‌های صفحه اصلی + پل importer).
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="doc-footer">
+    عصر خودرو — سند طرح تم وردپرس · هم‌مسیر با asrekhodro-redesign.html و prototype/
+  </footer>
+
+</body>
+</html>

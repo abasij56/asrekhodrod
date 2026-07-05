@@ -1,0 +1,57 @@
+{% import 'partials/macros.twig' as ak %}
+
+{% set logo_image = options.site_logo %}
+{% set flip_total = flip_posts|length + 1 %}
+
+{% set flip_dom_id = flip_id|default('featured-magazine-flip') %}
+{% set flip_cover_title = cover_title|default('اخبار ویژه') %}
+
+<div
+  class="featured-magazine mag-flip"
+  id="{{ flip_dom_id }}"
+  data-mag-flip
+  aria-label="مجله اخبار ویژه"
+>
+  <div class="mag-flip__viewport">
+    <div class="mag-flip__book">
+      <div class="mag-flip__page mag-flip__page--cover" data-density="hard">
+        {% include 'partials/mag-flip-cover.twig' with {
+          logo_image: logo_image,
+          site: site,
+          cover_title: flip_cover_title
+        } %}
+      </div>
+
+      {% for post in flip_posts %}
+        <div class="mag-flip__page">
+          <article class="mag-page mag-page--news">
+            <a class="mag-page__link" href="{{ post.link }}">
+              <div class="mag-page__media">
+                {{ ak.post_image(post, 800, 600) }}
+                {% set cat = post.categories|first %}
+                {% if cat %}<span class="tag tag--market">{{ cat.name }}</span>{% endif %}
+              </div>
+              <div class="mag-page__body">
+                <h3>{{ post.title }}</h3>
+                <p>{{ post.post_excerpt|default(post.post_content|striptags|slice(0, 160)) }}</p>
+                <div class="mag-page__meta">
+                  <time datetime="{{ post.date('Y-m-d') }}">{{ ak_post_date(post) }}</time>
+                  <span class="mag-page__read">ادامه مطلب ←</span>
+                </div>
+              </div>
+            </a>
+          </article>
+        </div>
+      {% endfor %}
+    </div>
+
+    <button type="button" class="mag-flip__corner mag-flip__corner--next" aria-label="صفحه بعد"></button>
+    <button type="button" class="mag-flip__corner mag-flip__corner--prev" aria-label="صفحه قبل"></button>
+
+    <div class="mag-flip__pager" aria-live="polite">
+      <span class="mag-flip__pager-current">۱</span>
+      <span class="mag-flip__pager-sep">/</span>
+      <span class="mag-flip__pager-total">{{ flip_total }}</span>
+    </div>
+  </div>
+</div>

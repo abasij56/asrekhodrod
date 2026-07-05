@@ -1,0 +1,18 @@
+{% import 'partials/macros.twig' as ak %}
+
+{% if rf_topic_posts|length > 0 %}
+<section class="rfarda-beyond" aria-labelledby="rfarda-beyond-heading">
+  {% include 'partials/rfarda/column-head.twig' with { title: 'فراتر از خبر', id: 'rfarda-beyond-heading', url: rf_topic_url } %}
+
+  <div class="rfarda-beyond__stack">
+    {% for post in rf_topic_posts|slice(0, 4) %}
+      <a href="{{ post.link }}" class="rfarda-beyond__card">
+        <div class="rfarda-beyond__image">
+          {{ ak.post_image(post, 320, 180) }}
+        </div>
+        <h3 class="rfarda-beyond__title">{{ post.title }}</h3>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}

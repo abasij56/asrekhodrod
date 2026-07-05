@@ -1,0 +1,7 @@
+{% if placement.wrapper %}
+<div class="{{ placement.wrapper }}">
+{% endif %}
+{% include placement.partial with { placement: placement, section_title: placement.title|default('') } %}
+{% if placement.wrapper %}
+</div>
+{% endif %}

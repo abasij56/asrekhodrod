@@ -1,0 +1,23 @@
+{% if pagination and pagination.total > 1 %}
+<nav class="pagination{% if pagination_modifier %} {{ pagination_modifier }}{% endif %}" aria-label="صفحه‌بندی">
+  {% if pagination.prev and pagination.prev.link %}
+    <a href="{{ pagination.prev.link }}" class="pagination__nav pagination__nav--prev" rel="prev">قبلی</a>
+  {% endif %}
+
+  <ul class="pagination__list">
+    {% for page in pagination.pages %}
+      <li class="pagination__item">
+        {% if page.link is defined and page.link %}
+          <a href="{{ page.link }}" class="pagination__link {{ page.class|default('') }}"{% if page.current %} aria-current="page"{% endif %}>{{ page.title }}</a>
+        {% else %}
+          <span class="pagination__ellipsis {{ page.class|default('') }}" aria-hidden="true">{{ page.title }}</span>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+
+  {% if pagination.next and pagination.next.link %}
+    <a href="{{ pagination.next.link }}" class="pagination__nav pagination__nav--next" rel="next">بعدی</a>
+  {% endif %}
+</nav>
+{% endif %}

@@ -1,0 +1,17 @@
+<section class="rail-widget rail-widget--popular" aria-labelledby="{{ widget_id }}">
+  <div class="rail-widget__head">
+    <h2 id="{{ widget_id }}" class="rail-widget__title">{{ title }}</h2>
+    {% if archive_url|default('') %}
+      <a href="{{ archive_url }}" class="rail-widget__archive">{{ archive_label|default('آرشیو') }}</a>
+    {% endif %}
+  </div>
+  <ul class="rail-widget__list">
+    {% for post in posts %}
+      <li>
+        <a href="{{ post.link }}" target="_blank" rel="noopener">
+          <h3>{{ post.title }}</h3>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</section>

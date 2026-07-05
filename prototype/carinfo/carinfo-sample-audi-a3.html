@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>آئودی A3 2025 — بررسی و مشخصات | عصر خودرو</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --brand: #e10600;
+      --brand-soft: #fff0f0;
+      --ink: #0d0d0d;
+      --muted: #6b6b6b;
+      --line: #e8e8e8;
+      --surface: #fff;
+      --surface-alt: #f7f7f8;
+      --gold: #c9a227;
+      --radius: 12px;
+      --container: 1120px;
+      --shadow: 0 12px 40px rgba(0,0,0,.08);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Vazirmatn", system-ui, sans-serif;
+      background: var(--surface-alt);
+      color: var(--ink);
+      line-height: 1.7;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    .container { width: min(100% - 2rem, var(--container)); margin-inline: auto; }
+
+    /* Breadcrumb */
+    .ci-breadcrumb {
+      padding: 1rem 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .ci-breadcrumb ol { display: flex; flex-wrap: wrap; gap: 0.35rem; list-style: none; }
+    .ci-breadcrumb li + li::before { content: "‹"; margin-inline: 0.35rem; color: #bbb; }
+    .ci-breadcrumb a:hover { color: var(--brand); }
+
+    /* Hero */
+    .ci-hero {
+      background: linear-gradient(135deg, #0a0a0b 0%, #1a1a1f 55%, #2a1210 100%);
+      color: #fff;
+      padding: 2rem 0 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .ci-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 10% 50%, rgba(225,6,0,.25), transparent 60%);
+      pointer-events: none;
+    }
+    .ci-hero__grid {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 2rem;
+      align-items: center;
+      position: relative;
+    }
+    @media (max-width: 900px) { .ci-hero__grid { grid-template-columns: 1fr; } }
+    .ci-hero__badge {
+      display: inline-block;
+      background: var(--brand);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      margin-bottom: 0.75rem;
+    }
+    .ci-hero__title { font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 800; line-height: 1.25; }
+    .ci-hero__subtitle { color: rgba(255,255,255,.7); margin-top: 0.5rem; font-size: 1rem; }
+
+    /* Score */
+    .ci-score {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      margin-top: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .ci-score__main {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      text-align: center;
+      min-width: 100px;
+    }
+    .ci-score__value { font-size: 2.25rem; font-weight: 800; color: var(--gold); line-height: 1; }
+    .ci-score__of { font-size: 0.8rem; color: rgba(255,255,255,.55); }
+    .ci-score__bars { flex: 1; min-width: 220px; display: grid; gap: 0.5rem; }
+    .ci-score__row { display: grid; grid-template-columns: 5rem 1fr 2.5rem; gap: 0.5rem; align-items: center; font-size: 0.8rem; }
+    .ci-score__bar { height: 6px; background: rgba(255,255,255,.15); border-radius: 999px; overflow: hidden; }
+    .ci-score__bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--brand), var(--gold)); border-radius: inherit; }
+    .ci-stars { color: var(--gold); letter-spacing: 1px; font-size: 0.85rem; }
+
+    .ci-hero__media {
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      aspect-ratio: 16/10;
+      background: #222;
+    }
+    .ci-hero__media img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Quick facts */
+    .ci-facts {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.75rem;
+      margin: -1.5rem auto 2rem;
+      position: relative;
+      z-index: 2;
+    }
+    @media (max-width: 800px) { .ci-facts { grid-template-columns: repeat(2, 1fr); } }
+    .ci-fact {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .ci-fact__label { font-size: 0.75rem; color: var(--muted); }
+    .ci-fact__value { font-size: 0.95rem; font-weight: 700; margin-top: 0.25rem; }
+
+    /* Layout */
+    .ci-layout { display: grid; grid-template-columns: 240px 1fr; gap: 2rem; padding-bottom: 3rem; }
+    @media (max-width: 900px) { .ci-layout { grid-template-columns: 1fr; } }
+    .ci-toc {
+      position: sticky;
+      top: 1rem;
+      align-self: start;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .ci-toc h2 { font-size: 0.9rem; margin-bottom: 0.75rem; color: var(--muted); }
+    .ci-toc ol { list-style: none; display: grid; gap: 0.35rem; font-size: 0.88rem; }
+    .ci-toc a { display: block; padding: 0.4rem 0.5rem; border-radius: 6px; }
+    .ci-toc a:hover { background: var(--brand-soft); color: var(--brand); }
+
+    /* Sections */
+    .ci-section {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .ci-section__title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--brand);
+    }
+    .ci-section p { color: var(--ink); margin-bottom: 0.75rem; }
+
+    /* Tables */
+    .ci-table-wrap { overflow-x: auto; }
+    table.ci-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .ci-table th, .ci-table td { padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--line); text-align: right; }
+    .ci-table th { background: var(--surface-alt); font-weight: 700; color: var(--muted); font-size: 0.8rem; }
+    .ci-table tr:hover td { background: #fafafa; }
+    .ci-table .ci-table__group { font-weight: 700; background: var(--brand-soft); color: var(--brand); }
+
+    /* Gallery */
+    .ci-gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.65rem; }
+    @media (max-width: 600px) { .ci-gallery { grid-template-columns: repeat(2, 1fr); } }
+    .ci-gallery button {
+      border: 0; padding: 0; border-radius: 8px; overflow: hidden; cursor: pointer;
+      aspect-ratio: 4/3; background: #eee;
+    }
+    .ci-gallery img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+    .ci-gallery button:hover img { transform: scale(1.05); }
+
+    /* Related */
+    .ci-related { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    @media (max-width: 700px) { .ci-related { grid-template-columns: 1fr; } }
+    .ci-related-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: box-shadow .2s, transform .2s;
+    }
+    .ci-related-card:hover { box-shadow: var(--shadow); transform: translateY(-4px); }
+    .ci-related-card img { aspect-ratio: 16/10; object-fit: cover; width: 100%; }
+    .ci-related-card__body { padding: 0.85rem; }
+    .ci-related-card__score { font-size: 0.8rem; color: var(--gold); font-weight: 700; }
+
+    /* Comments */
+    .ci-comment { border-bottom: 1px solid var(--line); padding: 1rem 0; }
+    .ci-comment__meta { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.35rem; }
+    .ci-form textarea {
+      width: 100%; min-height: 100px; border: 1px solid var(--line);
+      border-radius: 8px; padding: 0.75rem; font: inherit; margin-bottom: 0.75rem;
+    }
+    .ci-btn {
+      background: var(--brand); color: #fff; border: 0; padding: 0.65rem 1.25rem;
+      border-radius: 8px; font: inherit; font-weight: 700; cursor: pointer;
+    }
+    .ci-btn:hover { filter: brightness(1.05); }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <nav class="ci-breadcrumb" aria-label="مسیر">
+      <ol>
+        <li><a href="/">عصر خودرو</a></li>
+        <li><a href="/category/car-info/">اطلاعات ماشین‌ها</a></li>
+        <li><a href="/category/audi/">آئودی</a></li>
+        <li aria-current="page">A3</li>
+      </ol>
+    </nav>
+  </div>
+
+  <header class="ci-hero">
+    <div class="container ci-hero__grid">
+      <div>
+        <span class="ci-hero__badge">بررسی مدل</span>
+        <h1 class="ci-hero__title">آئودی A3 اسپرت‌بک ۲۰۲۵</h1>
+        <p class="ci-hero__subtitle">هاچ‌بک لوکس کامپکت — نسل چهارم، تیپ ۳۵ TFSI</p>
+
+        <div class="ci-score" aria-label="امتیاز کلی ۴.۳ از ۱۰">
+          <div class="ci-score__main">
+            <div class="ci-score__value">۴.۳</div>
+            <div class="ci-score__of">از ۱۰</div>
+            <div class="ci-stars" aria-hidden="true">★★★★☆</div>
+          </div>
+          <div class="ci-score__bars">
+            <div class="ci-score__row"><span>طراحی</span><div class="ci-score__bar"><span style="width:78%"></span></div><span>۷.۸</span></div>
+            <div class="ci-score__row"><span>ایمنی</span><div class="ci-score__bar"><span style="width:85%"></span></div><span>۸.۵</span></div>
+            <div class="ci-score__row"><span>فنی</span><div class="ci-score__bar"><span style="width:72%"></span></div><span>۷.۲</span></div>
+            <div class="ci-score__row"><span>مصرف</span><div class="ci-score__bar"><span style="width:65%"></span></div><span>۶.۵</span></div>
+            <div class="ci-score__row"><span>ارزش</span><div class="ci-score__bar"><span style="width:58%"></span></div><span>۵.۸</span></div>
+          </div>
+        </div>
+      </div>
+      <figure class="ci-hero__media">
+        <img src="https://picsum.photos/seed/audi-a3/960/600" alt="آئودی A3" width="960" height="600" />
+      </figure>
+    </div>
+  </header>
+
+  <div class="container ci-facts" role="list">
+    <div class="ci-fact" role="listitem"><div class="ci-fact__label">قیمت تقریبی</div><div class="ci-fact__value">۲.۸ میلیارد تومان</div></div>
+    <div class="ci-fact" role="listitem"><div class="ci-fact__label">کلاس بدنه</div><div class="ci-fact__value">هاچ‌بک کامپکت</div></div>
+    <div class="ci-fact" role="listitem"><div class="ci-fact__label">موتور</div><div class="ci-fact__value">۱.۵ لیتر توربو</div></div>
+    <div class="ci-fact" role="listitem"><div class="ci-fact__label">قدرت</div><div class="ci-fact__value">۱۵۰ اسب</div></div>
+    <div class="ci-fact" role="listitem"><div class="ci-fact__label">گیربکس</div><div class="ci-fact__value">۷DCT</div></div>
+  </div>
+
+  <div class="container ci-layout">
+    <aside class="ci-toc" aria-label="فهرست مطالب">
+      <h2>در این مطلب</h2>
+      <ol>
+        <li><a href="#overview">اطلاعات کلی</a></li>
+        <li><a href="#video">ویدیو بررسی</a></li>
+        <li><a href="#specs">مشخصات فنی</a></li>
+        <li><a href="#safety">ایمنی</a></li>
+        <li><a href="#gallery">گالری</a></li>
+        <li><a href="#faq">سوالات</a></li>
+        <li><a href="#related">مدل‌های مرتبط</a></li>
+        <li><a href="#comments">نظرات</a></li>
+      </ol>
+    </aside>
+
+    <main>
+      <section class="ci-section" id="overview">
+        <h2 class="ci-section__title">اطلاعات کلی</h2>
+        <p>آئودی A3 یکی از محبوب‌ترین هاچ‌بک‌های لوکس در بازار ایران است. در نسل جدید، طراحی تیزتر، کابین دیجیتال و سطح ایمنی بالاتر از نسل قبل ارائه شده است.</p>
+        <p>این مدل برای خریدارانی مناسب است که به دنبال برند لوکس، ابعاد شهری و مصرف منطقی هستند؛ هرچند فضای صندوق عقب نسبت به رقبای ژاپنی محدودتر است.</p>
+      </section>
+
+      <section class="ci-section" id="video">
+        <h2 class="ci-section__title">ویدیو بررسی</h2>
+        <div style="aspect-ratio:16/9;background:#111;border-radius:8px;display:grid;place-items:center;color:#888;">جایگزین iframe ویدیو</div>
+      </section>
+
+      <section class="ci-section" id="specs">
+        <h2 class="ci-section__title">مشخصات فنی</h2>
+        <div class="ci-table-wrap">
+          <table class="ci-table">
+            <thead><tr><th>گروه</th><th>مشخصه</th><th>مقدار</th></tr></thead>
+            <tbody>
+              <tr><td class="ci-table__group" colspan="3">موتور</td></tr>
+              <tr><td>موتور</td><td>حجم</td><td>۱۴۹۸ سی‌سی</td></tr>
+              <tr><td>موتور</td><td>قدرت</td><td>۱۵۰ اسب @ ۵۰۰۰ rpm</td></tr>
+              <tr><td class="ci-table__group" colspan="3">ابعاد</td></tr>
+              <tr><td>ابعاد</td><td>طول</td><td>۴۳۴۳ میلی‌متر</td></tr>
+              <tr><td>ابعاد</td><td>فاصله محور</td><td>۲۶۳۶ میلی‌متر</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="ci-section" id="safety">
+        <h2 class="ci-section__title">مشخصات ایمنی</h2>
+        <div class="ci-table-wrap">
+          <table class="ci-table">
+            <thead><tr><th>سیستم</th><th>وضعیت</th><th>توضیح</th></tr></thead>
+            <tbody>
+              <tr><td>Euro NCAP</td><td>۵ ستاره</td><td>سال ۲۰۲۰</td></tr>
+              <tr><td>ABS / ESP</td><td>دارد</td><td>استاندارد</td></tr>
+              <tr><td>کمک‌راننده</td><td>دارد</td><td>Lane Assist, AEB</td></tr>
+              <tr><td>ایربگ</td><td>۶ عدد</td><td>راننده، سرنشین، پرده‌ای</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="ci-section" id="gallery">
+        <h2 class="ci-section__title">گالری تصاویر</h2>
+        <div class="ci-gallery">
+          <button type="button"><img src="https://picsum.photos/seed/a31/400/300" alt="" /></button>
+          <button type="button"><img src="https://picsum.photos/seed/a32/400/300" alt="" /></button>
+          <button type="button"><img src="https://picsum.photos/seed/a33/400/300" alt="" /></button>
+          <button type="button"><img src="https://picsum.photos/seed/a34/400/300" alt="" /></button>
+        </div>
+      </section>
+
+      <section class="ci-section" id="faq">
+        <h2 class="ci-section__title">سوالات متداول</h2>
+        <details open><summary><strong>آیا A3 برای خانواده مناسب است؟</strong></summary><p style="margin-top:.5rem">برای خانواده ۲ تا ۳ نفره مناسب است؛ صندلی عقب برای مسافت‌های طولانی کمی محدود است.</p></details>
+        <details style="margin-top:.75rem"><summary><strong>مصرف واقعی چقدر است؟</strong></summary><p style="margin-top:.5rem">در ترافیک شهری حدود ۹ تا ۱۱ لیتر در ۱۰۰ کیلومتر گزارش شده است.</p></details>
+      </section>
+
+      <section class="ci-section" id="related">
+        <h2 class="ci-section__title">مدل‌های دیگر آئودی</h2>
+        <div class="ci-related">
+          <a href="#" class="ci-related-card">
+            <img src="https://picsum.photos/seed/a4/400/250" alt="" />
+            <div class="ci-related-card__body">
+              <strong>آئودی A4</strong>
+              <div class="ci-related-card__score">امتیاز ۴.۵/۱۰</div>
+            </div>
+          </a>
+          <a href="#" class="ci-related-card">
+            <img src="https://picsum.photos/seed/q5/400/250" alt="" />
+            <div class="ci-related-card__body">
+              <strong>آئودی Q5</strong>
+              <div class="ci-related-card__score">امتیاز ۴.۷/۱۰</div>
+            </div>
+          </a>
+          <a href="/category/audi/" class="ci-related-card" style="display:grid;place-items:center;min-height:180px;background:var(--brand-soft);color:var(--brand);font-weight:700;">
+            همه مدل‌های آئودی ←
+          </a>
+        </div>
+      </section>
+
+      <section class="ci-section" id="comments">
+        <h2 class="ci-section__title">نظرات کاربران</h2>
+        <article class="ci-comment">
+          <div class="ci-comment__meta">علی — ۱۴۰۴/۰۱/۱۰</div>
+          <p>مصرف در شهر واقعاً بالاتر از کاتالوگ است، ولی کیفیت ساخت کابین عالیه.</p>
+        </article>
+        <form class="ci-form" style="margin-top:1rem">
+          <textarea placeholder="نظر خود را بنویسید…"></textarea>
+          <button type="submit" class="ci-btn">ارسال نظر</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+</body>
+</html>

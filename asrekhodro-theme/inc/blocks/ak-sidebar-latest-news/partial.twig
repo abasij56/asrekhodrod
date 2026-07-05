@@ -1,0 +1,6 @@
+{% if latest_sidebar_posts|default([])|length > 0 %}
+  {% include 'partials/widget-latest-news.twig' with {
+    posts: latest_sidebar_posts,
+    section_title: section_title|default('آخرین اخبار')
+  } %}
+{% endif %}

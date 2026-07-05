@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>عصر خودرو — ویژه‌نامه بهار ۱۴۰۵</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ── StPageFlip base ── */
+    .stf__parent { position: relative; display: block; box-sizing: border-box; transform: translateZ(0); touch-action: pan-y; }
+    .stf__wrapper { position: relative; width: 100%; box-sizing: border-box; }
+    .stf__parent canvas { position: absolute; width: 100%; height: 100%; left: 0; top: 0; }
+    .stf__block { position: absolute; width: 100%; height: 100%; box-sizing: border-box; perspective: 2000px; }
+    .stf__item { display: none; position: absolute; transform-style: preserve-3d; }
+    .stf__outerShadow, .stf__innerShadow, .stf__hardShadow, .stf__hardInnerShadow { position: absolute; left: 0; top: 0; }
+
+    /* ── Tokens ── */
+    :root {
+      --brand: #c62828;
+      --brand-dark: #8e1c1c;
+      --gold: #c9a227;
+      --ink: #1a1a1a;
+      --ink-soft: #3d3d3d;
+      --ink-muted: #6b6b6b;
+      --paper: #f7f3ec;
+      --paper-warm: #efe8db;
+      --radius: 10px;
+      --shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Vazirmatn", Tahoma, sans-serif;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(201, 162, 39, 0.08), transparent 55%),
+        linear-gradient(165deg, #1a1410 0%, #2d241c 40%, #1f1814 100%);
+      color: var(--ink);
+    }
+
+    .scene {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem 2.5rem;
+      gap: 1.25rem;
+    }
+
+    .scene__header {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    .scene__header h1 {
+      margin: 0 0 0.35rem;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .scene__header p {
+      margin: 0;
+      font-size: 0.82rem;
+      opacity: 0.65;
+    }
+
+    .book-desk {
+      position: relative;
+      isolation: isolate;
+      width: min(100%, 920px);
+      height: 580px;
+      border-radius: calc(var(--radius) + 2px);
+      box-shadow: var(--shadow), 0 0 0 1px rgba(255, 255, 255, 0.06);
+      background: linear-gradient(180deg, #faf6ef 0%, #e8e0d4 100%);
+    }
+
+    .book-desk::before {
+      content: "";
+      position: absolute;
+      inset: -8px -8px -14px;
+      border-radius: calc(var(--radius) + 6px);
+      background: linear-gradient(145deg, #3d2f24, #1a120c);
+      z-index: -1;
+    }
+
+    /* خط وسط کتاب (شانه مجله) — فقط در حالت دو صفحه */
+    .book-desk.is-spread::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 18px;
+      transform: translateX(-50%);
+      z-index: 18;
+      pointer-events: none;
+      background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.14) 0%,
+        rgba(0, 0, 0, 0.04) 35%,
+        rgba(255, 255, 255, 0.06) 50%,
+        rgba(0, 0, 0, 0.04) 65%,
+        rgba(0, 0, 0, 0.12) 100%
+      );
+    }
+
+    #book {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ── Page base ── */
+    .page {
+      direction: rtl;
+      background: var(--paper);
+      border-radius: var(--radius);
+      overflow: hidden;
+      font-size: 0.82rem;
+      line-height: 1.65;
+    }
+
+    .page__inner {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Cover ── */
+    .page--cover {
+      color: #fff;
+    }
+
+    .cover-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
+        radial-gradient(circle at 15% 20%, rgba(255,255,255,.18), transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(0,0,0,.35), transparent 50%),
+        linear-gradient(155deg, #0a0606 0%, #3a0e0e 35%, var(--brand) 68%, #e85a52 100%);
+    }
+
+    .cover-bg::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(-22deg, rgba(255,255,255,.025) 0, rgba(255,255,255,.025) 1px, transparent 1px, transparent 8px);
+    }
+
+    .cover-inner {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2.2rem 1.5rem 1.8rem;
+      text-align: center;
+    }
+
+    .cover-top {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .cover-mark {
+      width: 4.2rem;
+      height: 4.2rem;
+      border-radius: 1rem;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 1.3rem;
+      background: rgba(255,255,255,.12);
+      border: 2px solid rgba(255,255,255,.25);
+      box-shadow: 0 8px 24px rgba(0,0,0,.25);
+    }
+
+    .cover-brand {
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+    }
+
+    .cover-kicker {
+      margin: 0.5rem 0 0;
+      font-size: 0.72rem;
+      letter-spacing: 0.28em;
+      opacity: 0.8;
+    }
+
+    .cover-title {
+      margin: 0.25rem 0 0;
+      font-size: clamp(1.5rem, 4vw, 1.95rem);
+      font-weight: 900;
+      line-height: 1.35;
+      text-shadow: 0 4px 18px rgba(0,0,0,.35);
+    }
+
+    .cover-sub {
+      margin: 0.6rem 0 0;
+      font-size: 0.85rem;
+      opacity: 0.88;
+      max-width: 16rem;
+      line-height: 1.7;
+    }
+
+    .cover-bottom {
+      width: 100%;
+    }
+
+    .cover-issue {
+      display: inline-block;
+      padding: 0.35rem 1rem;
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba(0,0,0,.2);
+    }
+
+    .cover-hint {
+      margin: 1rem 0 0;
+      font-size: 0.72rem;
+      opacity: 0.7;
+    }
+
+    .cover-car-silhouette {
+      width: 88%;
+      max-width: 280px;
+      height: 90px;
+      margin: 1rem auto 0;
+      opacity: 0.35;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 80' fill='white'%3E%3Cpath d='M20 52h24l8-16h36l6 16h88l10-22c4-8 12-12 22-12h44l18 34H20zm40-8h160l-6-14H70l-10 14zm196 8c0 11-9 20-20 20s-20-9-20-20 9-20 20-20 20 9 20 20zm-140 0c0 11-9 20-20 20s-20-9-20-20 9-20 20-20 20 9 20 20z'/%3E%3C/svg%3E") center/contain no-repeat;
+    }
+
+    /* ── Back cover ── */
+    .page--back {
+      background: linear-gradient(180deg, #e8e0d4 0%, #d5cbb8 100%);
+    }
+
+    .back-inner {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      gap: 1rem;
+      position: relative;
+    }
+
+    .back-inner::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(0,0,0,.06), transparent 30%);
+      pointer-events: none;
+    }
+
+    .back-logo {
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 0.75rem;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 1.1rem;
+      background: var(--brand);
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(198,40,40,.35);
+    }
+
+    .back-title {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .back-text {
+      margin: 0;
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      line-height: 1.8;
+      max-width: 18rem;
+    }
+
+    .back-contact {
+      margin-top: 0.5rem;
+      padding: 0.85rem 1.1rem;
+      background: rgba(255,255,255,.55);
+      border-radius: 0.65rem;
+      font-size: 0.74rem;
+      color: var(--ink-soft);
+      line-height: 1.9;
+      border: 1px solid rgba(0,0,0,.06);
+    }
+
+    .back-barcode {
+      margin-top: 0.75rem;
+      width: 120px;
+      height: 36px;
+      background: repeating-linear-gradient(90deg, #222 0, #222 2px, #fff 2px, #fff 4px, #222 4px, #222 5px, #fff 5px, #fff 8px);
+      opacity: 0.7;
+    }
+
+    /* ── Section tag ── */
+    .tag {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .tag--news { background: var(--brand); color: #fff; }
+    .tag--event { background: #1565c0; color: #fff; }
+    .tag--video { background: #6a1b9a; color: #fff; }
+    .tag--show { background: var(--gold); color: #1a1a1a; }
+    .tag--review { background: #2e7d32; color: #fff; }
+
+    /* ── News page (image + body) ── */
+    .page--article .page__inner { flex-direction: column; }
+
+    .article-media {
+      position: relative;
+      flex: 1 1 55%;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .article-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .article-media .tag {
+      position: absolute;
+      top: 0.7rem;
+      right: 0.7rem;
+    }
+
+    .article-body {
+      flex: 0 0 auto;
+      padding: 0.9rem 1rem 1rem;
+      background: linear-gradient(180deg, #faf7f1, var(--paper-warm));
+      border-top: 1px solid rgba(0,0,0,.05);
+    }
+
+    .article-body h2 {
+      margin: 0 0 0.4rem;
+      font-size: 0.98rem;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .article-body p {
+      margin: 0;
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+    }
+
+    .article-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.6rem;
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+    }
+
+    .article-meta .read {
+      color: var(--brand);
+      font-weight: 700;
+    }
+
+    /* ── TOC page ── */
+    .page--toc {
+      background: linear-gradient(180deg, #faf7f1, var(--paper));
+    }
+
+    .toc-header {
+      padding: 1.1rem 1.1rem 0.6rem;
+      border-bottom: 3px solid var(--brand);
+    }
+
+    .toc-header h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 900;
+    }
+
+    .toc-header p {
+      margin: 0.3rem 0 0;
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+    }
+
+    .toc-list {
+      flex: 1;
+      padding: 0.75rem 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      overflow: hidden;
+    }
+
+    .toc-item {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+    }
+
+    .toc-item__num {
+      flex: 0 0 1.4rem;
+      font-weight: 800;
+      color: var(--brand);
+      font-size: 0.85rem;
+    }
+
+    .toc-item__title {
+      flex: 1;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+
+    .toc-item__dots {
+      flex: 0 0 auto;
+      color: var(--ink-muted);
+      opacity: 0.4;
+      letter-spacing: 2px;
+    }
+
+    .toc-editor {
+      margin: auto 1.1rem 1rem;
+      padding: 0.75rem;
+      background: rgba(198,40,40,.06);
+      border-right: 3px solid var(--brand);
+      border-radius: 0 6px 6px 0;
+      font-size: 0.74rem;
+      color: var(--ink-soft);
+      line-height: 1.75;
+    }
+
+    .toc-editor strong {
+      display: block;
+      margin-bottom: 0.25rem;
+      color: var(--ink);
+      font-size: 0.78rem;
+    }
+
+    /* ── Spread / feature page ── */
+    .page--feature .feature-hero {
+      position: relative;
+      height: 48%;
+      overflow: hidden;
+    }
+
+    .page--feature .feature-hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .page--feature .feature-hero__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, rgba(0,0,0,.72) 0%, transparent 55%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1rem;
+      color: #fff;
+    }
+
+    .page--feature .feature-hero h2 {
+      margin: 0.4rem 0 0;
+      font-size: 1.05rem;
+      font-weight: 900;
+      line-height: 1.45;
+    }
+
+    .page--feature .feature-content {
+      flex: 1;
+      padding: 0.85rem 1rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.65rem;
+    }
+
+    .feature-col p {
+      margin: 0;
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+      line-height: 1.65;
+    }
+
+    .feature-stat {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+
+    .stat-box {
+      flex: 1;
+      text-align: center;
+      padding: 0.5rem 0.35rem;
+      background: var(--paper-warm);
+      border-radius: 6px;
+      border: 1px solid rgba(0,0,0,.05);
+    }
+
+    .stat-box strong {
+      display: block;
+      font-size: 1rem;
+      color: var(--brand);
+      font-weight: 900;
+    }
+
+    .stat-box span {
+      font-size: 0.62rem;
+      color: var(--ink-muted);
+    }
+
+    /* ── Video page ── */
+    .page--video .video-frame {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      background: #111;
+      overflow: hidden;
+    }
+
+    .page--video .video-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.85;
+    }
+
+    .play-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 50%;
+      background: rgba(198,40,40,.92);
+      border: 3px solid rgba(255,255,255,.9);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 8px 28px rgba(0,0,0,.4);
+    }
+
+    .play-btn::after {
+      content: "";
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 8px 0 8px 14px;
+      border-color: transparent transparent transparent #fff;
+      margin-right: -3px;
+    }
+
+    .video-duration {
+      position: absolute;
+      bottom: 0.6rem;
+      left: 0.6rem;
+      padding: 0.2rem 0.45rem;
+      background: rgba(0,0,0,.75);
+      color: #fff;
+      font-size: 0.68rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    /* ── Events list page ── */
+    .page--events .events-header {
+      padding: 1rem 1rem 0.5rem;
+      background: var(--brand);
+      color: #fff;
+    }
+
+    .page--events .events-header h2 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .events-list {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      overflow: hidden;
+    }
+
+    .event-card {
+      display: flex;
+      gap: 0.65rem;
+      padding: 0.55rem;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,.06);
+      box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    }
+
+    .event-date {
+      flex: 0 0 2.8rem;
+      text-align: center;
+      background: var(--paper-warm);
+      border-radius: 6px;
+      padding: 0.35rem 0.2rem;
+    }
+
+    .event-date strong {
+      display: block;
+      font-size: 1rem;
+      color: var(--brand);
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .event-date span {
+      font-size: 0.58rem;
+      color: var(--ink-muted);
+    }
+
+    .event-info h3 {
+      margin: 0 0 0.2rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .event-info p {
+      margin: 0;
+      font-size: 0.68rem;
+      color: var(--ink-muted);
+      line-height: 1.5;
+    }
+
+    /* ── Review / compare page ── */
+    .page--review .review-header {
+      padding: 0.9rem 1rem 0.6rem;
+      text-align: center;
+      border-bottom: 2px solid var(--brand);
+    }
+
+    .page--review .review-header h2 {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 900;
+    }
+
+    .compare-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      padding: 0.65rem;
+    }
+
+    .compare-col {
+      text-align: center;
+      padding: 0.5rem 0.35rem;
+    }
+
+    .compare-col img {
+      width: 100%;
+      height: 72px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 0.4rem;
+    }
+
+    .compare-col h3 {
+      margin: 0 0 0.35rem;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .compare-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      padding: 0.28rem 0;
+      border-bottom: 1px dashed rgba(0,0,0,.08);
+      color: var(--ink-muted);
+    }
+
+    .compare-row strong {
+      color: var(--ink);
+    }
+
+    .review-verdict {
+      margin: 0 0.65rem 0.65rem;
+      padding: 0.55rem 0.65rem;
+      background: rgba(46,125,50,.08);
+      border-radius: 6px;
+      font-size: 0.7rem;
+      color: var(--ink-soft);
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    /* ── Show / exhibition page ── */
+    .page--show .show-banner {
+      position: relative;
+      height: 42%;
+      overflow: hidden;
+    }
+
+    .page--show .show-banner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .page--show .show-banner__label {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      padding: 0.75rem 1rem;
+      background: linear-gradient(0deg, rgba(0,0,0,.8), transparent);
+      color: #fff;
+    }
+
+    .page--show .show-banner__label h2 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 900;
+    }
+
+    .show-grid {
+      flex: 1;
+      padding: 0.65rem 0.85rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .show-item {
+      background: #fff;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,.05);
+    }
+
+    .show-item img {
+      width: 100%;
+      height: 52px;
+      object-fit: cover;
+    }
+
+    .show-item p {
+      margin: 0;
+      padding: 0.35rem 0.4rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    /* ── Corner flip (RTL) ── */
+    .flip-corner {
+      position: absolute;
+      z-index: 20;
+      width: min(22%, 5.5rem);
+      height: min(22%, 5.5rem);
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .flip-corner--next {
+      left: 0;
+      bottom: 0;
+    }
+
+    .flip-corner--next::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 2.6rem;
+      height: 2.6rem;
+      background: linear-gradient(45deg, transparent 48%, rgba(255,255,255,.5) 52%, rgba(255,255,255,.92) 100%);
+      border-bottom-left-radius: calc(var(--radius) - 2px);
+      box-shadow: -2px 2px 8px rgba(0,0,0,.18);
+      transition: transform .2s, opacity .2s;
+    }
+
+    .flip-corner--prev {
+      right: 0;
+      bottom: 0;
+    }
+
+    .flip-corner--prev::before {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 2.6rem;
+      height: 2.6rem;
+      background: linear-gradient(-45deg, transparent 48%, rgba(255,255,255,.5) 52%, rgba(255,255,255,.92) 100%);
+      border-bottom-right-radius: calc(var(--radius) - 2px);
+      box-shadow: 2px 2px 8px rgba(0,0,0,.18);
+      transition: transform .2s, opacity .2s;
+    }
+
+    .flip-corner:hover::before { transform: scale(1.06); }
+    .flip-corner.is-hidden { pointer-events: none; opacity: 0; }
+
+    .pager {
+      position: absolute;
+      top: 0.7rem;
+      left: 0.8rem;
+      z-index: 22;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.28rem 0.6rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,.85);
+      color: var(--ink-soft);
+      pointer-events: none;
+      transition: background .3s, color .3s;
+    }
+
+    .pager.is-on-cover {
+      background: rgba(0,0,0,.45);
+      color: rgba(255,255,255,.92);
+    }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .controls button {
+      font: inherit;
+      cursor: pointer;
+      border: 0;
+      border-radius: 999px;
+      padding: 0.55rem 1.25rem;
+      background: var(--brand);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: background .2s, transform .15s;
+      box-shadow: 0 4px 14px rgba(198,40,40,.35);
+    }
+
+    .controls button:hover:not(:disabled) {
+      background: var(--brand-dark);
+      transform: translateY(-1px);
+    }
+
+    .controls button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    #page-info {
+      font-size: 0.9rem;
+      font-weight: 700;
+      min-width: 5.5rem;
+      text-align: center;
+      color: rgba(255,255,255,.88);
+    }
+
+    @media (max-width: 767px) {
+      .book-desk {
+        width: min(100%, 440px);
+        height: 560px;
+      }
+      .book-desk.is-spread::after { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .book-desk { height: 520px; }
+      .feature-content { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scene">
+    <header class="scene__header">
+      <h1>عصر خودرو — ویژه‌نامه بهار ۱۴۰۵</h1>
+      <p>دو صفحه کنار هم مثل مجله واقعی · گوشه را بکشید یا کلیک کنید</p>
+    </header>
+
+    <div class="book-desk" id="book-shell">
+      <div class="pager" id="pager" aria-live="polite"><span id="pager-current">۱</span> / <span id="pager-total">۱۰</span></div>
+      <button type="button" class="flip-corner flip-corner--next" id="corner-next" aria-label="صفحه بعد"></button>
+      <button type="button" class="flip-corner flip-corner--prev" id="corner-prev" aria-label="صفحه قبل"></button>
+
+      <div id="book">
+        <!-- ۱ — جلد -->
+        <div class="page page--cover" data-density="hard">
+          <div class="page__inner" style="position:relative">
+            <div class="cover-bg" aria-hidden="true"></div>
+            <div class="cover-inner">
+              <div class="cover-top">
+                <div class="cover-mark">AK</div>
+                <div class="cover-brand">عصر خودرو</div>
+                <p class="cover-kicker">ویژه‌نامه · بهار ۱۴۰۵</p>
+                <h1 class="cover-title">اخبار ویژه<br>خودرو و صنعت</h1>
+                <p class="cover-sub">نمایشگاه، رویدادها، ویدیوها و تحلیل‌های هفته</p>
+                <div class="cover-car-silhouette" aria-hidden="true"></div>
+              </div>
+              <div class="cover-bottom">
+                <span class="cover-issue">شماره ۴۲ · خرداد ۱۴۰۵</span>
+                <p class="cover-hint">برای ورق زدن، گوشه پایین چپ را بکشید ←</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ۲ — فهرست -->
+        <div class="page page--toc">
+          <div class="page__inner">
+            <div class="toc-header">
+              <h2>در این شماره</h2>
+              <p>مرور سریع مطالب ویژه‌نامه بهار</p>
+            </div>
+            <div class="toc-list">
+              <div class="toc-item"><span class="toc-item__num">۳</span><span class="toc-item__title">رشد ۲۲ درصدی فروش خودرو در بهار</span><span class="toc-item__dots">···</span></div>
+              <div class="toc-item"><span class="toc-item__num">۴</span><span class="toc-item__title">معرفی رسمی کراس‌اوور جدید ملی</span><span class="toc-item__dots">···</span></div>
+              <div class="toc-item"><span class="toc-item__num">۵</span><span class="toc-item__title">گزارش نمایشگاه خودرو تهران ۱۴۰۵</span><span class="toc-item__dots">···</span></div>
+              <div class="toc-item"><span class="toc-item__num">۶</span><span class="toc-item__title">ویدیو: تست رانندگی پژو ۲۰۷ اتوماتیک</span><span class="toc-item__dots">···</span></div>
+              <div class="toc-item"><span class="toc-item__num">۷</span><span class="toc-item__title">تقویم رویدادهای خودرویی خرداد</span><span class="toc-item__dots">···</span></div>
+              <div class="toc-item"><span class="toc-item__num">۸</span><span class="toc-item__title">ویژه برقی: آینده حمل‌ونقل شهری</span><span class="toc-item__dots">···</span></div>
+              <div class="toc-item"><span class="toc-item__num">۹</span><span class="toc-item__title">مقایسه: دو شاسی‌بلند پرفروش بازار</span><span class="toc-item__dots">···</span></div>
+            </div>
+            <div class="toc-editor">
+              <strong>کلمه سردبیر</strong>
+              بهار ۱۴۰۵ فصل تحول در صنعت خودروست؛ از نمایشگاه تهران تا عرضه مدل‌های برقی، این شماره نگاهی جامع به بازار دارد.
+            </div>
+          </div>
+        </div>
+
+        <!-- ۳ — خبر ویژه -->
+        <div class="page page--article">
+          <div class="page__inner">
+            <div class="article-media">
+              <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&h=600&fit=crop" alt="خودرو اسپرت" loading="lazy" />
+              <span class="tag tag--news">اخبار</span>
+            </div>
+            <div class="article-body">
+              <h2>رشد ۲۲ درصدی فروش خودرو در بهار ۱۴۰۵</h2>
+              <p>آمار رسمی نشان می‌دهد عرضه مدل‌های جدید و تسهیلات خرید، محرک اصلی رشد فروش در سه ماه اول سال بوده است. تحلیلگران پیش‌بینی می‌کنند این روند در تابستان نیز ادامه یابد.</p>
+              <div class="article-meta">
+                <time>۵ خرداد ۱۴۰۵</time>
+                <span class="read">ادامه مطلب ←</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ۴ — معرفی خودرو -->
+        <div class="page page--feature">
+          <div class="page__inner">
+            <div class="feature-hero">
+              <img src="https://images.unsplash.com/photo-1519641471654-76ce0107a1b1?w=800&h=500&fit=crop" alt="کراس‌اوور جدید" loading="lazy" />
+              <div class="feature-hero__overlay">
+                <span class="tag tag--news">معرفی</span>
+                <h2>کراس‌اوور ملی با موتور توربو ۱۵۰ اسب‌بخار معرفی شد</h2>
+              </div>
+            </div>
+            <div class="feature-content">
+              <div class="feature-col">
+                <p>خودروساز داخلی در مراسمی در کرج، نسل اول کراس‌اوور شهری خود را با طراحی مدرن و پلتفرم جدید رونمایی کرد.</p>
+              </div>
+              <div class="feature-col">
+                <p>امکانات ایمنی شامل ۶ ایربگ، ترمز اتوماتیک اضطراری و دوربین ۳۶۰ درجه از ویژگی‌های بارز این مدل است.</p>
+              </div>
+              <div class="feature-stat">
+                <div class="stat-box"><strong>۴.۳m</strong><span>طول</span></div>
+                <div class="stat-box"><strong>۲۱۰</strong><span>نیوتن‌متر</span></div>
+                <div class="stat-box"><strong>۶.۸</strong><span>لیتر/۱۰۰km</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ۵ — نمایشگاه -->
+        <div class="page page--show">
+          <div class="page__inner">
+            <div class="show-banner">
+              <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&h=500&fit=crop" alt="نمایشگاه خودرو" loading="lazy" />
+              <div class="show-banner__label">
+                <span class="tag tag--show">نمایشگاه</span>
+                <h2>نمایشگاه بین‌المللی خودرو تهران — روز سوم</h2>
+              </div>
+            </div>
+            <div class="show-grid">
+              <div class="show-item">
+                <img src="https://images.unsplash.com/photo-1583121274602-3e2820c58988?w=400&h=200&fit=crop" alt="" loading="lazy" />
+                <p>غرفه خودروهای برقی اروپایی</p>
+              </div>
+              <div class="show-item">
+                <img src="https://images.unsplash.com/photo-1619767886555-ef069aa7be3f?w=400&h=200&fit=crop" alt="" loading="lazy" />
+                <p>رونمایی سدان لوکس آسیایی</p>
+              </div>
+              <div class="show-item">
+                <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400&h=200&fit=crop" alt="" loading="lazy" />
+                <p>سوپراسپرت مفهومی ژاپنی</p>
+              </div>
+              <div class="show-item">
+                <img src="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=400&h=200&fit=crop" alt="" loading="lazy" />
+                <p>تست درایو رایگان بازدیدکنندگان</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ۶ — ویدیو -->
+        <div class="page page--video page--article">
+          <div class="page__inner">
+            <div class="video-frame">
+              <img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800&h=600&fit=crop" alt="تست رانندگی" loading="lazy" />
+              <div class="play-btn" aria-hidden="true"></div>
+              <span class="video-duration">۱۲:۴۵</span>
+              <span class="tag tag--video" style="position:absolute;top:.7rem;right:.7rem">ویدیو</span>
+            </div>
+            <div class="article-body">
+              <h2>تست و بررسی پژو ۲۰۷ اتوماتیک مدل ۱۴۰۵</h2>
+              <p>تیم عصر خودرو در یک هفته استفاده شهری، مصرف واقعی، عملکرد گیربکس جدید و آپشن‌های ایمنی این هاچ‌بک محبوب را ارزیابی کرد.</p>
+              <div class="article-meta">
+                <time>۳ خرداد ۱۴۰۵</time>
+                <span class="read">تماشای ویدیو ←</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ۷ — رویدادها -->
+        <div class="page page--events">
+          <div class="page__inner">
+            <div class="events-header">
+              <span class="tag tag--event" style="margin-bottom:.4rem;display:inline-block">رویداد</span>
+              <h2>تقویم خودرویی خرداد ۱۴۰۵</h2>
+            </div>
+            <div class="events-list">
+              <div class="event-card">
+                <div class="event-date"><strong>۸</strong><span>خرداد</span></div>
+                <div class="event-info">
+                  <h3>همایش صنعت خودرو و قطعه‌سازی</h3>
+                  <p>مرکز همایش‌های بین‌المللی تهران · سخنرانان داخلی و خارجی</p>
+                </div>
+              </div>
+              <div class="event-card">
+                <div class="event-date"><strong>۱۵</strong><span>خرداد</span></div>
+                <div class="event-info">
+                  <h3>مسابقات درگ قانونی حرفه‌ای</h3>
+                  <p>پیست آزادی · ثبت‌نام آنلاین برای علاقه‌مندان</p>
+                </div>
+              </div>
+              <div class="event-card">
+                <div class="event-date"><strong>۲۲</strong><span>خرداد</span></div>
+                <div class="event-info">
+                  <h3>کارگاه ایمنی رانندگی جاده‌ای</h3>
+                  <p>با حمایت پلیس راهور · ظرفیت محدود</p>
+                </div>
+              </div>
+              <div class="event-card">
+                <div class="event-date"><strong>۲۹</strong><span>خرداد</span></div>
+                <div class="event-info">
+                  <h3>جشنواره خودروهای کلاسیک</h3>
+                  <p>پارک ملت تهران · نمایش بیش از ۸۰ خودرو تاریخی</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ۸ — خودرو برقی -->
+        <div class="page page--feature">
+          <div class="page__inner">
+            <div class="feature-hero">
+              <img src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&h=500&fit=crop" alt="خودرو برقی" loading="lazy" />
+              <div class="feature-hero__overlay">
+                <span class="tag tag--news">ویژه برقی</span>
+                <h2>عرضه سه مدل برقی شهری در بازار ایران</h2>
+              </div>
+            </div>
+            <div class="feature-content">
+              <div class="feature-col">
+                <p>نمایندگی رسمی برند آسیایی با باتری ۶۰ کیلووات‌ساعت و برد ۴۲۰ کیلومتر، سه تیپ شهری را برای ۵۰۰ خریدار اول معرفی کرد.</p>
+              </div>
+              <div class="feature-col">
+                <p>ایستگاه‌های شارژ سریع در ۱۲ شهر بزرگ تا پایان تابستان فعال می‌شوند. قیمت پایه از ۱.۲ میلیارد تومان اعلام شد.</p>
+              </div>
+              <div class="feature-stat">
+                <div class="stat-box"><strong>۴۲۰</strong><span>کیلومتر برد</span></div>
+                <div class="stat-box"><strong>۳۵</strong><span>دقیقه شارژ</span></div>
+                <div class="stat-box"><strong>۱۸٪</strong><span>رشد بازار</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ۹ — مقایسه -->
+        <div class="page page--review">
+          <div class="page__inner">
+            <div class="review-header">
+              <span class="tag tag--review">بررسی</span>
+              <h2>مقایسه: تیگو ۸ پرو vs سانتافه ۲۰۲۵</h2>
+            </div>
+            <div class="compare-grid">
+              <div class="compare-col">
+                <img src="https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=400&h=200&fit=crop" alt="تیگو" loading="lazy" />
+                <h3>تیگو ۸ پرو</h3>
+                <div class="compare-row"><span>قدرت</span><strong>۱۹۷ hp</strong></div>
+                <div class="compare-row"><span>فضای صندوق</span><strong>۸۹۳ L</strong></div>
+                <div class="compare-row"><span>مصرف</span><strong>۷.۸ L</strong></div>
+              </div>
+              <div class="compare-col">
+                <img src="https://images.unsplash.com/photo-1517940310602-cea35ca96118?w=400&h=200&fit=crop" alt="سانتافه" loading="lazy" />
+                <h3>سانتافه ۲۰۲۵</h3>
+                <div class="compare-row"><span>قدرت</span><strong>۲۱۰ hp</strong></div>
+                <div class="compare-row"><span>فضای صندوق</span><strong>۹۵۰ L</strong></div>
+                <div class="compare-row"><span>مصرف</span><strong>۸.۲ L</strong></div>
+              </div>
+            </div>
+            <div class="review-verdict">
+              برای خانواده‌های پرجمعیت سانتافه فضای بیشتری دارد؛ تیگو ۸ پرو در قیمت و آپشن‌ها رقابتی‌تر است.
+            </div>
+          </div>
+        </div>
+
+        <!-- ۱۰ — پشت جلد -->
+        <div class="page page--back page--cover" data-density="hard">
+          <div class="page__inner back-inner">
+            <div class="back-logo">AK</div>
+            <h2 class="back-title">عصر خودرو</h2>
+            <p class="back-text">
+              مرجع تخصصی اخبار، بررسی و تحلیل صنعت خودرو ایران و جهان.
+              برای دریافت شماره‌های بعدی ویژه‌نامه با ما در ارتباط باشید.
+            </p>
+            <div class="back-contact">
+              www.asrekhodro.com<br>
+              info@asrekhodro.com<br>
+              تهران · خیابان ولیعصر
+            </div>
+            <div class="back-barcode" aria-hidden="true"></div>
+            <p class="back-text" style="margin-top:.5rem;font-size:.68rem">© ۱۴۰۵ عصر خودرو — تمامی حقوق محفوظ است</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button type="button" id="btn-prev">صفحه قبل</button>
+      <span id="page-info">۱ / ۱۰</span>
+      <button type="button" id="btn-next">صفحه بعد</button>
+    </div>
+  </div>
+
+  <script src="page-flip.browser.js"></script>
+  <script>
+    if (typeof St === "undefined") {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"><\/script>');
+    }
+  </script>
+  <script>
+    (function () {
+      "use strict";
+
+      var PERSIAN = "۰۱۲۳۴۵۶۷۸۹";
+      var pageInfoEl = document.getElementById("page-info");
+      var pagerEl = document.getElementById("pager");
+      var pagerCurrentEl = document.getElementById("pager-current");
+      var pagerTotalEl = document.getElementById("pager-total");
+      var btnPrev = document.getElementById("btn-prev");
+      var btnNext = document.getElementById("btn-next");
+      var cornerPrev = document.getElementById("corner-prev");
+      var cornerNext = document.getElementById("corner-next");
+      var shell = document.getElementById("book-shell");
+      var bookEl = document.getElementById("book");
+
+      function fa(n) {
+        return String(n).replace(/\d/g, function (d) { return PERSIAN[Number(d)]; });
+      }
+
+      function isSpreadMode() {
+        return window.matchMedia("(min-width: 768px)").matches;
+      }
+
+      function pageDimensions() {
+        var shellW = shell.clientWidth || (isSpreadMode() ? 920 : 440);
+        var shellH = shell.clientHeight || (isSpreadMode() ? 580 : 560);
+        return {
+          pageW: isSpreadMode() ? Math.floor(shellW / 2) : shellW,
+          pageH: shellH,
+        };
+      }
+
+      var pageFlipInstance = null;
+      var spreadActive = false;
+      var resizeTimer;
+
+      function bootMagazine() {
+        if (pageFlipInstance) {
+          pageFlipInstance.destroy();
+          pageFlipInstance = null;
+        }
+
+        if (typeof St === "undefined" || !St.PageFlip) {
+          pageInfoEl.textContent = "خطا در بارگذاری کتابخانه";
+          return;
+        }
+
+        var dims = pageDimensions();
+        spreadActive = isSpreadMode();
+        shell.classList.toggle("is-spread", spreadActive);
+
+        pageFlipInstance = new St.PageFlip(bookEl, {
+          width: dims.pageW,
+          height: dims.pageH,
+          size: "stretch",
+          minWidth: 260,
+          maxWidth: 480,
+          minHeight: 360,
+          maxHeight: 1200,
+          showCover: true,
+          maxShadowOpacity: 0.55,
+          mobileScrollSupport: true,
+          useMouseEvents: true,
+          disableFlipByClick: false,
+          drawShadow: true,
+          flippingTime: 850,
+          usePortrait: !spreadActive,
+          autoSize: true,
+          startPage: 0,
+        });
+
+        pageFlipInstance.loadFromHTML(document.querySelectorAll(".page"));
+        pageFlipInstance.on("flip", refreshUI);
+        pageFlipInstance.on("changeOrientation", function (e) {
+          spreadActive = e.data === "landscape";
+          refreshUI();
+        });
+        pageFlipInstance.on("init", refreshUI);
+        refreshUI();
+      }
+
+      function spreadLabel(idx, total) {
+        if (!spreadActive || idx === 0 || idx === total - 1) {
+          return fa(idx + 1) + " / " + fa(total);
+        }
+        var right = idx + 1;
+        var left = idx + 2 <= total ? idx + 2 : null;
+        if (left) {
+          return fa(right) + "–" + fa(left) + " / " + fa(total);
+        }
+        return fa(right) + " / " + fa(total);
+      }
+
+      function refreshUI() {
+        if (!pageFlipInstance) return;
+        var idx = pageFlipInstance.getCurrentPageIndex();
+        var total = pageFlipInstance.getPageCount();
+        var label = spreadLabel(idx, total);
+        pageInfoEl.textContent = label;
+        pagerCurrentEl.textContent = label.split(" / ")[0];
+        pagerTotalEl.textContent = fa(total);
+        pagerEl.classList.toggle("is-on-cover", idx === 0 || idx === total - 1);
+        shell.classList.toggle("is-spread", spreadActive && idx > 0 && idx < total - 1);
+        btnPrev.disabled = idx <= 0;
+        btnNext.disabled = idx >= total - 1;
+        cornerPrev.classList.toggle("is-hidden", idx <= 0);
+        cornerNext.classList.toggle("is-hidden", idx >= total - 1);
+      }
+
+      function onResize() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+          var nextSpread = isSpreadMode();
+          if (nextSpread !== spreadActive) {
+            bootMagazine();
+            return;
+          }
+          if (pageFlipInstance) {
+            pageFlipInstance.update();
+          }
+        }, 120);
+      }
+
+      function init() {
+        bootMagazine();
+
+        btnPrev.addEventListener("click", function () {
+          if (pageFlipInstance) pageFlipInstance.flipPrev("bottom");
+        });
+        btnNext.addEventListener("click", function () {
+          if (pageFlipInstance) pageFlipInstance.flipNext("bottom");
+        });
+        cornerPrev.addEventListener("click", function (e) {
+          e.preventDefault();
+          if (pageFlipInstance) pageFlipInstance.flipPrev("bottom");
+        });
+        cornerNext.addEventListener("click", function (e) {
+          e.preventDefault();
+          if (pageFlipInstance) pageFlipInstance.flipNext("bottom");
+        });
+        window.addEventListener("resize", onResize);
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+</body>
+</html>

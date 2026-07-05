@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>معماری Layout و Placement بلاک‌ها — تم عصر خودرو</title>
+  <style>
+    :root {
+      --bg: #f8f9fb;
+      --card: #ffffff;
+      --text: #1a1d26;
+      --muted: #5c6370;
+      --accent: #c41e3a;
+      --border: #e4e7ec;
+      --code-bg: #f1f3f6;
+      --good: #0d7a4e;
+      --warn: #b45309;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, "Vazirmatn", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      font-size: 16px;
+    }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    header {
+      background: linear-gradient(135deg, #1a1d26 0%, #2d3344 100%);
+      color: #fff;
+      padding: 2.5rem 1.25rem;
+      margin-bottom: 2rem;
+    }
+    header .wrap { padding: 0; }
+    header h1 { margin: 0 0 0.5rem; font-size: 1.75rem; }
+    header p { margin: 0; opacity: 0.85; font-size: 0.95rem; }
+    .nav-link {
+      display: inline-block;
+      margin-top: 1rem;
+      color: #fff;
+      opacity: 0.9;
+      font-size: 0.9rem;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(255,255,255,0.5);
+    }
+    h2 {
+      margin: 2.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--accent);
+      font-size: 1.35rem;
+    }
+    h3 { margin: 1.5rem 0 0.75rem; font-size: 1.1rem; color: #2d3344; }
+    p { margin: 0.75rem 0; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .highlight { border-right: 4px solid var(--accent); background: #fff5f6; }
+    .good { border-right-color: var(--good); background: #f0fdf6; }
+    .warn { border-right-color: var(--warn); background: #fffbeb; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.95rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.65rem 0.85rem;
+      text-align: right;
+      vertical-align: top;
+    }
+    th { background: #eef0f4; font-weight: 600; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    code, pre {
+      font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+      font-size: 0.88rem;
+      direction: ltr;
+      text-align: left;
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    ul, ol { margin: 0.5rem 0; padding-right: 1.5rem; }
+    li { margin: 0.35rem 0; }
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>معماری Layout و Placement بلاک‌ها</h1>
+    <p>بررسی ایده: manifest + zones + repeater تنظیمات + کش — تم Asre Khodro</p>
+    <a class="nav-link" href="appearance-blocks.html">← معماری بلوک‌ها</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="card highlight">
+    <p><strong>جمع‌بندی:</strong> ایده <strong>جهت درستی</strong> دارد و با معماری فعلی تم <strong>قابل اتصال</strong> است؛ فقط اگر یک‌جا پیاده شود، زود پیچیده می‌شود.</p>
+    <p>ظاهر = ساختار و جایگاه‌ها (ثابت، در manifest) · تنظیمات = منبع داده و انتخاب بلاک‌ها (متغیر، در ACF) · رندر = layout از کش + query + Twig</p>
+  </div>
+
+  <h2>وضعیت فعلی تم</h2>
+  <p>در <code>classic/manifest.php</code> ایده شروع شده: <code>pages → sections</code> و <code>blocks</code> تعریف شده‌اند.</p>
+  <p>ولی <code>front-page.twig</code> هنوز <strong>هاردکد</strong> است و manifest فقط نقشه است، نه موتور رندر.</p>
+  <p><code>HomepageData</code> داده را بخش‌به‌بخش می‌سازد و از ACFهای پراکنده مثل <code>home_main_slider</code> استفاده می‌کند — نه layout repeater واحد.</p>
+  <p>ایده پیشنهادی، <strong>مرحله بعدی طبیعی همین refactor</strong> است.</p>
+
+  <h2>نقاط قوت ایده</h2>
+
+  <h3>۱. تفکیک مسئولیت‌ها</h3>
+  <table>
+    <thead>
+      <tr><th>لایه</th><th>چه کسی تعریف می‌کند</th><th>مثال</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Manifest</td><td>توسعه‌دهنده</td><td>صفحه اصلی → <code>main</code>, <code>sidebar_primary</code></td></tr>
+      <tr><td>Options (ACF)</td><td>مدیر سایت</td><td>در <code>sidebar_primary</code> بلاک <code>ak-videos</code> با ۶ ویدیو آخر</td></tr>
+      <tr><td>Renderer</td><td>Core</td><td>query + Twig</td></tr>
+    </tbody>
+  </table>
+  <p>این با اصل «یک بلاک، چند ظاهر» در <code>appearance-blocks.html</code> هم‌راستاست.</p>
+
+  <h3>۲. قرارداد داده عمومی برای بلاک‌های لیستی</h3>
+  <p>برای بلاک‌هایی مثل featured، news-list، videos، magazines:</p>
+  <pre>post_type + category + count + strategy(latest|oldest|manual)</pre>
+  <p>بخشی از این الان هم وجود دارد (<code>featured_category</code>, <code>news_list_count</code>, relationship fields).</p>
+
+  <h3>۳. کش</h3>
+  <p>layout resolve‌شده را کش کنید (transient/object cache) و فقط هنگام save تنظیمات invalidate کنید. برای homepage خیلی ارزشمند است.</p>
+
+  <h2>چالش‌های مهم</h2>
+
+  <div class="card warn">
+    <h3>۱. همه بلاک‌ها «لیست پست» نیستند</h3>
+    <ul>
+      <li><code>ak-ticker</code>, <code>ak-hero</code> → اغلب انتخاب دستی</li>
+      <li><code>ak-newsletter</code> → بدون query</li>
+      <li><code>content_row_ad</code> → تبلیغات</li>
+      <li><code>ak-car-*</code> → داده از خود پست</li>
+    </ul>
+    <p>در manifest هر بلاک باید <strong>نوع منبع داده</strong> داشته باشد:</p>
+    <pre>'ak-videos' => [
+  'template' => '...',
+  'source'   => 'query',  // query | manual | static | post_meta | ads
+  'defaults' => ['post_type' => 'ak_video', 'count' => 6],
+],
+'ak-newsletter' => [
+  'source' => 'static',
+],</pre>
+  </div>
+
+  <h3>۲. سایدبار ≠ سکشن اصلی</h3>
+  <p>بهتر است «موقعیت» abstraction واحد باشد — سایدبار فقط یک zone است:</p>
+  <pre>front_page:
+  zones:
+    before_main: [...]
+    main: [...]
+    sidebar_primary: [...]
+    footer_band: [...]   // مثل picture_frame</pre>
+
+  <h3>۳. UX ریپیتر تو در تو در ACF</h3>
+  <p>«صفحه → موقعیت → بلاک → پست‌تایپ → کتگوری → ...» اگر همه در یک repeater باشد، برای کاربر سنگین است.</p>
+  <p><strong>پیشنهاد:</strong> یک ریپیتر اصلی <code>layout_placements[]</code> — هر ردیف = یک placement با conditional logic بر اساس <code>source</code> بلاک.</p>
+
+  <h3>۴. محدودیت‌های سازگاری</h3>
+  <ul>
+    <li>هر zone چه بلاک‌هایی مجازند</li>
+    <li>آیا تکرار مجاز است (<code>ak-hero</code> فقط یک‌بار)</li>
+    <li>ترتیب پیش‌فرض اگر کاربر چیزی تنظیم نکرد</li>
+  </ul>
+
+  <h3>۵. رندر واقعی در Twig</h3>
+  <ul>
+    <li><code>front-page.twig</code> فقط حلقه: <code>{% for placement in layout.main %}...</code></li>
+    <li>یا هر zone یک partial: <code>render_zone('sidebar_primary')</code></li>
+  </ul>
+  <p>بدون این، manifest فقط مستندات می‌ماند.</p>
+
+  <h2>پیشنهاد ساختار manifest</h2>
+  <pre>return [
+  'id' => 'classic',
+  'pages' => [
+    'front_page' => [
+      'label' => 'صفحه اصلی',
+      'zones' => [
+        'before_main' => [
+          'label'   => 'بالای صفحه',
+          'blocks'  => ['ak-ticker'],
+          'multiple' => false,
+        ],
+        'main' => [
+          'label'   => 'محتوای اصلی',
+          'blocks'  => ['ak-hero', 'ak-featured-grid', 'ak-news-list', ...],
+          'multiple' => true,
+        ],
+        'sidebar' => [
+          'label'   => 'سایدبار',
+          'blocks'  => ['ak-newsletter', 'sidebar-ads', 'sidebar-rail'],
+          'multiple' => true,
+        ],
+        'after_main' => [
+          'blocks' => ['ak-picture-frame'],
+        ],
+      ],
+      'defaults' => [
+        ['zone' => 'before_main', 'block' => 'ak-ticker'],
+        ['zone' => 'main', 'block' => 'ak-hero', 'source' => [...]],
+        ...
+      ],
+    ],
+    'archive' => [...],
+    'single_post' => [...],
+  ],
+  'blocks' => [...],
+];</pre>
+  <p><code>defaults</code> خیلی مهم است — وقتی کاربر هنوز چیزی تنظیم نکرده، سایت خالی نماند.</p>
+
+  <h2>جریان runtime پیشنهادی</h2>
+  <pre>1. active_appearance → manifest
+2. resolve page (front_page / archive / ...)
+3. read ACF placements (یا defaults)
+4. normalize + validate + cache
+5. برای هر placement:
+     BlockDataResolver::resolve(block, config)
+6. Twig render با context zoneها</pre>
+  <p><code>BlockDataResolver</code> جایگزین تدریجی <code>HomepageData::build_*</code> است.</p>
+
+  <h2>نظر نهایی</h2>
+  <table>
+    <thead>
+      <tr><th>جنبه</th><th>نظر</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>ایده کلی</td><td>✅ عالی و scalable</td></tr>
+      <tr><td>manifest به‌عنوان schema</td><td>✅ درست</td></tr>
+      <tr><td>repeater در options</td><td>✅ درست، UX را ساده نگه دارید</td></tr>
+      <tr><td>قرارداد داده یکسان برای همه</td><td>⚠️ فقط برای بلاک‌های query-based</td></tr>
+      <tr><td>کش</td><td>✅ حتماً</td></tr>
+      <tr><td>پیاده‌سازی یک‌مرحله‌ای</td><td>❌ خطرناک — incremental بهتر است</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card good">
+    <h3>مسیر پیشنهادی (۳ فاز)</h3>
+    <ol>
+      <li><strong>فاز ۱:</strong> manifest به <code>zones</code> + <code>defaults</code> + رندر داینامیک فقط <code>front_page/main</code></li>
+      <li><strong>فاز ۲:</strong> ACF repeater placements + <code>BlockDataResolver</code> عمومی</li>
+      <li><strong>فاز ۳:</strong> sidebar، archive، single و بلاک‌های خاص (ads, car, newsletter)</li>
+    </ol>
+  </div>
+
+  <footer>
+    <p>سند تحلیل معماری — بر اساس بحث layout/placement و وضعیت فعلی تم asrekhodro-theme</p>
+  </footer>
+
+</main>
+</body>
+</html>

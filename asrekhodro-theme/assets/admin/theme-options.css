@@ -1,0 +1,179 @@
+/**
+ * Theme Options — horizontal sub-panels (archive pages, contact page).
+ */
+
+.acf-admin-page .acf-field.ak-archive-panel-switcher,
+.acf-admin-page .acf-field.ak-contact-panel-switcher,
+.acf-admin-page .acf-field.ak-footer-panel-switcher,
+.acf-admin-page .acf-field.ak-theme-panel-switcher {
+  margin-bottom: 1.25rem;
+  padding-bottom: 0;
+  border-bottom: 1px solid #c3c4c7;
+}
+
+.acf-admin-page .acf-field.ak-archive-panel-switcher > .acf-label,
+.acf-admin-page .acf-field.ak-contact-panel-switcher > .acf-label,
+.acf-admin-page .acf-field.ak-footer-panel-switcher > .acf-label,
+.acf-admin-page .acf-field.ak-theme-panel-switcher > .acf-label {
+  display: none;
+}
+
+.acf-admin-page .acf-field.ak-archive-panel-switcher > .acf-input,
+.acf-admin-page .acf-field.ak-contact-panel-switcher > .acf-input,
+.acf-admin-page .acf-field.ak-footer-panel-switcher > .acf-input,
+.acf-admin-page .acf-field.ak-theme-panel-switcher > .acf-input {
+  margin: 0;
+}
+
+.acf-admin-page .acf-field.ak-archive-panel-switcher .acf-button-group,
+.acf-admin-page .acf-field.ak-contact-panel-switcher .acf-button-group,
+.acf-admin-page .acf-field.ak-footer-panel-switcher .acf-button-group,
+.acf-admin-page .acf-field.ak-theme-panel-switcher .acf-button-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0;
+  border: 1px solid #c3c4c7;
+  border-radius: 4px 4px 0 0;
+  overflow: hidden;
+  background: #f0f0f1;
+}
+
+.acf-admin-page .acf-field.ak-archive-panel-switcher .acf-button-group label,
+.acf-admin-page .acf-field.ak-contact-panel-switcher .acf-button-group label,
+.acf-admin-page .acf-field.ak-footer-panel-switcher .acf-button-group label,
+.acf-admin-page .acf-field.ak-theme-panel-switcher .acf-button-group label {
+  margin: 0;
+  border: 0;
+  border-inline-end: 1px solid #c3c4c7;
+  border-radius: 0;
+  background: transparent;
+  color: #50575e;
+  font-weight: 600;
+  padding: 0.65rem 1.25rem;
+  min-height: auto;
+  line-height: 1.4;
+  box-shadow: none;
+}
+
+.acf-admin-page .acf-field.ak-archive-panel-switcher .acf-button-group label:last-child,
+.acf-admin-page .acf-field.ak-contact-panel-switcher .acf-button-group label:last-child,
+.acf-admin-page .acf-field.ak-footer-panel-switcher .acf-button-group label:last-child,
+.acf-admin-page .acf-field.ak-theme-panel-switcher .acf-button-group label:last-child {
+  border-inline-end: 0;
+}
+
+.acf-admin-page .acf-field.ak-archive-panel-switcher .acf-button-group label.selected,
+.acf-admin-page .acf-field.ak-contact-panel-switcher .acf-button-group label.selected,
+.acf-admin-page .acf-field.ak-footer-panel-switcher .acf-button-group label.selected,
+.acf-admin-page .acf-field.ak-theme-panel-switcher .acf-button-group label.selected {
+  background: #fff;
+  color: #1d2327;
+  box-shadow: inset 0 -2px 0 #e10600;
+}
+
+.acf-admin-page .acf-field[data-key="field_ak_news_archive_hero_image"],
+.acf-admin-page .acf-field[data-key="field_ak_news_archive_title"],
+.acf-admin-page .acf-field[data-key="field_ak_news_archive_subtitle"],
+.acf-admin-page .acf-field[data-key="field_ak_news_archive_posts_per_page"],
+.acf-admin-page .acf-field[data-key="field_ak_category_archive_hero_image"],
+.acf-admin-page .acf-field[data-key="field_ak_category_archive_subtitle"],
+.acf-admin-page .acf-field[data-key="field_ak_tag_archive_hero_image"],
+.acf-admin-page .acf-field[data-key="field_ak_tag_archive_subtitle"],
+.acf-admin-page .acf-field[data-key="field_ak_kiosk_archive_hero_image"],
+.acf-admin-page .acf-field[data-key="field_ak_kiosk_archive_title"],
+.acf-admin-page .acf-field[data-key="field_ak_kiosk_archive_subtitle"],
+.acf-admin-page .acf-field[data-key="field_ak_magazine_archive_posts_per_page"],
+.acf-admin-page .acf-field[data-key="field_ak_review_archive_hero_image"],
+.acf-admin-page .acf-field[data-key="field_ak_review_archive_title"],
+.acf-admin-page .acf-field[data-key="field_ak_review_archive_subtitle"],
+.acf-admin-page .acf-field[data-key="field_ak_video_archive_hero_image"],
+.acf-admin-page .acf-field[data-key="field_ak_video_archive_title"],
+.acf-admin-page .acf-field[data-key="field_ak_video_archive_subtitle"],
+.acf-admin-page .acf-field[data-key="field_ak_video_archive_posts_per_page"],
+.acf-admin-page .acf-field[data-key="field_ak_contact_page_title"],
+.acf-admin-page .acf-field[data-key="field_ak_contact_map_lat"],
+.acf-admin-page .acf-field[data-key="field_ak_contact_map_lng"],
+.acf-admin-page .acf-field[data-key="field_ak_contact_info_card_title"],
+.acf-admin-page .acf-field[data-key="field_ak_contact_address"],
+.acf-admin-page .acf-field[data-key="field_ak_contact_postal_code"],
+.acf-admin-page .acf-field[data-key="field_ak_contact_phone"],
+.acf-admin-page .acf-field[data-key="field_ak_contact_email"],
+.acf-admin-page .acf-field[data-key="field_ak_contact_manager"],
+.acf-admin-page .acf-field[data-key="field_ak_contact_manager_note"],
+.acf-admin-page .acf-field[data-key="field_ak_contact_intro"],
+.acf-admin-page .acf-field[data-key="field_ak_contact_form_card_title"],
+.acf-admin-page .acf-field[data-key="field_ak_contact_form_card_lead"],
+.acf-admin-page .acf-field[data-key="field_ak_site_logo_footer"],
+.acf-admin-page .acf-field[data-key="field_ak_footer_logo_tagline"],
+.acf-admin-page .acf-field[data-key="field_ak_footer_text"],
+.acf-admin-page .acf-field[data-key="field_ak_footer_background_color"],
+.acf-admin-page .acf-field[data-key="field_ak_footer_about_title"],
+.acf-admin-page .acf-field[data-key="field_ak_footer_categories_title"],
+.acf-admin-page .acf-field[data-key="field_ak_footer_contact_title"],
+.acf-admin-page .acf-field[data-key="field_ak_footer_show_contact_column"],
+.acf-admin-page .acf-field[data-key="field_ak_footer_show_social"],
+.acf-admin-page .acf-field[data-key="field_ak_social_instagram"],
+.acf-admin-page .acf-field[data-key="field_ak_social_telegram"],
+.acf-admin-page .acf-field[data-key="field_ak_social_youtube"],
+.acf-admin-page .acf-field[data-key="field_ak_social_linkedin"],
+.acf-admin-page .acf-field[data-key="field_ak_social_instagram_svg"],
+.acf-admin-page .acf-field[data-key="field_ak_social_telegram_svg"],
+.acf-admin-page .acf-field[data-key="field_ak_social_youtube_svg"],
+.acf-admin-page .acf-field[data-key="field_ak_social_linkedin_svg"],
+.acf-admin-page .acf-field[data-key="field_ak_footer_copyright_text"],
+.acf-admin-page .acf-field[data-key="field_ak_footer_show_certificates"],
+.acf-admin-page .acf-field[data-key="field_ak_footer_certificates"],
+.acf-admin-page .acf-field[data-key="field_ak_footer_certificates_heading"] {
+  max-width: 640px;
+}
+
+.acf-admin-page .acf-field.ak-social-svg-field textarea {
+  font-family: Consolas, Monaco, "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  direction: ltr;
+  text-align: left;
+}
+
+.acf-admin-page .ak-social-svg-preview {
+  margin: 0.85rem 0 0.65rem;
+  padding: 0.75rem;
+  width: auto;
+  height: auto;
+  min-width: 56px;
+  min-height: 56px;
+  background: #435c70;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  overflow: hidden;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+}
+
+.acf-admin-page .ak-social-svg-preview__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0.15rem;
+  overflow: hidden;
+  line-height: 0;
+  box-sizing: border-box;
+}
+
+.acf-admin-page .ak-social-svg-preview__icon svg {
+  display: block;
+  width: 36px !important;
+  height: 36px !important;
+  max-width: 36px !important;
+  max-height: 36px !important;
+  flex: 0 0 36px;
+}
+
+.acf-admin-page .ak-social-svg-toolbar {
+  margin-top: 0.5rem;
+}

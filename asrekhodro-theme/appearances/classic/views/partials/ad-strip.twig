@@ -1,0 +1,13 @@
+<div class="container ad-strip">
+  <div class="ad-strip__inner" role="complementary">
+    {% for ad in menu_strip_ads %}
+      <a
+        href="{{ ad.link }}"
+        class="ad-strip__slot"
+        target="{{ ad.link_target|default('_blank') }}"
+        rel="{{ ad.link_rel|default('noopener noreferrer') }}"
+        {% if ad.image %} style="background-image:url('{{ ad.image }}')"{% endif %}
+      ></a>
+    {% endfor %}
+  </div>
+</div>

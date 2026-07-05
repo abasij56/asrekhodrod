@@ -1,0 +1,19 @@
+{% if overview_has_content %}
+  <section class="ci-overview-slide"{% if block.anchor %} id="{{ block.anchor }}"{% endif %}>
+    <div class="container ci-overview__grid">
+      <div class="ci-overview__panel ci-overview__panel--content">
+        {% if overview_title %}
+          <h2 class="ci-overview__title">{{ overview_title }}</h2>
+        {% endif %}
+
+        {% if overview_content %}
+          <div class="ci-overview__body body-text">
+            {{ overview_content|raw }}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="ci-overview__panel ci-overview__panel--empty ci-overview__video-slot" aria-hidden="true"></div>
+    </div>
+  </section>
+{% endif %}

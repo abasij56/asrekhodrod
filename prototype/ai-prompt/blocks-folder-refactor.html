@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بازآرایی بلوک‌ها زیر inc/blocks/ — گزارش پیاده‌سازی</title>
+  <style>
+    :root {
+      --bg: #f8f9fb;
+      --card: #ffffff;
+      --text: #1a1d26;
+      --muted: #5c6370;
+      --accent: #c41e3a;
+      --border: #e4e7ec;
+      --code-bg: #f1f3f6;
+      --good: #0d7a4e;
+      --warn: #b45309;
+      --bad: #b91c1c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, "Vazirmatn", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      font-size: 16px;
+    }
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #1a1d26 0%, #2d3344 100%);
+      color: #fff;
+      padding: 2.5rem 1.25rem;
+      margin-bottom: 2rem;
+    }
+    header .wrap { padding: 0; }
+    header h1 { margin: 0 0 0.5rem; font-size: 1.75rem; }
+    header p { margin: 0; opacity: 0.85; font-size: 0.95rem; }
+    h2 {
+      margin: 2.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--accent);
+      font-size: 1.35rem;
+    }
+    h3 { margin: 1.5rem 0 0.75rem; font-size: 1.1rem; color: #2d3344; }
+    p { margin: 0.75rem 0; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .highlight {
+      border-right: 4px solid var(--accent);
+      background: #fff5f6;
+    }
+    .good { border-right-color: var(--good); background: #f0fdf6; }
+    .warn { border-right-color: var(--warn); background: #fffbeb; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.95rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.65rem 0.85rem;
+      text-align: right;
+      vertical-align: top;
+    }
+    th { background: #eef0f4; font-weight: 600; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    pre {
+      font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+      font-size: 0.82rem;
+      direction: ltr;
+      text-align: left;
+      background: #1a1d26;
+      color: #e8eaef;
+      border-radius: 8px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+      line-height: 1.5;
+      white-space: pre;
+    }
+    ul { margin: 0.5rem 0; padding-right: 1.5rem; }
+    li { margin: 0.35rem 0; }
+    .checklist { list-style: none; padding-right: 0; }
+    .checklist li::before { content: "☐ "; color: var(--muted); }
+    .meta { color: var(--muted); font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>بازآرایی بلوک‌ها زیر <code style="color:#fff;">inc/blocks/</code></h1>
+    <p>گزارش پیاده‌سازی — تم عصر خودرو — ۲۹ بلوک با auto-discovery از طریق BlockRegistry</p>
+    <p class="meta" style="margin-top:0.75rem;opacity:0.7;">تاریخ: ژوئن ۲۰۲۶</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="card highlight">
+    <p>بازآرایی کامل شد. همهٔ ۲۹ بلوک اکنون زیر <strong>inc/blocks/{block-name}/</strong> با کشف خودکار از طریق <strong>BlockRegistry</strong> قرار دارند.</p>
+  </div>
+
+  <h2>درخت پوشه‌ها (inc/blocks/)</h2>
+  <pre>inc/blocks/
+├── BlockRegistry.php          ← unified registry + auto-discovery
+├── BlockRenderer.php
+├── BlockDataResolver.php
+├── CinfoBlocks.php
+├── load.php                   ← single boot path
+├── Support/
+│   ├── EmbedSanitizer.php
+│   └── RateFormatter.php
+├── layout/                    ← unchanged engine
+│   ├── LayoutBuilderAdmin.php
+│   ├── LayoutEngine.php
+│   ├── LayoutResolver.php
+│   ├── LayoutSchema.php
+│   ├── LayoutStorage.php
+│   ├── PageLayout.php
+│   └── Homepage.php
+├── ak-ad-strip/               ← config.php + partial.twig
+├── ak-ticker/                 ← + template.twig
+├── ak-hero/                   ← + template.twig
+├── ak-featured-grid/
+├── ak-news-list/
+├── ak-magazines/
+├── ak-videos/
+├── ak-reviews/
+├── ak-newsletter/
+├── ak-picture-frame/
+├── ak-content-row-ad/         ← config only (hidden, ads data)
+├── ak-sidebar-ads/            ← proof-of-pattern block
+├── ak-sidebar-popular-2day/
+├── ak-sidebar-popular-week/
+├── ak-sidebar-kiosk/
+├── ak-sidebar-latest-news/
+├── ak-sidebar-rail/           ← hidden (legacy expand)
+├── ak-page-content/
+├── ak-contact-page/
+├── ak-not-found/
+├── cinfo-hero/                ← Block.php, Fields.php, View.php, template.twig
+├── cinfo-facts/
+├── cinfo-overview/
+├── cinfo-video/
+├── cinfo-table/
+├── cinfo-gallery/
+├── cinfo-faq/
+├── cinfo-related/
+└── cinfo-comments/</pre>
+
+  <h3>Modern-blue appearance overrides</h3>
+  <p>رفتار بدون تغییر؛ مسیرهای جدید:</p>
+  <pre>appearances/modern-blue/views/ak-hero/partial.twig
+appearances/modern-blue/views/ak-featured-grid/partial.twig
+appearances/modern-blue/views/ak-videos/partial.twig
+appearances/modern-blue/views/ak-newsletter/partial.twig
+appearances/modern-blue/views/ak-picture-frame/partial.twig</pre>
+
+  <h2>فایل‌های حذف / منتقل‌شده</h2>
+  <table>
+    <thead>
+      <tr><th>عملیات</th><th>مسیر</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>حذف</strong></td><td><code>inc/blocks/definitions/manifest-blocks.php</code></td></tr>
+      <tr><td><strong>حذف</strong></td><td><code>appearances/shared/manifest-blocks.php</code></td></tr>
+      <tr><td><strong>حذف</strong></td><td><code>inc/blocks/acf/</code> (AcfBlockRegistry, Blocks, CinfoBlocks, cinfo-* subfolders)</td></tr>
+      <tr><td><strong>انتقال</strong></td><td><code>inc/blocks/acf/cinfo-*</code> → <code>inc/blocks/cinfo-*</code></td></tr>
+      <tr><td><strong>انتقال</strong></td><td><code>inc/blocks/acf/Support/</code> → <code>inc/blocks/Support/</code></td></tr>
+      <tr><td><strong>انتقال</strong></td><td><code>CinfoBlocks.php</code> → <code>inc/blocks/CinfoBlocks.php</code></td></tr>
+      <tr><td><strong>ایجاد</strong></td><td>۲۰ پوشه <code>ak-*</code> با <code>config.php</code> + twigهای هم‌مکان</td></tr>
+      <tr><td><strong>ایجاد</strong></td><td><code>inc/blocks/BlockRegistry.php</code></td></tr>
+    </tbody>
+  </table>
+  <p class="meta">فایل‌های twig قدیمی در <code>appearances/*/views/partials/</code> و <code>blocks/</code> حذف نشدند (کپی‌ها در پوشه بلوک‌ها هستند؛ مسیرهای قدیمی استفاده نمی‌شوند ولی بی‌ضررند).</p>
+
+  <h2>تغییرات سیم‌کشی کلیدی</h2>
+  <ol>
+    <li><strong>BlockRegistry</strong> — اسکن <code>inc/blocks/*/config.php</code>، ساخت manifest entries، بوت ACF blocks</li>
+    <li><strong>load.php</strong> — بوت واحد؛ بدون لیست <code>require_once</code> برای هر بلوک</li>
+    <li><strong>Appearance.php</strong> — مسیرهای Timber شامل <code>inc/blocks</code>؛ <code>resolve_template()</code> پوشه بلوک را هم چک می‌کند</li>
+    <li><strong>Appearance manifests</strong> — کلید <code>blocks</code> اکنون <code>array()</code> (فقط override در صورت نیاز)</li>
+    <li><strong>LayoutSchema::shared_blocks()</strong> — به <code>BlockRegistry::manifest_entries()</code> واگذار شد</li>
+    <li><strong>LayoutResolver</strong> — partialها از طریق <code>BlockRegistry::resolve_partial()</code></li>
+    <li><strong>Legacy Blocks::init()</strong> (ak-* ACF homepage blocks) — حذف شد</li>
+    <li><strong>Carsinfo seed order</strong> — با <code>seed_order</code> در هر cinfo <code>config.php</code> حفظ شد</li>
+  </ol>
+
+  <h2>تغییرات شکننده (Breaking changes)</h2>
+  <table>
+    <thead>
+      <tr><th>تغییر</th><th>تأثیر</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>حذف legacy <code>acf/Blocks.php</code> ak-* ACF registration</td>
+        <td>بلوک‌های Gutenberg قدیمی ak-* در محتوای پست (در صورت وجود) رندر نمی‌شوند؛ بلوک‌های layout builder تحت تأثیر نیستند</td>
+      </tr>
+      <tr>
+        <td>مسیر Timber <code>inc/blocks/acf</code> → <code>inc/blocks</code></td>
+        <td>ارجاعات hard-coded به مسیر قدیمی می‌شکنند (در تم یافت نشد)</td>
+      </tr>
+      <tr>
+        <td>حذف <code>manifest-blocks.php</code></td>
+        <td>کد خارجی که آن فایل را require می‌کند می‌شکند (فقط داخلی تم بود)</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="card good">
+    <p>هیچ تغییر رفتاری عمدی در front-end برای layout zones، page keys، یا cinfo blocks وجود ندارد.</p>
+  </div>
+
+  <h2>چک‌لیست تست دستی</h2>
+  <ul class="checklist">
+    <li><strong>Front page</strong> (Classic) — ad strip, ticker, hero, featured, news list, magazines, videos, reviews, newsletter, sidebar ads, picture frame</li>
+    <li><strong>Front page</strong> (Modern Blue) — hero/featured/videos/newsletter/picture-frame از overrideهای MB</li>
+    <li><strong>Archive</strong> — sidebar widgets + ad strip</li>
+    <li><strong>Single post</strong> — sidebar widgets + ad strip</li>
+    <li><strong>Page about / contact / 404</strong> — block page content رندر شود</li>
+    <li><strong>Layout builder admin</strong> (چیدمان صفحات) — همه بلوک‌های قابل قرارگیری لیست شوند؛ ذخیره/بارگذاری zone placement</li>
+    <li><strong>Carsinfo single</strong> — هر ۹ بلوک cinfo رندر؛ TOC؛ gallery lightbox</li>
+    <li><strong>New carsinfo post</strong> — auto-seed به ترتیب: hero → facts → overview → video → table → gallery → faq → related → comments</li>
+    <li><strong>Rfarda appearance</strong> — front page hero/videos/reviews</li>
+  </ul>
+
+  <h2>قرارداد پوشه هر بلوک (هدف)</h2>
+  <pre>inc/blocks/{block-name}/
+  config.php       — name, label, source, partial/template paths, defaults, seed_carsinfo (if ACF), type: layout|acf
+  Block.php        — registration (ACF blocks only)
+  Fields.php       — ACF field groups (acf blocks only)
+  View.php         — Twig context builder (when needed)
+  template.twig    — default render template
+  partial.twig     — layout partial (layout blocks)</pre>
+
+  <h2>زیرساخت مشترک (بدون تغییر رفتار)</h2>
+  <pre>inc/blocks/load.php          — auto-discover */config.php, boot blocks
+inc/blocks/BlockRegistry.php — unified registry
+inc/blocks/BlockRenderer.php
+inc/blocks/BlockDataResolver.php
+inc/blocks/layout/           — layout engine</pre>
+
+</div>
+</body>
+</html>

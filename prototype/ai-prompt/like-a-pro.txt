@@ -1,0 +1,21 @@
+اگر بخواهم دقیقاً مثل یک تیم حرفه‌ای آژانس وب عمل کنم، مراحل را این‌طوری می‌روم:
+
+Step 1
+Wireframe
+
+Step 2
+High-Fidelity Single Page HTML/CSS/JS
+
+Step 3
+Manager Approval
+
+Step 4
+Convert Approved Design To WordPress Theme
+
+Step 5
+Add ACF + Dynamic Content
+
+Step 6
+Optimization & SEO
+
+این کم‌ریسک‌ترین و سریع‌ترین مسیر برای پروژه‌های وردپرسی است.

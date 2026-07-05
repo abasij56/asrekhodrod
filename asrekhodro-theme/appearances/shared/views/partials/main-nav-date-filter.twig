@@ -1,0 +1,25 @@
+{% set filter = nav_date_filter|default({}) %}
+{% if filter.years|default([])|length %}
+  <div class="main-nav__date-filter date-filter date-filter--nav">
+    <form
+      class="main-nav-date-filter"
+      method="get"
+      action="{{ filter.action_url|default('') }}"
+      data-ak-news-date-filter
+      data-ak-date-filter-compact="1"
+      data-month-lengths="{{ filter.month_lengths_json|default('{}')|e('html_attr') }}"
+    >
+      {% if filter.is_active|default(false) %}
+        <div class="main-nav-date-filter__clear-row">
+          <a class="main-nav-date-filter__clear date-filter__clear" href="{{ filter.clear_url }}">حذف فیلتر</a>
+        </div>
+      {% endif %}
+
+      {% include 'partials/date-filter-form-fields.twig' with {
+        filter: filter,
+        fields_class: 'main-nav-date-filter__fields',
+        compact: true
+      } %}
+    </form>
+  </div>
+{% endif %}

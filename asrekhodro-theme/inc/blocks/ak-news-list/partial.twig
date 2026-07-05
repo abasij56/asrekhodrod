@@ -1,0 +1,16 @@
+{% if section_title is not defined %}{% set section_title = 'آخرین اخبار خودرو' %}{% endif %}
+<section class="news-list-section"{% if section_title|trim != '' %} aria-labelledby="news-list-heading"{% endif %}>
+  {% include 'partials/section-head.twig' with {
+    heading_id: 'news-list-heading',
+    section_link_url: news_archive_url,
+    section_link_label: 'آرشیو اخبار ←'
+  } %}
+  <ul class="news-list" id="news-list" role="list">
+    {% for post in news_list %}
+      {% include 'partials/news-list-item.twig' with { post: post } %}
+    {% endfor %}
+  </ul>
+  <div class="news-list__more">
+    <a href="{{ news_archive_url }}" class="btn btn--outline">مشاهده بیشتر</a>
+  </div>
+</section>

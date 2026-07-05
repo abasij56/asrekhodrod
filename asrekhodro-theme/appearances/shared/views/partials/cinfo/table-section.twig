@@ -1,0 +1,41 @@
+{% if table_has_content %}
+  <section
+    class="ci-specs-slide ci-section--table {{ section_modifier_class }}"
+    id="{{ block.anchor|default(table_default_anchor) }}"
+  >
+    <div class="container ci-specs__inner">
+      <div class="ci-specs__panel">
+        {% if table_title %}
+          <h2 class="ci-specs__title">{{ table_title }}</h2>
+        {% endif %}
+
+        <div class="ci-table-wrap">
+          <table class="ci-table">
+            <thead>
+              <tr>
+                <th scope="col">{{ table_col_1_label }}</th>
+                <th scope="col">{{ table_col_2_label }}</th>
+                <th scope="col">{{ table_col_3_label }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in table_rows %}
+                {% if row.type == 'group' %}
+                  <tr>
+                    <td class="ci-table__group" colspan="3">{{ row.label }}</td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td>{{ row.col1 }}</td>
+                    <td>{{ row.col2 }}</td>
+                    <td>{{ row.col3 }}</td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endif %}

@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>عصر خودرو | پایگاه اطلاع‌رسانی صنعت خودرو</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://images.unsplash.com" />
+  <link rel="preconnect" href="https://media.giphy.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --brand: #c41e2a;
+      --brand-dark: #9a1520;
+      --ink: #1a1a1a;
+      --ink-soft: #4a4a4a;
+      --ink-muted: #767676;
+      --line: #e8e8e8;
+      --surface: #ffffff;
+      --surface-alt: #f6f7f9;
+      --surface-dark: #111318;
+      --accent: #0d5ea8;
+      --shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+      --radius: 10px;
+      --ad-w: 300px;
+      --ad-h: 75px;
+      --tile-w: 300px;
+      --tile-h: 75px;
+      --sidebar-w: 300px;
+      --container: 1280px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "Vazirmatn", Tahoma, sans-serif;
+      background: var(--surface-alt);
+      color: var(--ink);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    ul { list-style: none; }
+
+    .container {
+      width: min(100% - 2rem, var(--container));
+      margin-inline: auto;
+    }
+
+    /* ── Ad banners 300×75 (sidebar) ── */
+    .ad-slot {
+      display: block;
+      width: var(--ad-w);
+      height: var(--ad-h);
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+      background: linear-gradient(160deg, #1e2430, #2a3142);
+      border: 1px solid #333;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .ad-slot:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .ad-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* ── Page layout with sidebar ── */
+    .page-layout {
+      display: grid;
+      grid-template-columns: 1fr var(--sidebar-w);
+      gap: 1.25rem;
+      align-items: start;
+      padding-top: 0.25rem;
+    }
+
+    .page-main {
+      min-width: 0;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 88px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      width: var(--sidebar-w);
+    }
+
+    .sidebar__title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--ink-muted);
+      text-align: center;
+      padding-bottom: 0.4rem;
+      border-bottom: 2px solid var(--line);
+      margin-bottom: 0.15rem;
+    }
+
+    .sidebar .ad-slot {
+      width: 100%;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .header__top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 0;
+      gap: 1rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .logo__mark {
+      width: 44px;
+      height: 44px;
+      background: var(--brand);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 1.15rem;
+    }
+
+    .logo__text h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--ink);
+    }
+
+    .logo__text span {
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+      font-weight: 400;
+    }
+
+    .header__actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: var(--surface-alt);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0.4rem 1rem;
+      gap: 0.5rem;
+      min-width: 220px;
+    }
+
+    .search-box input {
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 0.85rem;
+      width: 100%;
+      outline: none;
+      color: var(--ink);
+    }
+
+    .search-box svg { flex-shrink: 0; opacity: 0.45; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.45rem 1rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .btn--brand {
+      background: var(--brand);
+      color: #fff;
+    }
+
+    .btn--brand:hover { background: var(--brand-dark); }
+
+    .btn--ghost {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--ink-soft);
+    }
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem;
+    }
+
+    .nav {
+      border-top: 1px solid var(--line);
+    }
+
+    .nav__list {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav__list::-webkit-scrollbar { display: none; }
+
+    .nav__list a {
+      display: block;
+      padding: 0.85rem 1.1rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .nav__list a:hover,
+    .nav__list a.active {
+      color: var(--brand);
+      border-bottom-color: var(--brand);
+    }
+
+    /* ── Breaking ticker ── */
+    .ticker {
+      background: var(--brand);
+      color: #fff;
+      font-size: 0.82rem;
+      overflow: hidden;
+    }
+
+    .ticker__inner {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.55rem 0;
+    }
+
+    .ticker__badge {
+      flex-shrink: 0;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 0.2rem 0.75rem;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.75rem;
+    }
+
+    .ticker__track {
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker__text {
+      display: inline-block;
+      animation: scroll-ticker 28s linear infinite;
+    }
+
+    @keyframes scroll-ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ── Date bar ── */
+    .meta-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      padding: 0.5rem 0;
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+    }
+
+    .meta-bar__inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    /* ── Hero / lead story ── */
+    .hero {
+      padding: 1.75rem 0 1rem;
+    }
+
+    .hero__grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .lead-story {
+      background: var(--surface);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .lead-story__image {
+      aspect-ratio: 16 / 9;
+      background: #1a2a3a;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .lead-story__image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .lead-story__image::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.35), transparent 50%);
+      pointer-events: none;
+    }
+
+    .lead-story__badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: var(--brand);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.3rem 0.75rem;
+      border-radius: 4px;
+      z-index: 3;
+    }
+
+    .lead-story__body { padding: 1.25rem 1.5rem 1.5rem; }
+
+    .lead-story__category {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .lead-story__title {
+      font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+      font-weight: 800;
+      line-height: 1.45;
+      margin-bottom: 0.75rem;
+      transition: color 0.2s;
+    }
+
+    .lead-story:hover .lead-story__title { color: var(--brand); }
+
+    .lead-story__excerpt {
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+      margin-bottom: 1rem;
+    }
+
+    .lead-story__meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+    }
+
+    .side-headlines {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .side-headline {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 1rem 1.15rem;
+      box-shadow: var(--shadow);
+      border-right: 4px solid var(--brand);
+      transition: transform 0.2s;
+    }
+
+    .side-headline:hover { transform: translateX(-4px); }
+
+    .side-headline__title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 0.35rem;
+    }
+
+    .side-headline__date {
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+    }
+
+    /* ── Section headers ── */
+    .section {
+      padding: 1.5rem 0;
+    }
+
+    .section__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.65rem;
+      border-bottom: 2px solid var(--line);
+    }
+
+    .section__title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section__title::before {
+      content: "";
+      width: 4px;
+      height: 1.2em;
+      background: var(--brand);
+      border-radius: 2px;
+    }
+
+    .section__more {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .section__more:hover { text-decoration: underline; }
+
+    /* ── News cards 300×75 ── */
+    .news-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .news-card {
+      flex: 0 0 var(--tile-w);
+      width: var(--tile-w);
+      height: var(--tile-h);
+      background: var(--surface);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: row;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .news-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+    }
+
+    .news-card__image {
+      width: 100px;
+      height: 75px;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+      background: #1a2a3a;
+    }
+
+    .news-card__image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .news-card__body {
+      flex: 1;
+      min-width: 0;
+      padding: 0.35rem 0.55rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.1rem;
+    }
+
+    .news-card__category {
+      font-size: 0.58rem;
+      font-weight: 700;
+      color: var(--brand);
+    }
+
+    .news-card__title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .news-card__date {
+      font-size: 0.6rem;
+      color: var(--ink-muted);
+    }
+
+    /* ── Category blocks ── */
+    .category-blocks {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+    }
+
+    .category-block {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    .category-block__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .category-block__head h3 {
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .category-block__list li {
+      padding: 0.65rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .category-block__list li:last-child { border-bottom: none; }
+
+    .category-block__list a {
+      font-size: 0.86rem;
+      font-weight: 600;
+      line-height: 1.5;
+      display: block;
+      transition: color 0.2s;
+    }
+
+    .category-block__list a:hover { color: var(--brand); }
+
+    .category-block__list .date {
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+      margin-top: 0.2rem;
+      font-weight: 400;
+    }
+
+    /* ── Price table strip ── */
+    .price-strip {
+      background: var(--surface-dark);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .price-strip__title {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .price-strip__title span {
+      background: var(--brand);
+      font-size: 0.68rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+    }
+
+    .price-table {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .price-item {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+    }
+
+    .price-item__name {
+      font-size: 0.8rem;
+      opacity: 0.75;
+      margin-bottom: 0.25rem;
+    }
+
+    .price-item__value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #6ecf8a;
+    }
+
+    .price-item__change {
+      font-size: 0.7rem;
+      margin-top: 0.15rem;
+    }
+
+    .price-item__change.up { color: #6ecf8a; }
+    .price-item__change.down { color: #ef6b6b; }
+
+    /* ── Events banner ── */
+    .events-banner {
+      background: linear-gradient(120deg, rgba(13, 94, 168, 0.92), rgba(10, 61, 110, 0.92)),
+        url("https://images.unsplash.com/photo-144996541490-47664e5f8f5c?w=1200&h=400&fit=crop&q=80") center/cover;
+      border-radius: var(--radius);
+      padding: 1.5rem 2rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .events-banner h3 {
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    .events-banner p {
+      font-size: 0.85rem;
+      opacity: 0.85;
+      margin-top: 0.25rem;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      background: var(--surface-dark);
+      color: rgba(255, 255, 255, 0.75);
+      margin-top: 2rem;
+      padding: 2.5rem 0 1.5rem;
+    }
+
+    .footer__grid {
+      display: grid;
+      grid-template-columns: 1.5fr repeat(3, 1fr);
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .footer__brand h2 {
+      color: #fff;
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .footer__brand p {
+      font-size: 0.82rem;
+      line-height: 1.8;
+    }
+
+    .footer__col h4 {
+      color: #fff;
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+    }
+
+    .footer__col a {
+      display: block;
+      font-size: 0.8rem;
+      padding: 0.25rem 0;
+      transition: color 0.2s;
+    }
+
+    .footer__col a:hover { color: #fff; }
+
+    .footer__bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.75rem;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 1024px) {
+      .page-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        order: -1;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 0.5rem;
+      }
+
+      .sidebar .ad-slot {
+        flex: 0 0 var(--ad-w);
+      }
+
+      .category-blocks { grid-template-columns: 1fr; }
+      .footer__grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .hero__grid { grid-template-columns: 1fr; }
+      .search-box { display: none; }
+      .menu-toggle { display: block; }
+
+      .nav__list {
+        display: none;
+        flex-direction: column;
+        padding: 0.5rem 0 1rem;
+      }
+
+      .nav__list.open { display: flex; }
+
+      .nav__list a {
+        border-bottom: none;
+        border-right: 3px solid transparent;
+        width: 100%;
+      }
+
+      .nav__list a.active,
+      .nav__list a:hover {
+        border-right-color: var(--brand);
+        border-bottom-color: transparent;
+      }
+
+      .footer__grid { grid-template-columns: 1fr; }
+      .header__actions .btn--ghost { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header__top">
+        <a href="#" class="logo">
+          <div class="logo__mark">عخ</div>
+          <div class="logo__text">
+            <h1>عصر خودرو</h1>
+            <span>پایگاه اطلاع‌رسانی صنعت خودرو</span>
+          </div>
+        </a>
+        <div class="header__actions">
+          <div class="search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="search" placeholder="جستجو در اخبار، قیمت، رویدادها..." />
+          </div>
+          <button class="btn btn--ghost">قیمت روز</button>
+          <button class="btn btn--brand">عضویت خبرنامه</button>
+          <button class="menu-toggle" id="menuToggle" aria-label="منو">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+        </div>
+      </div>
+      <nav class="nav">
+        <ul class="nav__list" id="navList">
+          <li><a href="#" class="active">صفحه اصلی</a></li>
+          <li><a href="#">اخبار خودرو</a></li>
+          <li><a href="#">قیمت خودرو</a></li>
+          <li><a href="#">واردات</a></li>
+          <li><a href="#">تولید داخلی</a></li>
+          <li><a href="#">رویدادها</a></li>
+          <li><a href="#">بررسی خودرو</a></li>
+          <li><a href="#">گزارش و تحلیل</a></li>
+          <li><a href="#">چندرسانه‌ای</a></li>
+          <li><a href="#">تماس با ما</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Breaking news ticker -->
+  <div class="ticker">
+    <div class="container ticker__inner">
+      <span class="ticker__badge">خبر فوری</span>
+      <div class="ticker__track">
+        <span class="ticker__text">
+          آخرین وضعیت واگذاری سهام تودلی خودروسازان &nbsp;•&nbsp; شاید آگهی فروش سهام تودلی سایپا روز یکشنبه منتشر شود &nbsp;•&nbsp; آخرین طرح فروش نادین خودرو در سال ۱۴۰۴ &nbsp;•&nbsp;
+          آخرین وضعیت واگذاری سهام تودلی خودروسازان &nbsp;•&nbsp; شاید آگهی فروش سهام تودلی سایپا روز یکشنبه منتشر شود &nbsp;•&nbsp; آخرین طرح فروش نادین خودرو در سال ۱۴۰۴ &nbsp;•&nbsp;
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Date bar -->
+  <div class="meta-bar">
+    <div class="container meta-bar__inner">
+      <span>چهارشنبه ۲۰ خرداد ۱۴۰۵ — تهران</span>
+      <span>آخرین به‌روزرسانی قیمت: امروز ۱۴:۳۰</span>
+    </div>
+  </div>
+
+  <main>
+    <div class="container page-layout">
+      <div class="page-main">
+
+    <!-- Hero / lead story (Radio Farda style) -->
+    <section class="hero">
+        <div class="hero__grid">
+          <a href="#" class="lead-story">
+            <div class="lead-story__image">
+              <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=900&h=506&fit=crop&q=80" alt="خط تولید خودروسازی" loading="eager" />
+              <span class="lead-story__badge">خبر اول</span>
+            </div>
+            <div class="lead-story__body">
+              <div class="lead-story__category">خصوصی‌سازی صنعت خودرو</div>
+              <h2 class="lead-story__title">آخرین وضعیت واگذاری سهام تودلی خودروسازان؛ رایزنی‌های نهایی در جریان است</h2>
+              <p class="lead-story__excerpt">سهام تودلی خودروسازان طی سال‌های گذشته به یکی از اساسی‌ترین چالش‌های خودروسازان بزرگ کشور تبدیل شده و مسیر اصلاح ساختار این صنعت را با مانع مواجه کرده‌است.</p>
+              <div class="lead-story__meta">
+                <span>عصر خودرو</span>
+                <span>۲۰ خرداد ۱۴۰۵</span>
+                <span>۵ دقیقه مطالعه</span>
+              </div>
+            </div>
+          </a>
+          <div class="side-headlines">
+            <a href="#" class="side-headline">
+              <h3 class="side-headline__title">شاید آگهی فروش سهام تودلی سایپا روز یکشنبه منتشر شود</h3>
+              <span class="side-headline__date">۲۰ خرداد ۱۴۰۵</span>
+            </a>
+            <a href="#" class="side-headline">
+              <h3 class="side-headline__title">آخرین طرح فروش نادین خودرو در سال ۱۴۰۴</h3>
+              <span class="side-headline__date">۱۹ خرداد ۱۴۰۵</span>
+            </a>
+            <a href="#" class="side-headline">
+              <h3 class="side-headline__title">تباری محصولات وارداتی؛ آخرین بخشنامه وزارت صمت</h3>
+              <span class="side-headline__date">۱۹ خرداد ۱۴۰۵</span>
+            </a>
+            <a href="#" class="side-headline">
+              <h3 class="side-headline__title">قیمت خودروهای داخلی در هفته جاری؛ جزئیات نوسانات بازار</h3>
+              <span class="side-headline__date">۱۸ خرداد ۱۴۰۵</span>
+            </a>
+          </div>
+        </div>
+    </section>
+
+    <!-- Latest news — 300×75 cards -->
+    <section class="section">
+        <div class="section__header">
+          <h2 class="section__title">تازه‌ها</h2>
+          <a href="#" class="section__more">مشاهده همه ←</a>
+        </div>
+        <div class="news-grid">
+              <a href="#" class="news-card">
+                <div class="news-card__image"><img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=200&h=150&fit=crop&q=80" alt="خط تولید خودرو" loading="lazy" /></div>
+                <div class="news-card__body">
+                  <div class="news-card__category">تولید داخلی</div>
+                  <h3 class="news-card__title">ایران‌خودرو برنامه تولید ۶ ماهه دوم را اعلام کرد</h3>
+                  <time class="news-card__date">۲۰ خرداد ۱۴۰۵</time>
+                </div>
+              </a>
+              <a href="#" class="news-card">
+                <div class="news-card__image"><img src="https://images.unsplash.com/photo-1550355291-bbee04a92027?w=200&h=150&fit=crop&q=80" alt="خودرو لوکس" loading="lazy" /></div>
+                <div class="news-card__body">
+                  <div class="news-card__category">قیمت خودرو</div>
+                  <h3 class="news-card__title">قیمت پژو ۲۰۷ و تارا در بازار آزاد؛ افزایش جزئی</h3>
+                  <time class="news-card__date">۲۰ خرداد ۱۴۰۵</time>
+                </div>
+              </a>
+              <a href="#" class="news-card">
+                <div class="news-card__image"><img src="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=200&h=150&fit=crop&q=80" alt="واردات خودرو" loading="lazy" /></div>
+                <div class="news-card__body">
+                  <div class="news-card__category">واردات</div>
+                  <h3 class="news-card__title">جدیدترین لیست خودروهای وارداتی مجاز به بازار</h3>
+                  <time class="news-card__date">۱۹ خرداد ۱۴۰۵</time>
+                </div>
+              </a>
+              <a href="#" class="news-card">
+                <div class="news-card__image"><img src="https://images.unsplash.com/photo-1542280665-94a27bab85fd?w=200&h=150&fit=crop&q=80" alt="نمایشگاه خودرو" loading="lazy" /></div>
+                <div class="news-card__body">
+                  <div class="news-card__category">رویداد</div>
+                  <h3 class="news-card__title">نمایشگاه خودرو تهران ۱۴۰۵؛ زمان‌بندی و غرفه‌داران</h3>
+                  <time class="news-card__date">۱۹ خرداد ۱۴۰۵</time>
+                </div>
+              </a>
+              <a href="#" class="news-card">
+                <div class="news-card__image"><img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=200&h=150&fit=crop&q=80" alt="بررسی خودرو" loading="lazy" /></div>
+                <div class="news-card__body">
+                  <div class="news-card__category">بررسی خودرو</div>
+                  <h3 class="news-card__title">مقایسه کامل سایپا ساینا و کوییک R؛ کدام بهتر است؟</h3>
+                  <time class="news-card__date">۱۸ خرداد ۱۴۰۵</time>
+                </div>
+              </a>
+              <a href="#" class="news-card">
+                <div class="news-card__image"><img src="https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=200&h=150&fit=crop&q=80" alt="خودرو برقی" loading="lazy" /></div>
+                <div class="news-card__body">
+                  <div class="news-card__category">فناوری</div>
+                  <h3 class="news-card__title">خودروهای برقی ایرانی؛ وضعیت پروژه‌ها و چشم‌انداز</h3>
+                  <time class="news-card__date">۱۸ خرداد ۱۴۰۵</time>
+                </div>
+              </a>
+              <a href="#" class="news-card">
+                <div class="news-card__image"><img src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=200&h=150&fit=crop&q=80" alt="خودرو مدرن" loading="lazy" /></div>
+                <div class="news-card__body">
+                  <div class="news-card__category">قیمت خودرو</div>
+                  <h3 class="news-card__title">قیمت خودروهای چینی در بازار؛ روند صعودی ادامه دارد</h3>
+                  <time class="news-card__date">۱۷ خرداد ۱۴۰۵</time>
+                </div>
+              </a>
+              <a href="#" class="news-card">
+                <div class="news-card__image"><img src="https://images.unsplash.com/photo-1533474719590-79e9b01e2110?w=200&h=150&fit=crop&q=80" alt="صنعت خودرو" loading="lazy" /></div>
+                <div class="news-card__body">
+                  <div class="news-card__category">صنعت خودرو</div>
+                  <h3 class="news-card__title">گزارش عملکرد خودروسازان در بهار ۱۴۰۵</h3>
+                  <time class="news-card__date">۱۷ خرداد ۱۴۰۵</time>
+                </div>
+              </a>
+        </div>
+    </section>
+
+    <!-- Car prices -->
+    <section class="section">
+        <div class="section__header">
+          <h2 class="section__title">قیمت روز خودرو</h2>
+          <a href="#" class="section__more">جدول کامل قیمت‌ها ←</a>
+        </div>
+        <div class="price-strip">
+          <div class="price-strip__title">قیمت بازار آزاد <span>امروز</span></div>
+          <div class="price-table">
+            <div class="price-item">
+              <div class="price-item__name">پژو ۲۰۷ اتومات</div>
+              <div class="price-item__value">۱,۲۸۵,۰۰۰,۰۰۰ تومان</div>
+              <div class="price-item__change up">▲ ۱۲ میلیون</div>
+            </div>
+            <div class="price-item">
+              <div class="price-item__name">تارا اتومات</div>
+              <div class="price-item__value">۱,۱۰۵,۰۰۰,۰۰۰ تومان</div>
+              <div class="price-item__change up">▲ ۸ میلیون</div>
+            </div>
+            <div class="price-item">
+              <div class="price-item__name">هایما S7</div>
+              <div class="price-item__value">۱,۴۵۰,۰۰۰,۰۰۰ تومان</div>
+              <div class="price-item__change down">▼ ۵ میلیون</div>
+            </div>
+            <div class="price-item">
+              <div class="price-item__name">کوییک R</div>
+              <div class="price-item__value">۷۸۵,۰۰۰,۰۰۰ تومان</div>
+              <div class="price-item__change up">▲ ۳ میلیون</div>
+            </div>
+            <div class="price-item">
+              <div class="price-item__name">چری تیگو ۸</div>
+              <div class="price-item__value">۲,۱۲۰,۰۰۰,۰۰۰ تومان</div>
+              <div class="price-item__change up">▲ ۱۵ میلیون</div>
+            </div>
+            <div class="price-item">
+              <div class="price-item__name">سمند EF7</div>
+              <div class="price-item__value">۶۵۰,۰۰۰,۰۰۰ تومان</div>
+              <div class="price-item__change down">▼ ۲ میلیون</div>
+            </div>
+          </div>
+        </div>
+    </section>
+
+    <!-- More news grids by topic -->
+    <section class="section">
+        <div class="section__header">
+          <h2 class="section__title">اخبار خودرو</h2>
+          <a href="#" class="section__more">آرشیو اخبار ←</a>
+        </div>
+        <div class="news-grid">
+          <a href="#" class="news-card">
+            <div class="news-card__image"><img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=200&h=150&fit=crop&q=80" alt="کارگاه خودرو" loading="lazy" /></div>
+            <div class="news-card__body">
+              <div class="news-card__category">صنعت</div>
+              <h3 class="news-card__title">وزارت صمت: برنامه هفتم توسعه و نقش صنعت خودرو</h3>
+              <time class="news-card__date">۱۶ خرداد ۱۴۰۵</time>
+            </div>
+          </a>
+          <a href="#" class="news-card">
+            <div class="news-card__image"><img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=200&h=150&fit=crop&q=80" alt="خودرو شاسی‌بلند" loading="lazy" /></div>
+            <div class="news-card__body">
+              <div class="news-card__category">واردات</div>
+              <h3 class="news-card__title">واردات خودروهای هیبریدی؛ شرایط جدید گمرکی</h3>
+              <time class="news-card__date">۱۶ خرداد ۱۴۰۵</time>
+            </div>
+          </a>
+          <a href="#" class="news-card">
+            <div class="news-card__image"><img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=150&fit=crop&q=80" alt="رویداد خودرو" loading="lazy" /></div>
+            <div class="news-card__body">
+              <div class="news-card__category">رویداد</div>
+              <h3 class="news-card__title">همایش سالانه انجمن خودروسازان؛ محورهای اصلی</h3>
+              <time class="news-card__date">۱۵ خرداد ۱۴۰۵</time>
+            </div>
+          </a>
+          <a href="#" class="news-card">
+            <div class="news-card__image"><img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=200&h=150&fit=crop&q=80" alt="تست رانندگی" loading="lazy" /></div>
+            <div class="news-card__body">
+              <div class="news-card__category">بررسی</div>
+              <h3 class="news-card__title">تست رانندگی فیدلیتی پرایم؛ نقاط قوت و ضعف</h3>
+              <time class="news-card__date">۱۵ خرداد ۱۴۰۵</time>
+            </div>
+          </a>
+          <a href="#" class="news-card">
+            <div class="news-card__image"><img src="https://images.unsplash.com/photo-1617788138011-80ad40651399?w=200&h=150&fit=crop&q=80" alt="بازار خودرو" loading="lazy" /></div>
+            <div class="news-card__body">
+              <div class="news-card__category">اقتصاد</div>
+              <h3 class="news-card__title">تأثیر نرخ ارز بر قیمت قطعات و خودروهای مونتاژی</h3>
+              <time class="news-card__date">۱۴ خرداد ۱۴۰۵</time>
+            </div>
+          </a>
+        </div>
+
+        <div class="events-banner">
+          <div>
+            <h3>رویدادها و نمایشگاه‌های خودرو</h3>
+            <p>تقویم کامل نمایشگاه‌ها، همایش‌ها و رویدادهای صنعت خودرو ایران</p>
+          </div>
+          <button class="btn btn--brand">مشاهده تقویم رویدادها</button>
+        </div>
+    </section>
+
+    <!-- Category list blocks (Radio Farda style) -->
+    <section class="section">
+        <div class="section__header">
+          <h2 class="section__title">فراتر از خبر</h2>
+        </div>
+        <div class="category-blocks">
+          <div class="category-block">
+            <div class="category-block__head">
+              <h3>گزارش و تحلیل</h3>
+              <a href="#" class="section__more">بیشتر</a>
+            </div>
+            <ul class="category-block__list">
+              <li>
+                <a href="#">تحلیل بازار خودرو در سایه نوسانات ارزی<div class="date">۲۰ خرداد ۱۴۰۵</div></a>
+              </li>
+              <li>
+                <a href="#">آینده خصوصی‌سازی؛ سناریوهای محتمل<div class="date">۱۹ خرداد ۱۴۰۵</div></a>
+              </li>
+              <li>
+                <a href="#">چالش‌های زنجیره تأمین قطعات خودرو<div class="date">۱۸ خرداد ۱۴۰۵</div></a>
+              </li>
+            </ul>
+          </div>
+          <div class="category-block">
+            <div class="category-block__head">
+              <h3>واردات و تجارت</h3>
+              <a href="#" class="section__more">بیشتر</a>
+            </div>
+            <ul class="category-block__list">
+              <li>
+                <a href="#">تباری محصولات وارداتی؛ آخرین بخشنامه<div class="date">۱۹ خرداد ۱۴۰۵</div></a>
+              </li>
+              <li>
+                <a href="#">خودروهای وارداتی جدید در راه بازار ایران<div class="date">۱۷ خرداد ۱۴۰۵</div></a>
+              </li>
+              <li>
+                <a href="#">گمرک: آمار واردات خودرو در ۴ ماه اول<div class="date">۱۶ خرداد ۱۴۰۵</div></a>
+              </li>
+            </ul>
+          </div>
+          <div class="category-block">
+            <div class="category-block__head">
+              <h3>بررسی و مقایسه</h3>
+              <a href="#" class="section__more">بیشتر</a>
+            </div>
+            <ul class="category-block__list">
+              <li>
+                <a href="#">مقایسه شاهین و ساینا؛ کدام ارزش خرید بیشتری دارد؟<div class="date">۱۸ خرداد ۱۴۰۵</div></a>
+              </li>
+              <li>
+                <a href="#">بررسی فنی دنا پلاس توربو<div class="date">۱۷ خرداد ۱۴۰۵</div></a>
+              </li>
+              <li>
+                <a href="#">خودروهای شاسی‌بلند اقتصادی بازار ایران<div class="date">۱۵ خرداد ۱۴۰۵</div></a>
+              </li>
+            </ul>
+          </div>
+          <div class="category-block">
+            <div class="category-block__head">
+              <h3>پربازدیدترین‌ها</h3>
+              <a href="#" class="section__more">بیشتر</a>
+            </div>
+            <ul class="category-block__list">
+              <li>
+                <a href="#">۱. آخرین وضعیت واگذاری سهام تودلی<div class="date">۲۰ خرداد ۱۴۰۵</div></a>
+              </li>
+              <li>
+                <a href="#">۲. قیمت پژو ۲۰۷ و تارا در بازار آزاد<div class="date">۲۰ خرداد ۱۴۰۵</div></a>
+              </li>
+              <li>
+                <a href="#">۳. آخرین طرح فروش نادین خودرو<div class="date">۱۹ خرداد ۱۴۰۵</div></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+    </section>
+
+      </div><!-- /.page-main -->
+
+      <aside class="sidebar" aria-label="تبلیغات">
+        <div class="sidebar__title">تبلیغات</div>
+        <a href="#" class="ad-slot" aria-label="تبلیغ خودرو ۱">
+          <img src="https://media.giphy.com/media/l0HlBO7ROzRfmHSU8/giphy.gif" alt="انیمیشن خودرو" loading="lazy" />
+        </a>
+        <a href="#" class="ad-slot" aria-label="تبلیغ خودرو ۲">
+          <img src="https://media.giphy.com/media/3o7btPCcdNniyf0ArS/giphy.gif" alt="انیمیشن ماشین اسپرت" loading="lazy" />
+        </a>
+        <a href="#" class="ad-slot" aria-label="تبلیغ خودرو ۳">
+          <img src="https://media.giphy.com/media/xTiTnMhf2IFlyLAqzS/giphy.gif" alt="انیمیشن دریفت" loading="lazy" />
+        </a>
+        <a href="#" class="ad-slot" aria-label="تبلیغ خودرو ۴">
+          <img src="https://media.giphy.com/media/l3q2K5jnwTSqR9mSc/giphy.gif" alt="انیمیشن خودرو کلاسیک" loading="lazy" />
+        </a>
+        <a href="#" class="ad-slot" aria-label="تبلیغ خودرو ۵">
+          <img src="https://media.giphy.com/media/l0MYC0LajbaPoEADu/giphy.gif" alt="انیمیشن مسابقه" loading="lazy" />
+        </a>
+        <a href="#" class="ad-slot" aria-label="تبلیغ خودرو ۶">
+          <img src="https://media.giphy.com/media/26BRv4T75oREWbiUU/giphy.gif" alt="انیمیشن جاده" loading="lazy" />
+        </a>
+      </aside>
+
+    </div><!-- /.page-layout -->
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <h2>عصر خودرو</h2>
+          <p>پایگاه اطلاع‌رسانی تخصصی صنعت خودرو ایران. پوشش اخبار، قیمت روز، رویدادها، گزارش‌های تحلیلی و اطلاعات فنی خودروهای داخلی و وارداتی.</p>
+        </div>
+        <div class="footer__col">
+          <h4>بخش‌ها</h4>
+          <a href="#">اخبار خودرو</a>
+          <a href="#">قیمت خودرو</a>
+          <a href="#">واردات</a>
+          <a href="#">رویدادها</a>
+        </div>
+        <div class="footer__col">
+          <h4>خدمات</h4>
+          <a href="#">قیمت روز</a>
+          <a href="#">شرایط فروش</a>
+          <a href="#">آرشیو اخبار</a>
+          <a href="#">خبرنامه</a>
+        </div>
+        <div class="footer__col">
+          <h4>درباره</h4>
+          <a href="#">درباره ما</a>
+          <a href="#">تماس با ما</a>
+          <a href="#">تبلیغات</a>
+          <a href="#">قوانین و مقررات</a>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <span>© ۱۴۰۵ تمام حقوق این وب‌سایت برای عصر خودرو محفوظ است.</span>
+        <span>طراحی مجدد — پیش‌نمایش</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("menuToggle").addEventListener("click", function () {
+      document.getElementById("navList").classList.toggle("open");
+    });
+  </script>
+</body>
+</html>

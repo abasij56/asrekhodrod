@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>معماری بلوک‌ها در ظاهر Classic / Modern — تم عصر خودرو</title>
+  <style>
+    :root {
+      --bg: #f8f9fb;
+      --card: #ffffff;
+      --text: #1a1d26;
+      --muted: #5c6370;
+      --accent: #c41e3a;
+      --border: #e4e7ec;
+      --code-bg: #f1f3f6;
+      --good: #0d7a4e;
+      --warn: #b45309;
+      --bad: #b91c1c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, "Vazirmatn", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      font-size: 16px;
+    }
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #1a1d26 0%, #2d3344 100%);
+      color: #fff;
+      padding: 2.5rem 1.25rem;
+      margin-bottom: 2rem;
+    }
+    header .wrap { padding: 0; }
+    header h1 { margin: 0 0 0.5rem; font-size: 1.75rem; }
+    header p { margin: 0; opacity: 0.85; font-size: 0.95rem; }
+    .nav-link {
+      display: inline-block;
+      margin-top: 1rem;
+      color: #fff;
+      opacity: 0.9;
+      font-size: 0.9rem;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(255,255,255,0.5);
+    }
+    .nav-link:hover { opacity: 1; }
+    h2 {
+      margin: 2.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--accent);
+      font-size: 1.35rem;
+    }
+    h3 { margin: 1.5rem 0 0.75rem; font-size: 1.1rem; color: #2d3344; }
+    h4 { margin: 1.25rem 0 0.5rem; font-size: 1rem; color: #3d4455; }
+    p { margin: 0.75rem 0; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .highlight {
+      border-right: 4px solid var(--accent);
+      background: #fff5f6;
+    }
+    .good { border-right-color: var(--good); background: #f0fdf6; }
+    .warn { border-right-color: var(--warn); background: #fffbeb; }
+    .bad { border-right-color: var(--bad); background: #fef2f2; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.95rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.65rem 0.85rem;
+      text-align: right;
+      vertical-align: top;
+    }
+    th { background: #eef0f4; font-weight: 600; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    code, pre {
+      font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+      font-size: 0.88rem;
+      direction: ltr;
+      text-align: left;
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    ul, ol { margin: 0.5rem 0; padding-right: 1.5rem; }
+    li { margin: 0.35rem 0; }
+    .tag {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      margin-left: 0.35rem;
+      vertical-align: middle;
+    }
+    .tag.core { background: #2d3344; }
+    .tag.app { background: #0d7a4e; }
+    .diagram {
+      background: #1a1d26;
+      color: #e8eaef;
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-family: Consolas, monospace;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      direction: ltr;
+      text-align: left;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    .summary-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .summary-item strong {
+      display: block;
+      color: var(--accent);
+      margin-bottom: 0.35rem;
+      font-size: 0.9rem;
+    }
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>معماری بلوک‌ها در ظاهر Classic / Modern</h1>
+    <p>طرح Car Blocks، Homepage Blocks و ACF — تم Asre Khodro</p>
+    <a class="nav-link" href="appearance-separation.html">← سند جداسازی ظاهر از داده</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="card highlight">
+    <p><strong>اصل طلایی:</strong> بلوک‌هایی مثل <code>ak-car-specs</code> را <strong>دو بار ثبت نکنید</strong> (<code>ak-car-specs-classic</code> و <code>ak-car-specs-modern</code>).</p>
+    <p>محتوا و فیلدهای ACF در <code>post_content</code> ذخیره می‌شوند. اگر slug بلوک عوض شود، با سوییچ ظاهر محتوا می‌شکند.</p>
+    <p><strong>راه درست: یک بلوک، یک داده، چند ظاهر.</strong></p>
+  </div>
+
+  <h2>وضعیت فعلی در تم</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>لایه</th>
+        <th>فایل</th>
+        <th>نقش</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="tag core">Core</span> داده</td>
+        <td><code>CarAcfFields.php</code></td>
+        <td>فیلدهای ACF (heading، rows، gallery، ...)</td>
+      </tr>
+      <tr>
+        <td><span class="tag core">Core</span> ثبت</td>
+        <td><code>CarBlocks.php</code></td>
+        <td><code>acf_register_block_type</code> + render callback</td>
+      </tr>
+      <tr>
+        <td><span class="tag app">Appearance</span> ظاهر</td>
+        <td><code>views/blocks/car/*.twig</code></td>
+        <td>HTML، کلاس‌های CSS، ساختار UI</td>
+      </tr>
+      <tr>
+        <td><span class="tag core">Core</span> داده + ظاهر</td>
+        <td><code>Blocks.php</code></td>
+        <td>بلوک‌های homepage — داده سنگین + Twig</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>جریان فعلی در <code>CarBlocks::render()</code>:</p>
+  <pre>$context['fields'] = get_fields();
+\Timber\Timber::render( 'blocks/car/specs.twig', $context );</pre>
+
+  <p>با سوییچ ظاهر، فقط <strong>مسیر Twig و assetها</strong> باید عوض شوند؛ فیلد ACF و slug بلوک ثابت می‌مانند.</p>
+
+  <h2>اصل طراحی: Block = Contract + Appearance Template</h2>
+
+  <div class="diagram">┌─────────────────────────────────────────────────────────┐
+│  CORE (ثابت)                                            │
+│  • CarAcfFields     → فیلدها                            │
+│  • BlockRegistry    → ثبت ak-car-* یک‌بار               │
+│  • BlockRenderer    → resolve template + build context  │
+│  • CarBlockData*    → (اختیاری) نرمال‌سازی داده         │
+└─────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│  APPEARANCE (classic / modern)                          │
+│  • views/blocks/car/specs.twig                          │
+│  • assets/css/car-page.css                              │
+│  • assets/js/car-page.js                                │
+└─────────────────────────────────────────────────────────┘</div>
+
+  <h3>قرارداد بلوک (ثابت بین ظاهرها)</h3>
+  <ul>
+    <li><strong>slug:</strong> <code>ak-car-specs</code> (تغییر نمی‌کند)</li>
+    <li><strong>فیلدهای ACF:</strong> <code>section_title</code>, <code>rows</code>, <code>anchor_id</code>, ...</li>
+    <li><strong>context حداقلی:</strong> <code>fields</code>, <code>post</code>, <code>block</code>, <code>is_preview</code></li>
+  </ul>
+  <p>هر ظاهر فقط <strong>چگونگی نمایش</strong> همان داده را تعیین می‌کند.</p>
+
+  <h2>جریان Render پیشنهادی</h2>
+
+  <pre>// الان (ثابت)
+'template' => 'blocks/car/specs.twig'
+
+// بعد (داینامیک)
+Appearance::resolve_block_template( 'car/specs' );
+// → appearances/modern/views/blocks/car/specs.twig
+// یا fallback → appearances/classic/views/blocks/car/specs.twig</pre>
+
+  <h3>الگوریتم resolve</h3>
+  <ol>
+    <li>ظاهر فعال از option خوانده می‌شود (<code>classic</code> / <code>modern</code>)</li>
+    <li>اگر template در ظاهر فعال وجود داشت → همان استفاده می‌شود</li>
+    <li>اگر نبود → fallback به <code>classic</code> یا پوشه <code>shared/blocks/</code></li>
+    <li><code>Timber::render()</code> با همان context اجرا می‌شود</li>
+  </ol>
+
+  <pre>// CarBlocks::render() — بعد از refactor
+$context  = BlockContext::for_car_block( $block );  // core
+$template = Appearance::resolve( 'blocks/car/specs' );
+Timber::render( $template, $context );</pre>
+
+  <div class="card good">
+    <p>ثبت ACF و فیلدها در <strong>core</strong> می‌ماند. فقط مسیر Twig از ظاهر فعال resolve می‌شود.</p>
+  </div>
+
+  <h2>سه سطح تفاوت ظاهر برای بلوک‌ها</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>سطح</th>
+        <th>مثال در car blocks</th>
+        <th>کار لازم</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>۱ — فقط CSS</strong></td>
+        <td><code>comments</code>, <code>sales</code>, <code>faq</code></td>
+        <td>یک Twig مشترک در <code>shared/</code>؛ CSS جدا در هر ظاهر</td>
+      </tr>
+      <tr>
+        <td><strong>۲ — HTML متفاوت</strong></td>
+        <td><code>intro</code>, <code>gallery</code>, <code>specs</code>, <code>video</code></td>
+        <td>Twig جدا per appearance؛ داده و فیلد ACF یکسان</td>
+      </tr>
+      <tr>
+        <td><strong>۳ — چیدمان + تعامل</strong></td>
+        <td><code>toc</code>, <code>price-chart</code></td>
+        <td>Twig جدا + شاید JS متفاوت؛ فیلد ACF یکسان</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>در هر سه سطح، <strong>slug بلوک یکی است</strong> — فقط template و asset عوض می‌شود.</p>
+
+  <h2>لیست Car Blocks فعلی</h2>
+
+  <table>
+    <thead>
+      <tr><th>Slug</th><th>Template فعلی</th><th>سطح پیشنهادی</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>ak-car-intro</code></td><td><code>blocks/car/intro.twig</code></td><td>۲</td></tr>
+      <tr><td><code>ak-car-video</code></td><td><code>blocks/car/video.twig</code></td><td>۲</td></tr>
+      <tr><td><code>ak-car-toc</code></td><td><code>blocks/car/toc.twig</code></td><td>۳</td></tr>
+      <tr><td><code>ak-car-faq</code></td><td><code>blocks/car/faq.twig</code></td><td>۱</td></tr>
+      <tr><td><code>ak-car-gallery</code></td><td><code>blocks/car/gallery.twig</code></td><td>۲</td></tr>
+      <tr><td><code>ak-car-specs</code></td><td><code>blocks/car/specs.twig</code></td><td>۲</td></tr>
+      <tr><td><code>ak-car-comments</code></td><td><code>blocks/car/comments.twig</code></td><td>۱</td></tr>
+      <tr><td><code>ak-car-sales</code></td><td><code>blocks/car/sales.twig</code></td><td>۱</td></tr>
+      <tr><td><code>ak-car-price-chart</code></td><td><code>blocks/car/price-chart.twig</code></td><td>۳</td></tr>
+    </tbody>
+  </table>
+
+  <h2>بلوک‌های Homepage (<code>Blocks.php</code>)</h2>
+
+  <p>این بلوک‌ها علاوه بر Twig، <strong>داده سنگین</strong> هم می‌گیرند:</p>
+  <pre>$ctx = Homepage::get_context();  // چندین query
+Timber::render( $template, $ctx );</pre>
+
+  <h3>طرح جداگانه برای homepage blocks</h3>
+  <ol>
+    <li>در core: <code>HomepageData::section('hero')</code>, <code>::section('news_list', $count)</code></li>
+    <li>هر بلوک در manifest ظاهر اعلام کند چه داده‌ای می‌خواهد</li>
+    <li>Twig از همان مسیر resolve شود: <code>appearances/{active}/views/blocks/hero.twig</code></li>
+  </ol>
+
+  <pre>// manifest ظاهر — مثال
+'ak-hero' => [
+    'template' => 'blocks/hero.twig',
+    'data'     => ['hero', 'ticker'],  // فقط این‌ها fetch شوند
+],
+'ak-news-list' => [
+    'template' => 'blocks/news-list.twig',
+    'data'     => ['news_list'],
+],</pre>
+
+  <div class="card good">
+    <p>ظاهر minimal فقط داده لازم را می‌گیرد → سریع‌تر از <code>Homepage::get_context()</code> کامل.</p>
+  </div>
+
+  <h2>ساختار پوشه پیشنهادی</h2>
+
+  <pre>appearances/
+├── classic/
+│   ├── views/blocks/car/
+│   │   ├── intro.twig
+│   │   ├── specs.twig
+│   │   └── ...
+│   ├── views/blocks/
+│   │   ├── hero.twig
+│   │   └── news-list.twig
+│   ├── assets/css/car-page.css
+│   ├── assets/js/car-page.js
+│   └── manifest.php
+│
+├── modern/
+│   ├── views/blocks/car/
+│   │   ├── intro.twig      ← layout متفاوت
+│   │   └── specs.twig
+│   ├── assets/css/car-page.css
+│   ├── assets/js/price-chart.js
+│   └── manifest.php
+│
+└── shared/
+    └── views/blocks/car/
+        └── faq.twig        ← اگر هر دو ظاهر یکسان باشند</pre>
+
+  <p><strong>enqueue:</strong> به‌جای <code>Setup</code> با مسیر ثابت، کلاس ظاهر فعال بر اساس <code>is_singular('carsinfo')</code> یا <code>page_has_car_blocks()</code> asset خودش را لود می‌کند.</p>
+
+  <h2>manifest ظاهر</h2>
+
+  <pre>// appearances/modern/manifest.php
+return [
+    'id'     => 'modern',
+    'blocks' => [
+        'ak-car-intro' => [
+            'template' => 'blocks/car/intro.twig',
+        ],
+        'ak-car-specs' => [
+            'template' => 'blocks/car/specs.twig',
+        ],
+        'ak-car-price-chart' => [
+            'template' => 'blocks/car/price-chart.twig',
+            'script'   => 'assets/js/price-chart.js',
+        ],
+        'ak-hero' => [
+            'template' => 'blocks/hero.twig',
+            'data'     => ['hero', 'ticker'],
+        ],
+    ],
+];</pre>
+
+  <p><code>BlockRegistry</code> در core از اتحاد manifest همه ظاهرها فقط <strong>slugها</strong> را برای <code>acf_register_block_type</code> می‌گیرد. template در runtime از ظاهر فعال resolve می‌شود.</p>
+
+  <h2>ادیتور Gutenberg (Preview)</h2>
+
+  <table>
+    <thead>
+      <tr><th>موضوع</th><th>تصمیم پیشنهادی</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>پیش‌نمایش بلوک در ادیتور</td>
+        <td>همان ظاهر فعال سایت (<code>active_appearance</code>)</td>
+      </tr>
+      <tr>
+        <td>CSS ادیتور</td>
+        <td><code>appearances/{active}/assets/admin/car-blocks-editor.css</code></td>
+      </tr>
+      <tr>
+        <td>محتوای ذخیره‌شده در DB</td>
+        <td><strong>هیچ تغییری نمی‌کند</strong> — فقط frontend عوض می‌شود</td>
+      </tr>
+      <tr>
+        <td>سوییچ classic → modern</td>
+        <td>همان <code>&lt;!-- wp:acf/ak-car-specs --&gt;</code> با همان data؛ فقط Twig/CSS عوض شده</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>تقسیم مسئولیت Core vs Appearance</h2>
+
+  <table>
+    <thead>
+      <tr><th>در Core می‌ماند</th><th>در Appearance می‌رود</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <code>CarAcfFields</code><br>
+          <code>acf_register_block_type</code><br>
+          <code>CarBlocks::block_names()</code><br>
+          <code>editor_template()</code> / pattern<br>
+          <code>BlockContext</code> / normalize داده
+        </td>
+        <td>
+          Twig بلوک‌ها<br>
+          CSS/JS صفحه و بلوک<br>
+          partialهای اختصاصی UI<br>
+          استایل ادیتور (اختیاری)
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>تأثیر بر عملکرد</h2>
+
+  <table>
+    <thead>
+      <tr><th>موضوع</th><th>تأثیر</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>سوییچ ظاهر روی render بلوک</td>
+        <td>ناچیز (~یک lookup مسیر template)</td>
+      </tr>
+      <tr>
+        <td>۹ بلوک car در یک صفحه</td>
+        <td>۹ بار <code>Timber::render</code> — مثل الان</td>
+      </tr>
+      <tr>
+        <td>۲۰۰ هزار پست</td>
+        <td>تأثیر مستقیم روی car blocks ندارد؛ <code>get_fields()</code> همان post فعلی است</td>
+      </tr>
+      <tr>
+        <td>بهبود واقعی</td>
+        <td>homepage blocks فقط داده لازم + page cache</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>خطاهای رایج — انجام ندهید</h2>
+
+  <div class="card bad">
+    <table>
+      <thead>
+        <tr><th>اشتباه</th><th>چرا بد است</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>دو slug بلوک per appearance</td>
+          <td>محتوا در DB به slug وابسته است — migration لازم می‌شود</td>
+        </tr>
+        <tr>
+          <td>فیلد ACF جدا per appearance</td>
+          <td>داده تکراری و سردرگمی در ادیتور</td>
+        </tr>
+        <tr>
+          <td>کپی <code>CarBlocks.php</code> per appearance</td>
+          <td>ثبت دوباره ACF = conflict و خطا</td>
+        </tr>
+        <tr>
+          <td>hardcode template path در core</td>
+          <td>سوییچ ظاهر کار نمی‌کند</td>
+        </tr>
+        <tr>
+          <td>لود CSS هر دو ظاهر همزمان</td>
+          <td>حجم اضافی — فقط ظاهر فعال enqueue شود</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>مراحل پیاده‌سازی</h2>
+
+  <h3>فاز ۱ — زیرساخت</h3>
+  <ol>
+    <li>کلاس <code>Appearance</code> با <code>resolve()</code> و fallback</li>
+    <li>انتقال <code>views/blocks/</code> به <code>appearances/classic/views/blocks/</code></li>
+    <li>تغییر <code>CarBlocks::render()</code> برای استفاده از <code>Appearance::resolve()</code></li>
+  </ol>
+
+  <h3>فاز ۲ — manifest و enqueue</h3>
+  <ol>
+    <li><code>manifest.php</code> برای classic</li>
+    <li>انتقال <code>car-page.css</code> / <code>car-page.js</code> به پوشه ظاهر</li>
+    <li>همان کار برای <code>Blocks.php</code> (homepage)</li>
+  </ol>
+
+  <h3>فاز ۳ — ظاهر دوم</h3>
+  <ol>
+    <li>ساخت <code>appearances/modern/</code></li>
+    <li>فقط بلوک‌هایی که واقعاً متفاوت‌اند Twig جدا بگیرند؛ بقیه از shared یا fallback classic</li>
+    <li>option <code>active_appearance</code> در ACF</li>
+  </ol>
+
+  <h2>جمع‌بندی</h2>
+
+  <div class="summary-grid">
+    <div class="summary-item">
+      <strong>بلوک car با option عوض می‌شود؟</strong>
+      بله — Twig + CSS/JS per appearance
+    </div>
+    <div class="summary-item">
+      <strong>محتوا / فیلد ACF؟</strong>
+      ثابت در core — تغییر نمی‌کند
+    </div>
+    <div class="summary-item">
+      <strong>slug بلوک؟</strong>
+      ثابت — <code>ak-car-specs</code> همان می‌ماند
+    </div>
+    <div class="summary-item">
+      <strong>modern template نداشت؟</strong>
+      fallback به classic یا shared
+    </div>
+    <div class="summary-item">
+      <strong>ادیتور؟</strong>
+      preview با ظاهر فعال سایت
+    </div>
+  </div>
+
+  <div class="card highlight">
+    <p><strong>فرمول نهایی:</strong></p>
+    <p style="text-align:center; font-size:1.1rem; direction:ltr;">
+      <code>Block (core) + Fields (core) + Template (appearance) + Assets (appearance)</code>
+    </p>
+  </div>
+
+  <footer>
+    <p>سند معماری بلوک‌ها — تم Asre Khodro — مکمل <code>appearance-separation.html</code> — ژوئن ۲۰۲۶</p>
+  </footer>
+
+</main>
+</body>
+</html>

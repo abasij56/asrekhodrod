@@ -1,0 +1,37 @@
+{% extends 'base.twig' %}
+
+{% set hero_title = post.title|default('آئودی A3 اسپرت‌بک ۲۰۲۵') %}
+{% set show_toc = carsinfo_show_toc|default(false) %}
+
+{% block content %}
+<article class="carsinfo-page"{% if show_toc %} data-ci-toc-enabled{% endif %}>
+
+  <div class="container">
+    <nav class="ci-breadcrumb" aria-label="مسیر">
+      <ol>
+        <li><a href="{{ site.url }}">عصر خودرو</a></li>
+        <li><a href="#">اطلاعات ماشین‌ها</a></li>
+        <li><a href="#">آئودی</a></li>
+        <li aria-current="page">{{ hero_title }}</li>
+      </ol>
+    </nav>
+  </div>
+
+  {% if show_toc %}
+    {% include 'partials/cinfo/toc-sidebar.twig' %}
+  {% endif %}
+
+  {% if show_toc %}
+    <div class="container ci-toc-mobile-wrap">
+      {% include 'partials/cinfo/toc-mobile.twig' %}
+    </div>
+  {% endif %}
+
+  <div class="carsinfo-page__content">
+    {{ post.content }}
+  </div>
+
+</article>
+
+{% include 'partials/cinfo/car-lightbox.twig' %}
+{% endblock %}

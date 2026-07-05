@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>عصر خودرو — پاسخ تصمیم‌های تم وردپرس</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --brand: #e10600;
+      --brand-soft: #fff0f0;
+      --accent: #0066cc;
+      --green: #0d7a4e;
+      --green-soft: #e8f5ef;
+      --ink: #0d0d0d;
+      --ink-soft: #3d3d3d;
+      --ink-muted: #6b6b6b;
+      --line: #e5e5e5;
+      --surface: #ffffff;
+      --surface-alt: #f7f7f8;
+      --surface-dark: #0a0a0b;
+      --radius: 12px;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Vazirmatn", Tahoma, sans-serif;
+      background: var(--surface-alt);
+      color: var(--ink);
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .doc-header {
+      background: linear-gradient(135deg, var(--surface-dark) 0%, #1a1a2e 100%);
+      color: #fff;
+      padding: 3rem 0;
+      border-bottom: 4px solid var(--brand);
+    }
+
+    .container {
+      width: min(100% - 2rem, 960px);
+      margin-inline: auto;
+    }
+
+    .doc-header h1 {
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .doc-header .meta {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+    }
+
+    .doc-header .badge {
+      display: inline-block;
+      background: var(--brand);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      margin-bottom: 1rem;
+    }
+
+    main { padding: 2.5rem 0 4rem; }
+
+    section {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    section h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 3px solid var(--brand);
+      display: inline-block;
+    }
+
+    section h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 1.25rem 0 0.6rem;
+      color: var(--ink-soft);
+    }
+
+    p, li { color: var(--ink-soft); font-size: 0.95rem; }
+    p { margin-bottom: 0.75rem; }
+
+    ul, ol { padding-right: 1.25rem; margin-bottom: 0.75rem; }
+    li { margin-bottom: 0.35rem; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin: 1rem 0;
+    }
+
+    th, td {
+      border: 1px solid var(--line);
+      padding: 0.65rem 0.85rem;
+      text-align: right;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--surface-alt);
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    code, pre {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.82rem;
+      direction: ltr;
+      text-align: left;
+    }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      padding: 1.25rem;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      margin: 1rem 0;
+      line-height: 1.5;
+    }
+
+    .callout {
+      background: var(--brand-soft);
+      border-right: 4px solid var(--brand);
+      padding: 1rem 1.25rem;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      margin: 1rem 0;
+    }
+
+    .callout strong { color: var(--brand); }
+
+    .callout-info {
+      background: #e8f2fc;
+      border-right-color: var(--accent);
+    }
+
+    .callout-info strong { color: var(--accent); }
+
+    .callout-success {
+      background: var(--green-soft);
+      border-right-color: var(--green);
+    }
+
+    .callout-success strong { color: var(--green); }
+
+    .verdict {
+      display: inline-block;
+      background: var(--green-soft);
+      color: var(--green);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      margin-bottom: 0.75rem;
+    }
+
+    .toc {
+      background: var(--surface-alt);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--line);
+    }
+
+    .toc h2 {
+      font-size: 1rem;
+      border: none;
+      margin-bottom: 0.75rem;
+      padding: 0;
+    }
+
+    .toc ol { margin: 0; }
+    .toc a { color: var(--ink-soft); font-weight: 500; }
+
+    .summary-table td:first-child { font-weight: 700; color: var(--ink); white-space: nowrap; }
+
+    .flow-diagram {
+      background: var(--surface-alt);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin: 1rem 0;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+      line-height: 2;
+    }
+
+    .flow-diagram .arrow { color: var(--brand); font-weight: 700; margin: 0 0.35rem; }
+
+    footer.doc-footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      border-top: 1px solid var(--line);
+    }
+
+    @media print {
+      body { background: #fff; }
+      section { box-shadow: none; break-inside: avoid; }
+      .doc-header { background: #111; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="doc-header">
+    <div class="container">
+      <span class="badge">پاسخ تصمیم‌ها — پیش از توسعه</span>
+      <h1>نظر فنی: تصمیم‌های تم عصر خودرو</h1>
+      <p class="meta">
+        مرتبط با: <a href="asrekhodro-theme-plan.html" style="color:#9cf;">asrekhodro-theme-plan.html</a> ·
+        ACF Pro 6.8.4 نصب شده ·
+        تاریخ: خرداد ۱۴۰۵
+      </p>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <nav class="toc" aria-label="فهرست">
+      <h2>فهرست مطالب</h2>
+      <ol>
+        <li><a href="#news">اخبار: post یا CPT؟</a></li>
+        <li><a href="#ads">تبلیغات: CPT یا ACF؟</a></li>
+        <li><a href="#news-list">لیست ۴۰ خبر + lazy load</a></li>
+        <li><a href="#urls">URLهای قدیمی گوگل</a></li>
+        <li><a href="#importer">Importer v0.2 یا نه؟</a></li>
+        <li><a href="#summary">جمع‌بندی نهایی</a></li>
+        <li><a href="#confirm">نیاز به تأیید</a></li>
+      </ol>
+    </nav>
+
+    <section id="news">
+      <h2>۱. اخبار: <code>post</code> یا CPT <code>news</code>؟</h2>
+      <span class="verdict">توصیه: همان post — موافقم با نظر شما</span>
+      <table>
+        <thead>
+          <tr><th>مزیت استفاده از post</th><th>چرا CPT جدا لازم نیست</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Importer الان به‌صورت post وارد می‌کند</td><td>نیاز به re-import یا migration</td></tr>
+          <tr><td>category / tag / comment از قبل کار می‌کند</td><td>همان کار را دوباره می‌کند</td></tr>
+          <tr><td>سازگاری با پلاگین‌های SEO و جستجو</td><td>query و template اضافه بدون فایده</td></tr>
+          <tr><td>مناسب پورتال خبری (اکثر محتوا مقاله است)</td><td>فقط اگر ساختار admin/URL کاملاً متفاوت باشد</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-success">
+        <strong>پیشنهاد:</strong>
+        اخبار → <code>post</code> ·
+        بخش‌های دیگر صفحه اصلی → CPT جدا: <code>video</code>, <code>magazine</code>, <code>car_price</code>, <code>review</code> ·
+        برای تفکیک نوع داخل post از متا <code>_asrekhodro_content_type_id</code> + دسته‌بندی استفاده شود
+        (در نمونه export: <code>contentTypeId</code> برابر ۱۲ = خبر، ۸ = احتمالاً ویدئو/بررسی)
+      </div>
+    </section>
+
+    <section id="ads">
+      <h2>۲. تبلیغات: CPT یا ACF Options؟</h2>
+      <span class="verdict">توصیه: CPT ad_slot — موافقم با نظر شما</span>
+      <p>Repeater در ACF Options برای ۲–۳ بنر ثابت کافی است. برای عصر خودرو نیاز دارید:</p>
+      <ul>
+        <li>چند جایگاه (نوار منو ۴۳۵×۶۰، سایدبار ۱۶۰×۸۰، …)</li>
+        <li>فعال/غیرفعال کردن هر تبلیغ</li>
+        <li>تاریخ شروع/پایان (اختیاری)</li>
+        <li>taxonomy موقعیت: <code>menu_strip</code>, <code>sidebar_left</code>, …</li>
+        <li>لینک کلیک، تصویر، اولویت/ترتیب</li>
+      </ul>
+      <p>CPT + taxonomy <code>ad_position</code> برای ویرایشگر راحت‌تر و مقیاس‌پذیرتر از bury کردن تبلیغات در theme options است.</p>
+      <div class="callout">
+        <strong>پیشنهاد:</strong> CPT <code>ad_slot</code> + فیلدهای ACF روی هر تبلیغ (تصویر، لینک، تاریخ، active)
+      </div>
+    </section>
+
+    <section id="news-list">
+      <h2>۳. لیست اخبار: ۴۰ آیتم + lazy loading</h2>
+      <span class="verdict">توصیه: ۴۰ آیتم در HTML اولیه + lazy تصاویر</span>
+      <table>
+        <thead>
+          <tr><th>رویکرد</th><th>نظر</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>۴۰ پست server-rendered</strong></td><td>بله — ساده، سریع، مطابق prototype</td></tr>
+          <tr><td><strong>Lazy load تصاویر</strong> (<code>loading="lazy"</code> + ۱۶۳×۱۰۹)</td><td>بله — حتماً</td></tr>
+          <tr><td><strong>Infinite scroll / AJAX load more در صفحه اصلی</strong></td><td>خیر — برای دقیقاً ۴۰ آیتم لازم نیست</td></tr>
+          <tr><td><strong>Intersection Observer برای fade-in</strong></td><td>اختیاری — فقط polish</td></tr>
+        </tbody>
+      </table>
+      <p>۴۰ thumbnail کوچک + عنوان سبک است. سود اصلی از lazy <strong>تصاویر</strong> است، نه lazy <strong>پست‌ها</strong>.</p>
+      <div class="callout callout-info">
+        <strong>پیشنهاد:</strong>
+        رندر اولیه: هر ۴۰ از PHP/Timber ·
+        تصاویر: lazy load بومی ·
+        لینک «مشاهده همه» → آرشیو دسته با pagination واقعی ·
+        بدون scroll-to-load-more در صفحه اصلی
+      </div>
+    </section>
+
+    <section id="urls">
+      <h2>۴. URLهای قدیمی ایندکس‌شده گوگل — برنامه</h2>
+      <p>وضعیت فعلی importer:</p>
+      <ul>
+        <li>Slug: <code>content-{contentId}</code> (مثلاً <code>content-263703</code>)</li>
+        <li>Meta: <code>_asrekhodro_content_id</code></li>
+        <li>Meta: <code>_asrekhodro_old_page_url</code> فقط اگر <code>pageUrl</code> در JSON باشد (نمونه ۱۰۰ پستی فعلاً <strong>pageUrl ندارد</strong>)</li>
+      </ul>
+      <p>سایت قدیم احتمالاً مسیرهایی مثل <code>/News/{contentId}/...</code> (ASP.NET) دارد. با permalink پیش‌فرض وردپرس خودکار کار نمی‌کند.</p>
+
+      <h3>برنامه SEO-safe (ریدایرکت ۳۰۱)</h3>
+      <div class="flow-diagram">
+        کاربر/گوگل → URL قدیمی
+        <span class="arrow">→</span>
+        ماژول redirect تم
+        <span class="arrow">→</span>
+        استخراج contentId از path
+        <span class="arrow">→</span>
+        یافتن post با <code>_asrekhodro_content_id</code>
+        <span class="arrow">→</span>
+        <strong>۳۰۱ به permalink جدید</strong>
+      </div>
+
+      <h3>فاز A — قبل از launch (الزامی)</h3>
+      <ol>
+        <li><strong>ماژول Legacy Redirect</strong> در تم (یا mu-plugin کوچک): در <code>template_redirect</code> تطبیق الگوها:
+          <ul>
+            <li><code>/News/{id}/...</code></li>
+            <li><code>/Home/News/{id}/...</code> (اگر در سایت live استفاده شود)</li>
+          </ul>
+        </li>
+        <li>جستجوی post: <code>meta_key = _asrekhodro_content_id</code>, <code>meta_value = {id}</code></li>
+        <li><code>wp_redirect( permalink, 301 )</code></li>
+        <li>Fallback: اگر <code>_asrekhodro_old_page_url</code> موجود است، تطبیق path کامل</li>
+      </ol>
+
+      <h3>فاز B — داده (قبل از migration کامل)</h3>
+      <ol start="5">
+        <li>SQL exporter: فیلد <strong><code>pageUrl</code></strong> از DB (manifest به <code>SingleContent</code> اشاره دارد)</li>
+        <li>re-import تا هر post متا URL قدیمی داشته باشد</li>
+      </ol>
+
+      <h3>فاز C — permalink جدید</h3>
+      <ol start="7">
+        <li>پست‌های جدید: slug زیبا از عنوان</li>
+        <li>URLهای قدیمی ایندکس‌شده با ۳۰۱ → canonical جدید</li>
+        <li>بعد از go-live: sitemap + پایش Search Console</li>
+      </ol>
+
+      <div class="callout">
+        <strong>نیاز نیست:</strong> بازتولید دقیق URL قدیمی ASP.NET به‌عنوان canonical وردپرس (سخت و شلوغ). <strong>۳۰۱ استاندارد و درست برای گوگل است.</strong>
+      </div>
+    </section>
+
+    <section id="importer">
+      <h2>۵. Importer v0.2 — الان یا بعد؟</h2>
+      <span class="verdict">توصیه: نه v0.2 کامل — فقط v0.1.5 کوچک</span>
+
+      <h3>همراه با تم (کوچک، پرارزش)</h3>
+      <table>
+        <thead>
+          <tr><th>تغییر</th><th>دلیل</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ذخیره <code>overTitle</code> / <code>underTitle</code> در post meta</td><td>تم به آن‌ها نیاز دارد؛ در JSON هست</td></tr>
+          <tr><td>ذخیره <code>contentTypeId</code> به‌عنوان <code>_asrekhodro_content_type_id</code></td><td>تفکیک ویدئو/خبر بدون CPT جدا</td></tr>
+          <tr><td>export + import <code>pageUrl</code></td><td>الزامی برای redirect</td></tr>
+        </tbody>
+      </table>
+      <p>حدود ۱–۲ ساعت در importer + exporter؛ تم و SEO را unblock می‌کند.</p>
+
+      <h3>به تعویق بیفتد (این فاز نیست)</h3>
+      <table>
+        <thead>
+          <tr><th>تغییر</th><th>دلیل تعویق</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>نگاشت <code>contentTypeId</code> → CPTهای جدا</td><td>شما post را برای خبر انتخاب کردید</td></tr>
+          <tr><td>re-slug همه پست‌ها مطابق URL قدیم</td><td>redirectها SEO را پوشش می‌دهند</td></tr>
+          <tr><td>دانلود media به کتابخانه WP</td><td>هنوز URL خارجی</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-info">
+        <strong>پیشنهاد:</strong> Importer <strong>v0.1.5</strong> (meta + pageUrl)، نه v0.2 کامل.
+        تم فوراً شروع شود؛ redirect handler با تم بیاید؛ به‌روزرسانی importer هنگام export کامل SQL.
+      </div>
+    </section>
+
+    <section id="summary">
+      <h2>جمع‌بندی — چه چیزی بسازیم</h2>
+      <table class="summary-table">
+        <thead>
+          <tr><th>موضوع</th><th>انتخاب پیشنهادی</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>اخبار</td><td><code>post</code></td></tr>
+          <tr><td>تبلیغات</td><td>CPT <code>ad_slot</code></td></tr>
+          <tr><td>لیست صفحه اصلی</td><td>۴۰ آیتم server-render + lazy تصاویر</td></tr>
+          <tr><td>URLهای قدیمی</td><td>handler ریدایرکت ۳۰۱ + <code>pageUrl</code> در export</td></tr>
+          <tr><td>Importer</td><td>به‌روزرسانی کوچک meta/pageUrl الان، نه v0.2 کامل</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="confirm">
+      <h2>قبل از کدنویسی — یک مورد تأیید</h2>
+      <p>لطفاً <strong>۲–۳ URL واقعی ایندکس‌شده</strong> از asrekhodro.com بفرستید (یک مقاله + یک دسته اگر ممکن است).</p>
+      <p>در body نمونه export اشاره به <code>/Home/Keyword/18</code> برای tag دیده می‌شود — باید الگوهای دقیق سایت live را match کنیم تا redirect کامل باشد.</p>
+      <div class="callout callout-success">
+        پس از تأیید جدول بالا (یا اصلاح آن)، شروع با:
+        scaffold تم + redirect handler + CPT <code>ad_slot</code>،
+        و در صورت تمایل به‌روزرسانی کوچک importer به‌صورت موازی.
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="doc-footer">
+    عصر خودرو — پاسخ تصمیم‌های تم · هم‌مسیر با asrekhodro-theme-plan.html
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,16 @@
+{% if video_has_content %}
+  <section
+    class="container ci-section ci-section--video ci-section--classic"
+    id="{{ block.anchor|default(video_default_anchor) }}"
+  >
+    {% if video_title %}
+      <h2 class="ci-section__title">{{ video_title }}</h2>
+    {% endif %}
+
+    {% if video_embed %}
+      <div class="ci-video__player">
+        {{ video_embed|raw }}
+      </div>
+    {% endif %}
+  </section>
+{% endif %}

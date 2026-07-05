@@ -1,0 +1,7 @@
+{% if video_kiosk_items|default([])|length > 0 %}
+  {% include 'partials/widget-videos.twig' with {
+    items: video_kiosk_items,
+    archive_url: video_kiosk_archive_url|default(''),
+    section_title: section_title|default('ویدیوها')
+  } %}
+{% endif %}

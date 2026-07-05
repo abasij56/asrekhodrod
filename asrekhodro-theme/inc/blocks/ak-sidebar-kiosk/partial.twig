@@ -1,0 +1,8 @@
+{% if show_kiosk is defined and show_kiosk == false %}
+{% elseif kiosk_items|default([])|length > 0 %}
+  {% include 'partials/widget-kiosk.twig' with {
+    items: kiosk_items,
+    archive_url: kiosk_archive_url|default(''),
+    section_title: section_title|default('دکه مطبوعات')
+  } %}
+{% endif %}

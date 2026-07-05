@@ -1,0 +1,30 @@
+{% import 'partials/macros.twig' as ak %}
+
+{% if cb_news|length > 0 %}
+<section class="cb-section cb-news-strip" aria-labelledby="cb-news-heading">
+  <header class="cb-section__head">
+    <h2 id="cb-news-heading" class="cb-section__title">اخبار</h2>
+    <a href="{{ cb_archive_url }}" class="cb-section__more">مشاهده همه</a>
+  </header>
+  <div class="cb-news-strip__list">
+    {% for post in cb_news %}
+      <article class="cb-news-item">
+        <a href="{{ post.link }}">
+          <div class="cb-news-item__media">{{ ak.post_image(post, 320, 200) }}</div>
+          <div class="cb-news-item__body">
+            {% set cat = post.categories|first %}
+            {% if cat %}<span class="cb-news-item__tag">{{ cat.name }}</span>{% endif %}
+            <h3>{{ post.title }}</h3>
+            <div class="cb-news-item__meta">
+              {% if post.meta('_asrekhodro_author') %}
+                <span>{{ post.meta('_asrekhodro_author') }}</span>
+              {% endif %}
+              <time datetime="{{ post.date('Y-m-d') }}">{{ ak_post_date(post) }}</time>
+            </div>
+          </div>
+        </a>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}

@@ -1,0 +1,78 @@
+{% set is_car_page = 'car-page' in body_class|default('') %}
+{% set is_about_page = is_about_page|default(false)
+  or layout_page|default('') == 'page_about'
+  or placement.layout_page|default('') == 'page_about'
+  or 'about-page' in body_class|default('') %}
+
+{% if is_car_page %}
+<article class="car-page__article layout-page-content">
+  {% if post.content %}
+    <div class="car-page__content layout-page-content__body body-text">
+      {{ post.content }}
+    </div>
+  {% endif %}
+</article>
+{% elseif is_about_page %}
+<section class="about about--page layout-page-content" aria-labelledby="about-page-title">
+  <div class="about--page__backdrop" aria-hidden="true"></div>
+
+  <div class="about--page__inner">
+    {% if post.title %}
+      <header class="about--page__head layout-page-content__head">
+        <h1 id="about-page-title" class="about--page__title layout-page-content__title">{{ post.title }}</h1>
+        <span class="about--page__divider light-backdrop-divider" aria-hidden="true"></span>
+      </header>
+    {% endif %}
+
+    {% if post.thumbnail or post.content %}
+      <div class="about--page__body layout-page-content__body">
+        {% if post.thumbnail %}
+          <figure class="about--page__figure layout-page-content__hero">
+            <img
+              src="{{ post.thumbnail.src('large') }}"
+              alt="{{ post.thumbnail.alt ?: post.title }}"
+              width="{{ post.thumbnail.width }}"
+              height="{{ post.thumbnail.height }}"
+              loading="eager"
+              decoding="async"
+            />
+          </figure>
+        {% endif %}
+
+        {% if post.content %}
+          <div class="about--page__content body-text">
+            {{ post.content }}
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% else %}
+<article class="about-page__panel layout-page-content">
+  {% if post.title %}
+    <header class="about-page__head layout-page-content__head">
+      <h1 class="about-page__title layout-page-content__title">{{ post.title }}</h1>
+    </header>
+  {% endif %}
+
+  {% if post.thumbnail %}
+    <figure class="about-page__hero layout-page-content__hero">
+      <img
+        src="{{ post.thumbnail.src('large') }}"
+        alt="{{ post.thumbnail.alt ?: post.title }}"
+        width="{{ post.thumbnail.width }}"
+        height="{{ post.thumbnail.height }}"
+        loading="eager"
+        decoding="async"
+      />
+    </figure>
+  {% endif %}
+
+  {% if post.content %}
+    <div class="about-page__content layout-page-content__body body-text">
+      {{ post.content }}
+    </div>
+  {% endif %}
+</article>
+{% endif %}

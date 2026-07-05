@@ -1,0 +1,1371 @@
+/* Car Info 3D template — glass header, fixed 3D canvas, no footer */
+
+body.carinfo3d-page {
+  --ci3d-brand: #c41e2a;
+  --ci3d-ink: #141820;
+  --ci3d-bg: #eef2f8;
+  --ci3d-chrome-height: 7.5rem;
+  background: var(--ci3d-bg);
+  color: var(--ci3d-ink);
+  overflow-x: hidden;
+}
+
+html.carinfo3d-root {
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+}
+
+body.carinfo3d-page.carinfo3d-page--has-scene {
+  background: transparent;
+}
+
+/* Glass site header (existing markup) */
+body.carinfo3d-page .site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 300;
+  background: rgba(255, 255, 255, 0.72);
+  border-bottom: 1px solid rgba(20, 24, 32, 0.08);
+  box-shadow: 0 4px 24px rgba(20, 24, 32, 0.05);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+body.carinfo3d-page .site-header .container {
+  background: transparent;
+}
+
+body.carinfo3d-page .site-header__search {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(20, 24, 32, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+body.carinfo3d-page .main-nav {
+  border-top: 1px solid rgba(20, 24, 32, 0.06);
+  background: transparent;
+}
+
+/* Fixed 3D canvas — prototype car-intro-chile20-03 */
+body.carinfo3d-page .carinfo3d-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+body.carinfo3d-page .carinfo3d-scene canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+}
+
+body.carinfo3d-page .carinfo3d-scene canvas:active {
+  cursor: grabbing;
+}
+
+body.carinfo3d-page:not(.carinfo3d-page--has-scene) .carinfo3d-scene {
+  display: none;
+}
+
+body.carinfo3d-page .ci-ads-config {
+  display: none;
+}
+
+/* Content layer (blocks added in later phases) */
+body.carinfo3d-page .carinfo3d-main {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  pointer-events: none;
+}
+
+body.carinfo3d-page .carinfo3d-main a,
+body.carinfo3d-page .carinfo3d-main button,
+body.carinfo3d-page .carinfo3d-main input,
+body.carinfo3d-page .carinfo3d-main textarea,
+body.carinfo3d-page .carinfo3d-main select,
+body.carinfo3d-page .carinfo3d-main .ci-3dmodel__inner,
+body.carinfo3d-page .carinfo3d-main .ci-3dmodel__colors,
+body.carinfo3d-page .carinfo3d-main .ci-3dmodel__color,
+body.carinfo3d-page .carinfo3d-main .ci-hero__grid,
+body.carinfo3d-page .carinfo3d-main .ci-facts,
+body.carinfo3d-page .carinfo3d-main .ci-overview__grid,
+body.carinfo3d-page .carinfo3d-main .ci-overview__panel,
+body.carinfo3d-page .carinfo3d-main .ci-overview__panel--video,
+body.carinfo3d-page .carinfo3d-main .ci-video__player,
+body.carinfo3d-page .carinfo3d-main .ci-specs__inner,
+body.carinfo3d-page .carinfo3d-main .ci-specs__panel,
+body.carinfo3d-page .carinfo3d-main .ci-table-wrap,
+body.carinfo3d-page .carinfo3d-main .ci-gallery__inner,
+body.carinfo3d-page .carinfo3d-main .ci-gallery__panel,
+body.carinfo3d-page .carinfo3d-main .ci-gallery-wrap,
+body.carinfo3d-page .carinfo3d-main .ci-gallery__thumb,
+body.carinfo3d-page .carinfo3d-main .ci-faq__inner,
+body.carinfo3d-page .carinfo3d-main .ci-faq__panel,
+body.carinfo3d-page .carinfo3d-main .ci-faq__list,
+body.carinfo3d-page .carinfo3d-main .ci-faq,
+body.carinfo3d-page .carinfo3d-main .ci-related__inner,
+body.carinfo3d-page .carinfo3d-main .ci-related__panel,
+body.carinfo3d-page .carinfo3d-main .ci-related,
+body.carinfo3d-page .carinfo3d-main .ci-related-card,
+body.carinfo3d-page .carinfo3d-main .ci-comments__inner,
+body.carinfo3d-page .carinfo3d-main .ci-comments__panel,
+body.carinfo3d-page .carinfo3d-main .ak-comments {
+  pointer-events: auto;
+}
+
+/* First section — cinfo-3dmodel */
+body.carinfo3d-page .carinfo3d-section {
+  min-height: calc(100vh - var(--ci3d-chrome-height));
+  min-height: calc(100dvh - var(--ci3d-chrome-height));
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: var(--ci3d-chrome-height) 0 4rem;
+  position: relative;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+body.carinfo3d-page .carinfo3d-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 75% 60% at 50% 45%,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(238, 242, 248, 0.12) 100%
+  );
+}
+
+body.carinfo3d-page .ci-3dmodel__inner {
+  position: relative;
+  z-index: 2;
+  padding-top: 1.25rem;
+  text-align: start;
+  --ci3d-color-swatches: 5;
+  --ci3d-color-size: 2rem;
+  --ci3d-color-gap: 0.625rem;
+  --ci3d-colors-width: calc(
+    var(--ci3d-color-swatches) * var(--ci3d-color-size) +
+      (var(--ci3d-color-swatches) - 1) * var(--ci3d-color-gap)
+  );
+}
+
+body.carinfo3d-page .ci-3dmodel__visual {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--ci3d-chrome-height) + 8vh) 1.5rem 5rem;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  visibility: hidden;
+}
+
+body.carinfo3d-page .ci-3dmodel__visual.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+body.carinfo3d-page .ci-3dmodel__visual img {
+  display: block;
+  max-width: min(720px, 88vw);
+  max-height: min(460px, 52vh);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 1rem;
+  filter: drop-shadow(0 28px 60px rgba(20, 24, 32, 0.16));
+}
+
+body.carinfo3d-page .ci-3dmodel__title {
+  font-size: clamp(1.5rem, 3.2vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-shadow: 0 1px 16px rgba(255, 255, 255, 0.75);
+}
+
+body.carinfo3d-page .ci-3dmodel__info {
+  font-size: clamp(0.875rem, 1.4vw, 1rem);
+  font-weight: 400;
+  color: rgba(20, 24, 32, 0.68);
+  max-width: calc(var(--ci3d-colors-width) + 1.25rem);
+  margin: 0.75rem 0 0;
+  line-height: 1.75;
+}
+
+body.carinfo3d-page .ci-3dmodel__colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ci3d-color-gap);
+  width: var(--ci3d-colors-width);
+  max-width: 100%;
+  margin-top: 1.25rem;
+}
+
+body.carinfo3d-page .ci-3dmodel__color {
+  width: var(--ci3d-color-size);
+  height: var(--ci3d-color-size);
+  padding: 0;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  border-radius: 0.4rem;
+  cursor: pointer;
+  background: var(--ci3d-color);
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--ci3d-color) 55%, white) 0%,
+    color-mix(in srgb, var(--ci3d-color) 100%, black 35%) 48%,
+    color-mix(in srgb, var(--ci3d-color) 70%, white 20%) 100%
+  );
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.45),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.28),
+    0 3px 10px rgba(20, 24, 32, 0.18);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    outline-color 0.18s ease;
+}
+
+body.carinfo3d-page .ci-3dmodel__color:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.5),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.3),
+    0 5px 14px rgba(20, 24, 32, 0.22);
+}
+
+body.carinfo3d-page .ci-3dmodel__color.is-active {
+  outline: 2px solid var(--ci3d-ink);
+  outline-offset: 2px;
+}
+
+/* Immersive slides — 3D intro + hero/facts group + overview + specs */
+body.carinfo3d-page .ci-hero-slide,
+body.carinfo3d-page .ci-overview-slide,
+body.carinfo3d-page .ci-specs-slide,
+body.carinfo3d-page .ci-gallery-slide,
+body.carinfo3d-page .ci-faq-slide,
+body.carinfo3d-page .ci-related-slide,
+body.carinfo3d-page .ci-comments-slide {
+  min-height: calc(100vh - var(--ci3d-chrome-height));
+  min-height: calc(100dvh - var(--ci3d-chrome-height));
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  position: relative;
+  display: grid;
+  align-content: center;
+  gap: 0;
+  overflow: visible;
+  padding: 4rem 0;
+  color: var(--ci3d-ink);
+  background: transparent;
+  pointer-events: none;
+}
+
+body.carinfo3d-page .ci-hero-slide::before,
+body.carinfo3d-page .ci-overview-slide::before,
+body.carinfo3d-page .ci-specs-slide::before,
+body.carinfo3d-page .ci-gallery-slide::before,
+body.carinfo3d-page .ci-faq-slide::before,
+body.carinfo3d-page .ci-related-slide::before,
+body.carinfo3d-page .ci-comments-slide::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(238, 242, 248, 0.35) 100%
+  );
+}
+
+body.carinfo3d-page .ci-hero {
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+body.carinfo3d-page .ci-facts-section {
+  position: relative;
+  z-index: 3;
+  min-height: 0;
+  padding: 0;
+  margin: -1.75rem 0 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+body.carinfo3d-page .ci-hero-slide > .ci-hero:only-child {
+  padding: 0;
+}
+
+body.carinfo3d-page .ci-hero__grid,
+body.carinfo3d-page .ci-overview__panel,
+body.carinfo3d-page .ci-gallery__panel,
+body.carinfo3d-page .ci-related__panel {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+  padding: 2rem;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.48) 0%,
+    rgba(255, 255, 255, 0.28) 52%,
+    rgba(255, 255, 255, 0.38) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.14),
+    0 14px 36px rgba(20, 24, 32, 0.08);
+}
+
+body.carinfo3d-page .ci-specs__panel,
+body.carinfo3d-page .ci-faq__panel,
+body.carinfo3d-page .ci-comments__panel {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+  padding: 2rem;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.84) 0%,
+    rgba(255, 255, 255, 0.76) 52%,
+    rgba(255, 255, 255, 0.8) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.72),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.18),
+    0 14px 36px rgba(20, 24, 32, 0.1);
+}
+
+body.carinfo3d-page .ci-hero__grid::before,
+body.carinfo3d-page .ci-overview__panel::before,
+body.carinfo3d-page .ci-gallery__panel::before,
+body.carinfo3d-page .ci-specs__panel::before,
+body.carinfo3d-page .ci-faq__panel::before,
+body.carinfo3d-page .ci-related__panel::before,
+body.carinfo3d-page .ci-comments__panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 14% 10%, rgba(255, 255, 255, 0.4) 0%, transparent 42%),
+    radial-gradient(circle at 86% 88%, rgba(255, 255, 255, 0.14) 0%, transparent 46%);
+  z-index: 0;
+}
+
+body.carinfo3d-page .ci-hero__grid::after,
+body.carinfo3d-page .ci-overview__panel::after,
+body.carinfo3d-page .ci-gallery__panel::after,
+body.carinfo3d-page .ci-specs__panel::after,
+body.carinfo3d-page .ci-faq__panel::after,
+body.carinfo3d-page .ci-related__panel::after,
+body.carinfo3d-page .ci-comments__panel::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: calc(1.25rem - 1px);
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  z-index: 0;
+}
+
+body.carinfo3d-page .ci-hero__grid {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+body.carinfo3d-page .ci-hero__grid > div,
+body.carinfo3d-page .ci-hero__media {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+body.carinfo3d-page .ci-hero__grid > div {
+  padding: 0;
+}
+
+body.carinfo3d-page .ci-hero__badge {
+  display: inline-block;
+  background: rgba(196, 30, 42, 0.9);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  margin-bottom: 0.75rem;
+}
+
+body.carinfo3d-page .ci-hero__title {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.25;
+  margin: 0;
+}
+
+body.carinfo3d-page .ci-hero__subtitle {
+  color: rgba(20, 24, 32, 0.7);
+  margin: 0.5rem 0 0;
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+body.carinfo3d-page .ci-score {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+}
+
+body.carinfo3d-page .ci-score__main {
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 0.9rem;
+  padding: 1rem 1.25rem;
+  text-align: center;
+  min-width: 100px;
+}
+
+body.carinfo3d-page .ci-score__value {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #d89a21;
+  line-height: 1;
+}
+
+body.carinfo3d-page .ci-score__of {
+  font-size: 0.8rem;
+  color: rgba(20, 24, 32, 0.5);
+}
+
+body.carinfo3d-page .ci-score__bars {
+  flex: 1;
+  min-width: 220px;
+  display: grid;
+  gap: 0.5rem;
+}
+
+body.carinfo3d-page .ci-score__row {
+  display: grid;
+  grid-template-columns: 5rem 1fr 2.5rem;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+body.carinfo3d-page .ci-score__bar {
+  height: 6px;
+  background: rgba(20, 24, 32, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+body.carinfo3d-page .ci-score__bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--ci3d-brand), #d89a21);
+  border-radius: inherit;
+}
+
+body.carinfo3d-page .ci-stars {
+  color: #d89a21;
+  letter-spacing: 1px;
+  font-size: 0.85rem;
+  margin-top: 0.35rem;
+}
+
+body.carinfo3d-page .ci-hero__media {
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  margin: 0;
+  border-radius: 0.85rem;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+body.carinfo3d-page .ci-hero__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+body.carinfo3d-page .ci-facts {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 0.75rem;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 5vw, 6.25rem);
+  box-sizing: border-box;
+  list-style: none;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  pointer-events: auto;
+}
+
+body.carinfo3d-page .ci-fact {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 0.85rem;
+  padding: 1rem;
+  text-align: center;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.65),
+    0 10px 24px rgba(20, 24, 32, 0.1);
+}
+
+body.carinfo3d-page .ci-fact__label {
+  font-size: 0.75rem;
+  color: rgba(20, 24, 32, 0.58);
+}
+
+body.carinfo3d-page .ci-fact__value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-top: 0.25rem;
+  color: var(--ci3d-ink);
+}
+
+/* Third slide — overview (prototype design section) */
+body.carinfo3d-page .ci-overview-slide {
+  pointer-events: none;
+}
+
+body.carinfo3d-page .ci-overview__grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: stretch;
+}
+
+body.carinfo3d-page .ci-overview__panel--content .ci-overview__title {
+  margin-bottom: 1rem;
+}
+
+body.carinfo3d-page .ci-overview__panel--empty {
+  min-height: 12rem;
+  pointer-events: none;
+}
+
+body.carinfo3d-page .ci-overview__panel--video {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  pointer-events: auto;
+}
+
+body.carinfo3d-page .ci-overview__panel--video .ci-section__title {
+  font-size: clamp(1.1rem, 2.4vw, 1.35rem);
+  font-weight: 800;
+  line-height: 1.3;
+  margin: 0;
+  color: var(--ci3d-ink);
+}
+
+body.carinfo3d-page .ci-overview__panel--video .ci-video__player {
+  border-radius: 0.85rem;
+  overflow: hidden;
+  background: rgba(20, 24, 32, 0.88);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+body.carinfo3d-page .ci-overview__panel--video .ci-video__player iframe,
+body.carinfo3d-page .ci-overview__panel--video .ci-video__player video,
+body.carinfo3d-page .ci-overview__panel--video .ci-video__player .ak-video-player,
+body.carinfo3d-page .ci-overview__panel--video .ci-video__player .ak-video-player video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border: 0;
+}
+
+body.carinfo3d-page .ci-overview__panel--empty::before,
+body.carinfo3d-page .ci-overview__panel--empty::after {
+  opacity: 0.55;
+}
+
+body.carinfo3d-page .ci-overview__panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+body.carinfo3d-page .ci-overview__title {
+  font-size: clamp(1.35rem, 3.2vw, 2rem);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--ci3d-ink);
+}
+
+body.carinfo3d-page .ci-overview__body {
+  color: rgba(20, 24, 32, 0.72);
+  font-size: clamp(0.95rem, 1.6vw, 1.05rem);
+  line-height: 1.85;
+}
+
+body.carinfo3d-page .ci-overview__body p {
+  margin: 0 0 1rem;
+}
+
+body.carinfo3d-page .ci-overview__body p:last-child {
+  margin-bottom: 0;
+}
+
+/* Fourth slide — specs table */
+body.carinfo3d-page .ci-specs-slide {
+  pointer-events: none;
+}
+
+body.carinfo3d-page .ci-specs__inner {
+  position: relative;
+  z-index: 2;
+}
+
+body.carinfo3d-page .ci-specs__panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+body.carinfo3d-page .ci-specs__title {
+  font-size: clamp(1.35rem, 3.2vw, 2rem);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.25rem;
+  color: var(--ci3d-ink);
+}
+
+body.carinfo3d-page .ci-specs__panel .ci-table-wrap {
+  max-height: min(52vh, 28rem);
+  overflow: auto;
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.42);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+  -webkit-overflow-scrolling: touch;
+}
+
+body.carinfo3d-page .ci-specs__panel .ci-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: clamp(0.82rem, 1.4vw, 0.92rem);
+}
+
+body.carinfo3d-page .ci-specs__panel .ci-table th,
+body.carinfo3d-page .ci-specs__panel .ci-table td {
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid rgba(20, 24, 32, 0.08);
+  text-align: right;
+}
+
+body.carinfo3d-page .ci-specs__panel .ci-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.72);
+  font-weight: 700;
+  color: rgba(20, 24, 32, 0.62);
+  font-size: 0.78rem;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+body.carinfo3d-page .ci-specs__panel .ci-table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.38);
+}
+
+body.carinfo3d-page .ci-specs__panel .ci-table .ci-table__group {
+  font-weight: 700;
+  background: rgba(196, 30, 42, 0.1);
+  color: var(--ci3d-brand);
+}
+
+/* Fifth slide — image gallery */
+body.carinfo3d-page .ci-gallery-slide {
+  pointer-events: none;
+}
+
+body.carinfo3d-page .ci-gallery__inner {
+  position: relative;
+  z-index: 2;
+}
+
+body.carinfo3d-page .ci-gallery__panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+body.carinfo3d-page .ci-gallery__title {
+  font-size: clamp(1.35rem, 3.2vw, 2rem);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.25rem;
+  color: var(--ci3d-ink);
+}
+
+body.carinfo3d-page .ci-gallery__panel .ci-gallery-wrap {
+  max-height: min(52vh, 26rem);
+  overflow-y: auto;
+  padding-inline-end: 0.15rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+body.carinfo3d-page .ci-gallery__panel .ci-gallery__group-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: rgba(20, 24, 32, 0.58);
+  margin: 1rem 0 0.65rem;
+}
+
+body.carinfo3d-page .ci-gallery__panel .ci-gallery-wrap > .ci-gallery__group-title:first-child {
+  margin-top: 0;
+}
+
+body.carinfo3d-page .ci-gallery__panel .ci-gallery-wrap > .ci-gallery__group-title:not(:first-child) {
+  margin-top: 1.15rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(20, 24, 32, 0.08);
+}
+
+body.carinfo3d-page .ci-gallery__panel .ci-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(4.75rem, 5.75rem));
+  gap: 0.5rem;
+  justify-content: start;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+body.carinfo3d-page .ci-gallery__panel .ci-gallery__item {
+  min-width: 0;
+}
+
+body.carinfo3d-page .ci-gallery__panel .ci-gallery__thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 0.65rem;
+  overflow: hidden;
+  cursor: zoom-in;
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.45),
+    0 4px 12px rgba(20, 24, 32, 0.08);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+body.carinfo3d-page .ci-gallery__panel .ci-gallery__thumb:hover,
+body.carinfo3d-page .ci-gallery__panel .ci-gallery__thumb:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.78);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    0 8px 18px rgba(20, 24, 32, 0.12);
+}
+
+body.carinfo3d-page .ci-gallery__panel .ci-gallery__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.22s ease;
+}
+
+body.carinfo3d-page .ci-gallery__panel .ci-gallery__thumb:hover img,
+body.carinfo3d-page .ci-gallery__panel .ci-gallery__thumb:focus-visible img {
+  transform: scale(1.06);
+}
+
+/* Sixth slide — FAQ */
+body.carinfo3d-page .ci-faq-slide {
+  pointer-events: none;
+}
+
+body.carinfo3d-page .ci-faq__inner {
+  position: relative;
+  z-index: 2;
+}
+
+body.carinfo3d-page .ci-faq__panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+body.carinfo3d-page .ci-faq__title {
+  font-size: clamp(1.35rem, 3.2vw, 2rem);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.25rem;
+  color: var(--ci3d-ink);
+}
+
+body.carinfo3d-page .ci-faq__panel .ci-faq__list {
+  display: grid;
+  gap: 0.65rem;
+  max-height: min(52vh, 28rem);
+  overflow-y: auto;
+  padding-inline-end: 0.15rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+body.carinfo3d-page .ci-faq__panel .ci-faq {
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.42);
+  overflow: hidden;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+body.carinfo3d-page .ci-faq__panel .ci-faq[open] {
+  background: rgba(255, 255, 255, 0.58);
+  border-color: rgba(255, 255, 255, 0.74);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45);
+}
+
+body.carinfo3d-page .ci-faq__panel .ci-faq__question {
+  position: relative;
+  padding: 0.9rem 1rem;
+  padding-inline-start: 2.35rem;
+  font-size: clamp(0.88rem, 1.5vw, 0.98rem);
+  font-weight: 700;
+  line-height: 1.55;
+  color: var(--ci3d-ink);
+  cursor: pointer;
+  list-style: none;
+}
+
+body.carinfo3d-page .ci-faq__panel .ci-faq__question::-webkit-details-marker {
+  display: none;
+}
+
+body.carinfo3d-page .ci-faq__panel .ci-faq__question::after {
+  content: "+";
+  position: absolute;
+  inset-inline-start: 1rem;
+  top: 0.9rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+  color: rgba(20, 24, 32, 0.62);
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+body.carinfo3d-page .ci-faq__panel .ci-faq[open] .ci-faq__question::after {
+  content: "−";
+  color: var(--ci3d-brand);
+  background: rgba(196, 30, 42, 0.12);
+}
+
+body.carinfo3d-page .ci-faq__panel .ci-faq__answer {
+  margin: 0;
+  padding: 0 1rem 1rem;
+  color: rgba(20, 24, 32, 0.72);
+  font-size: clamp(0.84rem, 1.4vw, 0.94rem);
+  line-height: 1.85;
+}
+
+/* Seventh slide — related models */
+body.carinfo3d-page .ci-related-slide {
+  pointer-events: none;
+}
+
+body.carinfo3d-page .ci-related__inner {
+  position: relative;
+  z-index: 2;
+}
+
+body.carinfo3d-page .ci-related__panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+body.carinfo3d-page .ci-related__title {
+  font-size: clamp(1.35rem, 3.2vw, 2rem);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.25rem;
+  color: var(--ci3d-ink);
+}
+
+body.carinfo3d-page .ci-related__panel .ci-related {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+body.carinfo3d-page .ci-related__panel .ci-related-card {
+  display: block;
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  border-radius: 0.85rem;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.42);
+  color: inherit;
+  text-decoration: none;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.45),
+    0 6px 16px rgba(20, 24, 32, 0.08);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease;
+}
+
+body.carinfo3d-page .ci-related__panel .ci-related-card:hover,
+body.carinfo3d-page .ci-related__panel .ci-related-card:focus-visible {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.56);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    0 12px 26px rgba(20, 24, 32, 0.14);
+}
+
+body.carinfo3d-page .ci-related__panel .ci-related-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+body.carinfo3d-page .ci-related__panel .ci-related-card__body {
+  padding: 0.75rem 0.9rem;
+}
+
+body.carinfo3d-page .ci-related__panel .ci-related-card__body strong {
+  font-size: clamp(0.88rem, 1.5vw, 0.98rem);
+  font-weight: 700;
+  color: var(--ci3d-ink);
+  line-height: 1.5;
+}
+
+body.carinfo3d-page .ci-related__panel .ci-related-card__score {
+  font-size: 0.78rem;
+  color: #d89a21;
+  font-weight: 700;
+  margin-top: 0.25rem;
+}
+
+body.carinfo3d-page .ci-related__panel .ci-related-card--more {
+  display: grid;
+  place-items: center;
+  min-height: 9rem;
+  background: rgba(196, 30, 42, 0.1);
+  color: var(--ci3d-brand);
+  font-weight: 700;
+  text-align: center;
+  padding: 1rem;
+}
+
+body.carinfo3d-page .ci-related__panel .ci-related-card--more:hover,
+body.carinfo3d-page .ci-related__panel .ci-related-card--more:focus-visible {
+  background: rgba(196, 30, 42, 0.16);
+}
+
+/* Eighth slide — user comments */
+body.carinfo3d-page .ci-comments-slide {
+  pointer-events: none;
+}
+
+body.carinfo3d-page .ci-comments__inner {
+  position: relative;
+  z-index: 2;
+}
+
+body.carinfo3d-page .ci-comments__panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+body.carinfo3d-page .ci-comments__panel .ak-comments--embedded.ak-comments--cinfo {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.carinfo3d-page .ci-comments__panel .ak-comments__inner {
+  padding: 0;
+}
+
+body.carinfo3d-page .ci-comments__panel .ak-comments__title {
+  font-size: clamp(1.35rem, 3.2vw, 2rem);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--ci3d-ink);
+}
+
+body.carinfo3d-page .ci-comments__panel .ak-comments__lead {
+  color: rgba(20, 24, 32, 0.68);
+  font-size: clamp(0.88rem, 1.5vw, 0.98rem);
+}
+
+body.carinfo3d-page .ci-comments__panel .ak-comments__layout {
+  display: grid;
+  gap: 1rem;
+  max-height: min(58vh, 32rem);
+  overflow-y: auto;
+  padding-inline-end: 0.15rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+body.carinfo3d-page .ci-comments__panel .ak-comments__form-card {
+  background: rgba(255, 255, 255, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  border-radius: 0.85rem;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45);
+}
+
+body.carinfo3d-page .ci-comments__panel .ak-comment-card {
+  background: rgba(255, 255, 255, 0.58);
+  border-color: rgba(255, 255, 255, 0.68);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.5),
+    0 6px 16px rgba(20, 24, 32, 0.08);
+}
+
+body.carinfo3d-page .ci-comments__panel .ak-comment-card:hover {
+  background: rgba(255, 255, 255, 0.68);
+  border-color: rgba(255, 255, 255, 0.78);
+  transform: translateY(-1px);
+}
+
+body.carinfo3d-page .ci-comments__panel .ak-comments__count-badge {
+  background: rgba(196, 30, 42, 0.12);
+  color: var(--ci3d-brand);
+  border: 1px solid rgba(196, 30, 42, 0.16);
+}
+
+body.carinfo3d-page .ci-comments__panel .ak-comments__jump {
+  color: var(--ci3d-brand);
+}
+
+/* Car gallery lightbox (car-page.js, carsinfo pattern) */
+.car-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  background: rgba(8, 8, 10, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.car-lightbox[hidden] {
+  display: none;
+}
+
+.car-lightbox__figure {
+  position: relative;
+  margin: 0;
+  max-width: min(96vw, 1200px);
+}
+
+.car-lightbox__hit {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 38%;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.car-lightbox__hit[hidden] {
+  display: none;
+}
+
+.car-lightbox__hit--prev {
+  left: 0;
+  right: auto;
+  cursor: w-resize;
+}
+
+.car-lightbox__hit--next {
+  right: 0;
+  left: auto;
+  cursor: e-resize;
+}
+
+.car-lightbox--has-nav .car-lightbox__hit--prev:hover,
+.car-lightbox--has-nav .car-lightbox__hit--next:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.car-lightbox__close {
+  position: absolute;
+  top: 1rem;
+  inset-inline-end: 1rem;
+  z-index: 2;
+  border: 0;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 999px;
+}
+
+.car-lightbox__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  border: 0;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.car-lightbox__nav[hidden] {
+  display: none;
+}
+
+.car-lightbox__nav--prev {
+  left: 1rem;
+  right: auto;
+}
+
+.car-lightbox__nav--next {
+  right: 1rem;
+  left: auto;
+}
+
+.car-lightbox__nav:hover,
+.car-lightbox__close:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.car-lightbox__image {
+  position: relative;
+  z-index: 0;
+  max-width: min(96vw, 1200px);
+  max-height: 90vh;
+  width: auto;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+@media (max-width: 768px) {
+  body.carinfo3d-page .ci-3dmodel__inner {
+    padding-top: 1rem;
+  }
+
+  body.carinfo3d-page .ci-3dmodel__title {
+    font-size: clamp(1.35rem, 5vw, 1.75rem);
+  }
+
+  body.carinfo3d-page .ci-hero-slide {
+    padding: 2rem 0 3rem;
+  }
+
+  body.carinfo3d-page .ci-facts-section {
+    margin-top: -1.25rem;
+  }
+
+  body.carinfo3d-page .ci-facts {
+    grid-auto-flow: row;
+    grid-auto-columns: unset;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-inline: 1rem;
+  }
+
+  body.carinfo3d-page .ci-overview-slide {
+    padding: 2rem 0 3rem;
+  }
+
+  body.carinfo3d-page .ci-specs-slide {
+    padding: 2rem 0 3rem;
+  }
+
+  body.carinfo3d-page .ci-specs__panel {
+    padding: 1.35rem;
+  }
+
+  body.carinfo3d-page .ci-specs__panel .ci-table-wrap {
+    max-height: min(46vh, 22rem);
+  }
+
+  body.carinfo3d-page .ci-gallery-slide {
+    padding: 2rem 0 3rem;
+  }
+
+  body.carinfo3d-page .ci-gallery__panel {
+    padding: 1.35rem;
+  }
+
+  body.carinfo3d-page .ci-gallery__panel .ci-gallery-wrap {
+    max-height: min(46vh, 22rem);
+  }
+
+  body.carinfo3d-page .ci-gallery__panel .ci-gallery {
+    grid-template-columns: repeat(auto-fill, minmax(4.25rem, 5rem));
+    gap: 0.45rem;
+  }
+
+  body.carinfo3d-page .ci-faq-slide {
+    padding: 2rem 0 3rem;
+  }
+
+  body.carinfo3d-page .ci-faq__panel {
+    padding: 1.35rem;
+  }
+
+  body.carinfo3d-page .ci-faq__panel .ci-faq__list {
+    max-height: min(46vh, 22rem);
+  }
+
+  body.carinfo3d-page .ci-related-slide {
+    padding: 2rem 0 3rem;
+  }
+
+  body.carinfo3d-page .ci-related__panel {
+    padding: 1.35rem;
+  }
+
+  body.carinfo3d-page .ci-related__panel .ci-related {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+  body.carinfo3d-page .ci-comments-slide {
+    padding: 2rem 0 3rem;
+  }
+
+  body.carinfo3d-page .ci-comments__panel {
+    padding: 1.35rem;
+  }
+
+  body.carinfo3d-page .ci-comments__panel .ak-comments__layout {
+    max-height: min(50vh, 26rem);
+  }
+
+  body.carinfo3d-page .ci-overview__grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  body.carinfo3d-page .ci-overview__panel--empty:not(.is-filled) {
+    display: none;
+  }
+
+  body.carinfo3d-page .ci-overview__panel--video {
+    display: flex;
+  }
+
+  body.carinfo3d-page .ci-hero__grid {
+    grid-template-columns: 1fr;
+  }
+
+  body.carinfo3d-page .ci-hero__media {
+    order: -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.carinfo3d-page .carinfo3d-scene {
+    display: none;
+  }
+
+  body.carinfo3d-page .ci-3dmodel__visual {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  body.carinfo3d-page.carinfo3d-page--has-scene {
+    background: var(--ci3d-bg);
+  }
+}

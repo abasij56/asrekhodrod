@@ -1,0 +1,9 @@
+node_modules/
+dist/
+export/
+export-errors.log
+*.log
+.env
+connection.config.json
+.tmp-export-*.json
+.DS_Store

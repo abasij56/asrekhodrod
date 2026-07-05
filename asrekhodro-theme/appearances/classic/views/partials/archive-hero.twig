@@ -1,0 +1,32 @@
+{% set is_kiosk = variant|default('light') == 'kiosk' %}
+{% set hero_class = is_kiosk ? 'kiosk-archive-hero' : 'news-archive-hero' %}
+{% set photo_class = is_kiosk ? 'kiosk-archive-hero__photo' : 'news-archive-hero__photo' %}
+{% set content_class = is_kiosk ? 'kiosk-archive-hero__content' : 'news-archive-hero__content' %}
+{% set photo_var = is_kiosk ? 'kiosk-hero-photo' : 'news-hero-photo' %}
+
+<header
+  class="{{ hero_class }}"
+  style="--archive-hero-aspect: {{ hero_aspect|default('21 / 9') }};"
+  data-archive-hero
+  data-hero-image="{{ hero_image|e('html_attr') }}"
+  {% if hero_aspect_fallback|default(false) %}data-hero-aspect-fallback="1"{% endif %}
+>
+  <div
+    class="{{ photo_class }}"
+    aria-hidden="true"
+    style="--{{ photo_var }}: url('{{ hero_image|e('css') }}');"
+  ></div>
+  <div class="{{ content_class }}">
+    <h1 id="{{ heading_id }}">{{ title }}</h1>
+    <span class="{{ is_kiosk ? 'kiosk-archive-hero__divider' : 'news-archive-hero__divider light-backdrop-divider' }}" aria-hidden="true"></span>
+    <p class="{{ is_kiosk ? 'kiosk-archive-hero__subtitle' : 'news-archive-hero__subtitle' }}">{{ subtitle }}</p>
+  </div>
+  <a
+    href="#archive-content"
+    class="archive-hero__scroll"
+    data-archive-hero-scroll
+    aria-label="رفتن به محتوا"
+  >
+    <span class="archive-hero__scroll-icon" aria-hidden="true"></span>
+  </a>
+</header>

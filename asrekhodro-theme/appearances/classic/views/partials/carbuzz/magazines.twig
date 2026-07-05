@@ -1,0 +1,19 @@
+{% import 'partials/macros.twig' as ak %}
+
+<section class="cb-section cb-magazines" aria-labelledby="cb-magazines-heading">
+  <header class="cb-section__head">
+    <h2 id="cb-magazines-heading" class="cb-section__title">مجله و کیوسک</h2>
+    <a href="{{ cb_magazines_url }}" class="cb-section__more">مشاهده همه</a>
+  </header>
+  <div class="cb-magazines__grid">
+    {% for mag in cb_magazines %}
+      <article class="cb-magazine-card">
+        <a href="{{ mag.link }}">
+          <div class="cb-magazine-card__media">{{ ak.post_image(mag, 300, 400) }}</div>
+          <h3>{{ mag.title }}</h3>
+          <time datetime="{{ mag.date('Y-m-d') }}">{{ ak_post_date(mag) }}</time>
+        </a>
+      </article>
+    {% endfor %}
+  </div>
+</section>

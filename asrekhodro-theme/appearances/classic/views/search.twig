@@ -1,0 +1,26 @@
+﻿{% extends 'base.twig' %}
+
+{% block before_main %}
+  {% include 'partials/layout-zone.twig' with { zone: 'before_main' } %}
+{% endblock %}
+
+{% block content %}
+{% embed 'partials/layout-shell.twig' with { shell: 'archive' } %}
+  {% block system_content %}
+    <section class="news-list-section">
+      <div class="section-head">
+        <h1>نتایج جستجو برای: {{ query }}</h1>
+      </div>
+      {% if posts|length > 0 %}
+        <ul class="news-list" role="list">
+          {% for post in posts %}
+            {% include 'partials/news-list-item.twig' with { post: post, show_excerpt: false } %}
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>نتیجه‌ای یافت نشد.</p>
+      {% endif %}
+    </section>
+  {% endblock %}
+{% endembed %}
+{% endblock %}

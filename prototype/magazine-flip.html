@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>پروتوتایپ مجله — StPageFlip</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/vendor/stPageFlip.css" />
+  <style>
+    :root {
+      --brand: #c62828;
+      --ink: #1a1a1a;
+      --ink-muted: #5c5c5c;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Vazirmatn", Tahoma, sans-serif;
+      background: #ece7de;
+      color: var(--ink);
+    }
+
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1rem 3rem;
+    }
+
+    h1 {
+      margin: 0 0 0.35rem;
+      font-size: 1.4rem;
+    }
+
+    .hint {
+      margin: 0 0 1.25rem;
+      color: var(--ink-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Container must have explicit size for size:"stretch" (official demo pattern) */
+    .book-shell {
+      width: min(100%, 400px);
+      height: 600px;
+      margin: 0 auto 1rem;
+      border-radius: var(--radius);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
+      background: #f7f3ec;
+    }
+
+    #book {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Official StPageFlip: pages are direct children of #book */
+    .page {
+      direction: rtl;
+      background: #f7f3ec;
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .page--cover {
+      color: #fff;
+      text-align: center;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255,255,255,.16), transparent 42%),
+        linear-gradient(145deg, #120909 0%, #4a1010 38%, var(--brand) 72%, #ff6a63 100%);
+    }
+
+    .page--cover .inner {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 2rem 1.25rem;
+    }
+
+    .page--cover .mark {
+      width: 4rem;
+      height: 4rem;
+      border-radius: 1rem;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.22);
+    }
+
+    .page--cover h2 {
+      margin: 0.25rem 0 0;
+      font-size: 1.6rem;
+    }
+
+    .page--cover p {
+      margin: 0.5rem 0 0;
+      font-size: 0.8rem;
+      opacity: 0.85;
+    }
+
+    .page--news {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .page--news img {
+      width: 100%;
+      height: 58%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .page--news .body {
+      flex: 1;
+      padding: 0.9rem 1rem 1rem;
+      background: linear-gradient(180deg, #faf7f1, #f0ebe2);
+    }
+
+    .page--news h3 {
+      margin: 0 0 0.4rem;
+      font-size: 0.98rem;
+      line-height: 1.5;
+    }
+
+    .page--news p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      line-height: 1.6;
+    }
+
+    .page--news .meta {
+      margin-top: 0.65rem;
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .controls button {
+      font: inherit;
+      cursor: pointer;
+      border: 0;
+      border-radius: 999px;
+      padding: 0.55rem 1.1rem;
+      background: var(--brand);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .controls button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    #page-info {
+      font-size: 0.9rem;
+      font-weight: 700;
+      min-width: 5rem;
+      text-align: center;
+    }
+
+    #status {
+      margin-top: 0.75rem;
+      text-align: center;
+      font-size: 0.82rem;
+      color: #a33;
+      min-height: 1.2em;
+    }
+
+    @media (max-width: 480px) {
+      .book-shell {
+        height: 520px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>پروتوتایپ StPageFlip</h1>
+    <p class="hint">
+      مطابق <a href="https://nodlik.github.io/StPageFlip/" target="_blank" rel="noopener">دمو رسمی</a> —
+      کلیک روی گوشه صفحه یا دکمه‌های پایین
+    </p>
+
+    <div class="book-shell">
+      <div id="book">
+        <div class="page page--cover" data-density="hard">
+          <div class="inner">
+            <div class="mark">AK</div>
+            <strong>عصر خودرو</strong>
+            <h2>اخبار ویژه</h2>
+            <p>گوشه صفحه را بزنید یا از دکمه‌ها استفاده کنید</p>
+          </div>
+        </div>
+
+        <div class="page page--news">
+          <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&h=600&fit=crop" alt="" />
+          <div class="body">
+            <h3>رشد ۱۸ درصدی فروش خودروهای برقی در بهار ۱۴۰۵</h3>
+            <p>تحلیلگران بازار معتقدند عرضه مدل‌های جدید محرک اصلی این روند بوده است.</p>
+            <div class="meta">۱۵ فروردین ۱۴۰۵</div>
+          </div>
+        </div>
+
+        <div class="page page--news">
+          <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&h=600&fit=crop" alt="" />
+          <div class="body">
+            <h3>تست و بررسی پژو ۲۰۷ اتوماتیک مدل ۱۴۰۵</h3>
+            <p>گیربکس جدید و آپشن‌های ایمنی تجربه رانندگی شهری را بهبود داده‌اند.</p>
+            <div class="meta">۱۴ فروردین ۱۴۰۵</div>
+          </div>
+        </div>
+
+        <div class="page page--news">
+          <img src="https://images.unsplash.com/photo-1619767886555-ef069aa7be3f?w=800&h=600&fit=crop" alt="" />
+          <div class="body">
+            <h3>ورود رسمی برند چینی به بازار خودروهای برقی ایران</h3>
+            <p>نمایندگی رسمی با سه مدل شهری برای ۵۰۰ خریدار اول معرفی شد.</p>
+            <div class="meta">۱۳ فروردین ۱۴۰۵</div>
+          </div>
+        </div>
+
+        <div class="page page--cover" data-density="hard">
+          <div class="inner">
+            <h2>پایان</h2>
+            <p>ممنون از مطالعه</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button type="button" id="btn-prev">صفحه قبل</button>
+      <span id="page-info">۱ / ۵</span>
+      <button type="button" id="btn-next">صفحه بعد</button>
+    </div>
+    <p id="status" role="status"></p>
+  </div>
+
+  <!-- Local bundle first; CDN fallback (same as official site library) -->
+  <script src="assets/vendor/page-flip.browser.js"></script>
+  <script>
+    if (typeof St === "undefined") {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"><\/script>');
+    }
+  </script>
+  <script>
+    (function () {
+      "use strict";
+
+      var PERSIAN = "۰۱۲۳۴۵۶۷۸۹";
+      var statusEl = document.getElementById("status");
+      var pageInfoEl = document.getElementById("page-info");
+      var btnPrev = document.getElementById("btn-prev");
+      var btnNext = document.getElementById("btn-next");
+
+      function fa(n) {
+        return String(n).replace(/\d/g, function (d) { return PERSIAN[Number(d)]; });
+      }
+
+      function fail(msg) {
+        statusEl.textContent = msg;
+        console.error("[magazine-flip]", msg);
+      }
+
+      function init() {
+        if (typeof St === "undefined" || !St.PageFlip) {
+          fail("St.PageFlip لود نشد. فایل را با سرور محلی باز کنید (نه file://).");
+          return;
+        }
+
+        var bookEl = document.getElementById("book");
+        var shell = bookEl.parentElement;
+        var w = shell.clientWidth || 400;
+        var h = shell.clientHeight || 600;
+
+        // Official API: https://nodlik.github.io/StPageFlip/
+        var pageFlip = new St.PageFlip(bookEl, {
+          width: w,
+          height: h,
+          size: "stretch",
+          minWidth: 280,
+          maxWidth: 800,
+          minHeight: 360,
+          maxHeight: 1200,
+          showCover: true,
+          maxShadowOpacity: 0.5,
+          mobileScrollSupport: true,
+          useMouseEvents: true,
+          disableFlipByClick: false,
+          drawShadow: true,
+          flippingTime: 800,
+        });
+
+        pageFlip.loadFromHTML(document.querySelectorAll(".page"));
+
+        function refreshUI() {
+          var idx = pageFlip.getCurrentPageIndex();
+          var total = pageFlip.getPageCount();
+          pageInfoEl.textContent = fa(idx + 1) + " / " + fa(total);
+          btnPrev.disabled = idx <= 0;
+          btnNext.disabled = idx >= total - 1;
+        }
+
+        pageFlip.on("flip", refreshUI);
+        pageFlip.on("init", refreshUI);
+        refreshUI();
+
+        btnPrev.addEventListener("click", function () {
+          pageFlip.flipPrev("bottom");
+        });
+
+        btnNext.addEventListener("click", function () {
+          pageFlip.flipNext("bottom");
+        });
+
+        window.addEventListener("resize", function () {
+          pageFlip.update();
+        });
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+</body>
+</html>

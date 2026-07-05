@@ -1,0 +1,25 @@
+{% if hero_overall_rate > 0 or hero_rate_items|length > 0 %}
+  <div class="ci-score"{% if hero_score_aria_label %} aria-label="{{ hero_score_aria_label }}"{% endif %}>
+    {% if hero_overall_rate > 0 %}
+      <div class="ci-score__main">
+        <div class="ci-score__value">{{ hero_overall_label }}</div>
+        <div class="ci-score__of">از ۱۰</div>
+        {% if hero_stars %}
+          <div class="ci-stars" aria-hidden="true">{{ hero_stars }}</div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if hero_rate_items|length > 0 %}
+      <div class="ci-score__bars">
+        {% for item in hero_rate_items %}
+          <div class="ci-score__row">
+            <span>{{ item.title }}</span>
+            <div class="ci-score__bar"><span style="width:{{ item.bar_width }}%"></span></div>
+            <span>{{ item.rate_label }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+{% endif %}

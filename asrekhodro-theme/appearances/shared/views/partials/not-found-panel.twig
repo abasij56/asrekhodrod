@@ -1,0 +1,38 @@
+<section class="not-found" aria-labelledby="not-found-heading">
+  <div class="not-found__backdrop" aria-hidden="true"></div>
+
+  <div class="not-found__panel">
+    <div class="not-found__sign-wrap" aria-hidden="true">
+      <div class="not-found__sign">
+        <span class="not-found__sign-code">404</span>
+      </div>
+      <div class="not-found__sign-pole"></div>
+    </div>
+
+    <p class="not-found__kicker">خطای ۴۰۴</p>
+    <h1 id="not-found-heading" class="not-found__title">این مسیر به جایی نمی‌رسد!</h1>
+    <p class="not-found__lead">
+      شاید لینک قدیمی باشد یا صفحه جابه‌جا شده باشد. می‌توانید به صفحه اصلی برگردید یا در اخبار جستجو کنید.
+    </p>
+
+    <form class="not-found__search" role="search" method="get" action="{{ site.link }}">
+      <label class="sr-only" for="not-found-search">جستجو در اخبار</label>
+      <input
+        id="not-found-search"
+        type="search"
+        name="s"
+        placeholder="جستجو در اخبار، خودروها و ویدئوها..."
+        autocomplete="off"
+      />
+      <button type="submit" class="btn btn--outline not-found__search-btn">جستجو در اخبار</button>
+    </form>
+
+    <div class="not-found__actions">
+      <a href="{{ site.url }}" class="btn btn--primary">بازگشت به صفحه اصلی</a>
+      {% set archive_url = not_found_archive_url|default(news_archive_url|default('')) %}
+      {% if archive_url %}
+        <a href="{{ archive_url }}" class="btn btn--outline">آرشیو اخبار</a>
+      {% endif %}
+    </div>
+  </div>
+</section>

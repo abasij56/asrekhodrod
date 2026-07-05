@@ -1,0 +1,23 @@
+{% import 'partials/macros.twig' as ak %}
+
+<section class="cb-section cb-reviews" aria-labelledby="cb-reviews-heading">
+  <header class="cb-section__head cb-section__head--dark">
+    <h2 id="cb-reviews-heading" class="cb-section__title">تست و بررسی با کارشناسان</h2>
+    <a href="{{ cb_reviews_url }}" class="cb-section__more">مشاهده همه</a>
+  </header>
+  <div class="cb-reviews__grid">
+    {% for review in cb_reviews %}
+      <article class="cb-review-card">
+        <a href="{{ review.link }}">
+          <div class="cb-review-card__media">{{ ak.post_image(review, 600, 375) }}</div>
+          <div class="cb-review-card__body">
+            <span class="cb-review-card__tag">بررسی</span>
+            <h3>{{ review.title }}</h3>
+            <p>{{ review.post_excerpt|default(review.post_content|striptags|slice(0, 140)) }}…</p>
+            <time datetime="{{ review.date('Y-m-d') }}">{{ ak_post_date(review) }}</time>
+          </div>
+        </a>
+      </article>
+    {% endfor %}
+  </div>
+</section>

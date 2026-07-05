@@ -1,0 +1,58 @@
+<section
+  class="ci-3dmodel carinfo3d-section"
+  data-cinfo-3dmodel
+  data-model-url="{{ model_url|e('html_attr') }}"
+  data-image-url="{{ model_image_url|e('html_attr') }}"
+  data-draco-path="{{ model_draco_path|e('html_attr') }}"
+  {% if model_url %}
+    data-initial-rotation="{{ model_initial_rotation }}"
+  {% endif %}
+  {% if model_url and model_default_color %}
+    data-default-color="{{ model_default_color|e('html_attr') }}"
+  {% endif %}
+  {% if block.anchor %} id="{{ block.anchor }}"{% endif %}
+>
+  {% if model_image_url %}
+    <div class="ci-3dmodel__visual{% if not model_url %} is-visible{% endif %}" aria-hidden="true">
+      <img
+        src="{{ model_image_url|e('html_attr') }}"
+        alt="{{ model_image_alt|e('html_attr') }}"
+        width="{{ model_image_width }}"
+        height="{{ model_image_height }}"
+        loading="eager"
+        decoding="async"
+      />
+    </div>
+  {% endif %}
+
+  <div
+    class="container ci-3dmodel__inner"
+    {% if model_url and model_colors|length %}
+      style="--ci3d-color-swatches: {{ model_colors|length }}"
+    {% endif %}
+  >
+    {% if model_title %}
+      <h1 class="ci-3dmodel__title">{{ model_title }}</h1>
+    {% endif %}
+
+    {% if model_has_extra_info %}
+      <div class="ci-3dmodel__info">{{ model_extra_info_html|raw }}</div>
+    {% endif %}
+
+    {% if model_url and model_colors|length %}
+      <div class="ci-3dmodel__colors" role="group" aria-label="رنگ بدنه">
+        {% for color in model_colors %}
+          {% set is_default = loop.index == model_default_color_index %}
+          <button
+            type="button"
+            class="ci-3dmodel__color{% if is_default %} is-active{% endif %}"
+            data-color="{{ color.hex|e('html_attr') }}"
+            style="--ci3d-color: {{ color.hex|e('html_attr') }}"
+            aria-label="{{ color.label|e('html_attr') }}"
+            aria-pressed="{{ is_default ? 'true' : 'false' }}"
+          ></button>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>

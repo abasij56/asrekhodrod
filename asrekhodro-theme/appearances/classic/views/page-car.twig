@@ -1,0 +1,11 @@
+{% extends 'base.twig' %}
+
+{% block before_main %}
+  {% include 'partials/layout-zone.twig' with { zone: 'before_main' } %}
+{% endblock %}
+
+{% block content %}
+{% embed 'partials/layout-shell.twig' with { shell: 'page' } %}{% endembed %}
+
+{% include 'partials/cinfo/car-lightbox.twig' %}
+{% endblock %}

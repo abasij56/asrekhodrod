@@ -1,0 +1,47 @@
+{% extends 'base.twig' %}
+
+{% block before_main %}
+  {% include 'partials/rf/meta-bar.twig' %}
+{% endblock %}
+
+{% block content %}
+<div class="container rf-layout rfarda-layout">
+  <main class="rf-main rfarda-main" id="main-content">
+    <section class="rfarda-top" aria-label="سرتیتر اخبار">
+      <div class="rfarda-top__col rfarda-top__col--lead">
+        {% include 'partials/rf/hero.twig' %}
+      </div>
+      <div class="rfarda-top__col rfarda-top__col--latest">
+        {% include 'partials/rfarda/latest-list.twig' %}
+      </div>
+      <div class="rfarda-top__col rfarda-top__col--beyond">
+        {% include 'partials/rfarda/beyond-stack.twig' %}
+      </div>
+    </section>
+
+    {% include 'partials/rfarda/recent-news-columns.twig' %}
+
+    {% include 'partials/rf/news-grid.twig' with {
+      section_id: 'rf-topic',
+      title: rf_topic_title,
+      more_url: news_archive_url,
+      posts: rf_topic_posts,
+      layout: 'row'
+    } %}
+
+    {% if videos|length > 0 %}
+      <div class="rf-block rf-block--videos rfarda-block">
+        {% include 'partials/section-videos.twig' %}
+      </div>
+    {% endif %}
+
+    {% if reviews|length > 0 %}
+      <div class="rf-block rf-block--reviews rfarda-block">
+        {% include 'partials/section-reviews.twig' %}
+      </div>
+    {% endif %}
+
+    {% include 'partials/rf/category-blocks.twig' %}
+  </main>
+</div>
+{% endblock %}

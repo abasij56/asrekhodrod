@@ -1,0 +1,19 @@
+/**
+ * Modern appearance — visual overrides on top of classic assets (fallback).
+ */
+.appearance-modern {
+	--ak-accent: #1565c0;
+	--ak-accent-hover: #0d47a1;
+}
+
+.appearance-modern .site-header {
+	box-shadow: 0 2px 12px rgba(21, 101, 192, 0.08);
+}
+
+.appearance-modern .section-hero__main-title {
+	letter-spacing: -0.02em;
+}
+
+.appearance-modern .page-content {
+	gap: 2rem;
+}

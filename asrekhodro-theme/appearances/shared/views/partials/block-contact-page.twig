@@ -1,0 +1,55 @@
+<section class="contact contact--page" aria-labelledby="contact-page-title">
+  <div class="contact--page__backdrop" aria-hidden="true"></div>
+
+  <div class="contact--page__inner">
+    {% if contact.map_embed_url %}
+      <div class="contact-page__map-wrap">
+        <iframe
+          class="contact-page__map"
+          title="موقعیت عصر خودرو روی نقشه"
+          src="{{ contact.map_embed_url }}"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen
+        ></iframe>
+      </div>
+    {% endif %}
+
+    <header class="contact--page__head">
+      <h1 id="contact-page-title" class="contact--page__title">{{ contact_page_title|default('با ما در تماس باشید') }}</h1>
+      <span class="contact--page__divider light-backdrop-divider" aria-hidden="true"></span>
+    </header>
+
+    <div class="contact--page__body contact-page__body">
+      <div class="contact--page__form-card contact-page__form-col">
+        {% if contact.form_card_title|default('')|trim != '' %}
+          <h2 class="contact--page__form-card-title">{{ contact.form_card_title }}</h2>
+        {% endif %}
+        {% if contact.form_card_lead|default('')|trim != '' %}
+          <p class="contact--page__form-card-lead">{{ contact.form_card_lead|nl2br }}</p>
+        {% endif %}
+        {% if contact_form_html %}
+          {{ contact_form_html|raw }}
+        {% else %}
+          <p class="contact-page__fallback">فرم تماس در دسترس نیست. لطفاً افزونه Contact Form 7 را فعال کنید.</p>
+        {% endif %}
+      </div>
+
+      <aside class="contact--page__info-card contact-page__info" aria-label="{{ contact.info_card_title|default('اطلاعات تماس') }}">
+        {% if contact.info_card_title|default('')|trim != '' %}
+          <h2 class="contact--page__info-card-title">{{ contact.info_card_title }}</h2>
+        {% endif %}
+        <address class="contact--page__address contact-page__address">
+          <p><strong>نشانی پستی:</strong> {{ contact.address }}</p>
+          <p><strong>کدپستی:</strong> {{ contact.postal_code }}</p>
+          <p><strong>تلفن تماس:</strong> <a href="tel:{{ contact.phone|replace({'-': '', ' ': ''}) }}">{{ contact.phone }}</a></p>
+          <p><strong>مدیر مسئول:</strong> {{ contact.manager }}<br>{{ contact.manager_note }}</p>
+        </address>
+
+        <div class="contact--page__intro contact-page__intro">
+          <p>{{ contact.intro|nl2br }}</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>

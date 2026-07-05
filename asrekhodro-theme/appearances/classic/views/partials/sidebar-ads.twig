@@ -1,0 +1,14 @@
+<aside class="page-sidebar" role="complementary">
+  {% for ad in sidebar_ads %}
+    <a
+      href="{{ ad.link }}"
+      class="ad-sidebar__slot"
+      target="{{ ad.link_target|default('_blank') }}"
+      rel="{{ ad.link_rel|default('noopener noreferrer') }}"
+    >
+      {% if ad.image %}
+        <img src="{{ ad.image }}" alt="" width="160" height="80" loading="lazy" decoding="async" />
+      {% endif %}
+    </a>
+  {% endfor %}
+</aside>

@@ -1,0 +1,39 @@
+﻿{% extends 'base.twig' %}
+
+{% block before_main %}
+  {% include 'partials/layout-zone.twig' with { zone: 'before_main' } %}
+{% endblock %}
+
+{% block content %}
+{% embed 'partials/layout-shell.twig' with { shell: 'archive', container_modifier: 'archive-shell--videos' } %}
+  {% block system_content %}
+    <section class="videos videos--archive" aria-labelledby="videos-archive-heading">
+      <div class="videos--archive__backdrop" aria-hidden="true"></div>
+
+      {% include 'partials/archive-hero.twig' with {
+        variant: 'kiosk',
+        hero_image: video_archive_hero_image,
+        hero_aspect: video_archive_hero_aspect,
+        hero_aspect_fallback: video_archive_hero_aspect_fallback,
+        heading_id: 'videos-archive-heading',
+        title: archive_hero_title|default(video_archive_title|default('ویدئوهای عصر خودرو')),
+        subtitle: video_archive_subtitle|default('آخرین ویدئوهای منتشر شده')
+      } %}
+
+      <div id="archive-content" class="videos--archive__body archive-section__body">
+        <div class="video-grid video-grid--archive">
+          {% for video in posts %}
+            {% include 'partials/video-card.twig' with { video: video } %}
+          {% else %}
+            <p class="videos--archive__empty">ویدئویی ثبت نشده است.</p>
+          {% endfor %}
+        </div>
+        {% include 'partials/pagination.twig' with {
+          pagination: posts.pagination,
+          pagination_modifier: 'pagination--kiosk'
+        } %}
+      </div>
+    </section>
+  {% endblock %}
+{% endembed %}
+{% endblock %}

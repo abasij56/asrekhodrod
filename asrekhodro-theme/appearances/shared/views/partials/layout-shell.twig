@@ -1,0 +1,63 @@
+{#
+  Unified page shell for layout zones.
+  shell: home | archive | single | page
+  Embeds optional system_content between main and main_after zones.
+#}
+{% set sidebar_placements = layout_zones.sidebar ?? [] %}
+{% set has_sidebar = sidebar_placements|filter(p => p.partial)|length > 0 %}
+{% set has_main_after = layout_zones.main_after is defined %}
+{% set has_after_main = layout_zones.after_main is defined %}
+
+{% if shell == 'home' %}
+  {% set container_class = 'page-shell' %}
+  {% set use_inner_grid = false %}
+  {% set main_class = 'page-content' %}
+{% elseif shell == 'archive' %}
+  {% set container_class = 'archive-shell' %}
+  {% set grid_class = 'archive-grid' %}
+  {% set use_inner_grid = true %}
+  {% set main_class = 'page-content' %}
+{% elseif shell == 'single' %}
+  {% set container_class = 'single-shell' %}
+  {% set grid_class = 'single-grid' %}
+  {% set use_inner_grid = true %}
+  {% set use_single_backdrop = single_main_backdrop|default(ak_single_uses_main_backdrop(post|default(null))) %}
+  {% set main_class = use_single_backdrop ? 'single-main single-main--backdrop' : 'single-main' %}
+{% else %}
+  {% set container_class = 'page-shell layout-shell--page' %}
+  {% set use_inner_grid = false %}
+  {% set main_class = 'page-content' %}
+{% endif %}
+
+{% if shell == 'home' %}
+  {% include 'partials/layout-home-main.twig' with { has_sidebar: has_sidebar } %}
+{% else %}
+<div class="container {{ container_class }}{% if not has_sidebar and not use_inner_grid %} page-shell--full{% endif %}{% if container_modifier %} {{ container_modifier }}{% endif %}">
+  {% if use_inner_grid %}
+  <div class="{{ grid_class }}{% if not has_sidebar %} {{ grid_class }}--full{% endif %}">
+  {% endif %}
+    <main class="{{ main_class }}" id="main-content">
+      {% if use_single_backdrop %}
+        <div class="single-main__backdrop" aria-hidden="true"></div>
+        <div class="single-main__inner">
+      {% endif %}
+      {% include 'partials/layout-zone.twig' with { zone: 'main' } %}
+      {% block system_content %}{% endblock %}
+      {% if has_main_after %}
+        {% include 'partials/layout-zone.twig' with { zone: 'main_after' } %}
+      {% endif %}
+      {% if use_single_backdrop %}
+        </div>
+      {% endif %}
+    </main>
+    {% if has_sidebar %}
+      {% include 'partials/layout-zone.twig' with { zone: 'sidebar' } %}
+    {% endif %}
+  {% if use_inner_grid %}
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+{% if has_after_main %}
+  {% include 'partials/layout-zone.twig' with { zone: 'after_main' } %}
+{% endif %}

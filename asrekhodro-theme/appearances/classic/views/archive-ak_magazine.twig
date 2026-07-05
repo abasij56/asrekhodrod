@@ -1,0 +1,55 @@
+﻿{% extends 'base.twig' %}
+{% import 'partials/macros.twig' as ak %}
+
+{% block before_main %}
+  {% include 'partials/layout-zone.twig' with { zone: 'before_main' } %}
+{% endblock %}
+
+{% block content %}
+{% embed 'partials/layout-shell.twig' with { shell: 'archive', container_modifier: 'archive-shell--magazines' } %}
+  {% block system_content %}
+    <section class="magazines magazines--archive" aria-labelledby="magazines-archive-heading">
+      <div class="magazines--archive__backdrop" aria-hidden="true"></div>
+
+      {% include 'partials/archive-hero.twig' with {
+        variant: 'kiosk',
+        hero_image: kiosk_archive_hero_image,
+        hero_aspect: kiosk_archive_hero_aspect,
+        hero_aspect_fallback: kiosk_archive_hero_aspect_fallback,
+        heading_id: 'magazines-archive-heading',
+        title: kiosk_archive_title|default('دکه مطبوعات'),
+        subtitle: kiosk_archive_subtitle|default('آخرین مجلات اضافه شده')
+      } %}
+
+      <div id="archive-content" class="magazines--archive__body archive-section__body">
+        <div class="magazine-grid magazine-grid--archive">
+          {% for mag in posts %}
+            {% set issue_num = ak_magazine_issue_number(mag.title) %}
+            <article class="magazine-item">
+              <a href="{{ mag.link }}">
+                <div class="magazine-item__cover">
+                  {% if issue_num %}
+                    <span class="magazine-item__issue-no" aria-hidden="true">{{ issue_num }}</span>
+                  {% endif %}
+                  {% set cover_src = ak_magazine_featured_image_url(mag, 'medium') %}
+                  {% if cover_src %}
+                    <img src="{{ cover_src }}" width="300" height="400" alt="{{ mag.title }}" loading="lazy" decoding="async" />
+                  {% endif %}
+                </div>
+                <h2>{{ mag.title }}</h2>
+                <time datetime="{{ mag.date('Y-m-d') }}">{{ ak_post_date(mag) }}</time>
+              </a>
+            </article>
+          {% else %}
+            <p class="magazines--archive__empty">مجله‌ای ثبت نشده است.</p>
+          {% endfor %}
+        </div>
+        {% include 'partials/pagination.twig' with {
+          pagination: posts.pagination,
+          pagination_modifier: 'pagination--kiosk'
+        } %}
+      </div>
+    </section>
+  {% endblock %}
+{% endembed %}
+{% endblock %}

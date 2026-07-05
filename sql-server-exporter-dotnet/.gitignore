@@ -1,0 +1,4 @@
+bin/
+obj/
+connection.config.json
+.tmp-export-*.json

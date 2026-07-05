@@ -1,0 +1,29 @@
+{% import 'partials/macros.twig' as ak %}
+
+{% if hero_main %}
+{% if section_title|default('')|trim != '' %}
+  {% include 'partials/section-head.twig' with { heading_id: 'hero-section-heading' } %}
+{% endif %}
+<section class="hero" aria-labelledby="hero-heading">
+  <article class="hero__main">
+    {{ ak.post_image(hero_visual|default(hero_main), 1200, 800, 'eager') }}
+    <div class="hero__content">
+      {% if hero_main.meta('_asrekhodro_over_title') %}<span class="tag tag--ev">{{ hero_main.meta('_asrekhodro_over_title') }}</span>{% endif %}
+      <h1 id="hero-heading"><a href="{{ hero_main.link }}">{{ hero_main.title }}</a></h1>
+      <p>{{ hero_main.post_excerpt|default(hero_main.post_content|striptags|slice(0, 200)) }}</p>
+      <a href="{{ hero_main.link }}" class="btn btn--primary">ادامه مطلب</a>
+    </div>
+  </article>
+  <aside class="hero__side" aria-label="اخبار مهم">
+    {% for post in hero_side_posts %}
+      <article class="hero-text-item">
+        <a href="{{ post.link }}">
+          {% if post.meta('_asrekhodro_over_title') %}<span class="tag tag--breaking">{{ post.meta('_asrekhodro_over_title') }}</span>{% endif %}
+          <h3>{{ post.title }}</h3>
+          <time datetime="{{ post.date('Y-m-d') }}">{{ ak_post_date(post) }}</time>
+        </a>
+      </article>
+    {% endfor %}
+  </aside>
+</section>
+{% endif %}

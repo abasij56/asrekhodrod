@@ -1,0 +1,106 @@
+{% set comments_post = comments_post|default(post) %}
+{% set comments_open = comments_open|default(comments_post.comment_status == 'open') %}
+{% set comments_count = comments_count|default(comments_post.comment_count|default(0)) %}
+{% set visible_comments_count = ak_post_visible_comments_count(comments_post) %}
+{% set submission_notice = ak_comment_submission_notice(comments_post) %}
+{% set section_title = comments_section_title|default('نظرات خوانندگان') %}
+{% set section_id = comments_section_id|default('Comments') %}
+{% set variant = comments_variant|default('standalone') %}
+{% set show_section = comments_show|default(comments_open or comments_count > 0 or visible_comments_count > 0 or submission_notice) %}
+
+{% set show_head = comments_show_head ?? true %}
+
+{% if show_section and comments_post %}
+<section
+  class="ak-comments ak-comments--{{ variant }}{% if comments_modifier_class %} {{ comments_modifier_class }}{% endif %}{% if not show_head %} ak-comments--no-head{% endif %}"
+  id="{{ section_id }}"
+  {% if show_head %}aria-labelledby="ak-comments-heading-{{ section_id }}"{% else %}aria-label="{{ section_title }}"{% endif %}
+>
+  <div class="ak-comments__inner">
+    {% if show_head %}
+    <header class="ak-comments__head">
+      <div class="ak-comments__head-main">
+        <span class="ak-comments__eyebrow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          گفت‌وگو با تحریریه
+        </span>
+        <h2 id="ak-comments-heading-{{ section_id }}" class="ak-comments__title">
+          {% if comments_custom_title|default('')|trim != '' %}
+            {{ comments_custom_title }}
+          {% else %}
+            {{ section_title }}
+          {% endif %}
+        </h2>
+        <p class="ak-comments__lead">
+          {% if comments_count > 0 %}
+            {{ comments_count|persian_digits }} نظر ثبت شده — دیدگاه خود را با ما به اشتراک بگذارید.
+          {% else %}
+            هنوز نظری ثبت نشده. اولین نفری باشید که نظر می‌دهد.
+          {% endif %}
+        </p>
+      </div>
+      {% if comments_count > 0 %}
+        <div class="ak-comments__head-meta">
+          <span class="ak-comments__count-badge">{{ comments_count|persian_digits }}</span>
+          <a class="ak-comments__jump" href="#Comments-list">مشاهده نظرات</a>
+        </div>
+      {% endif %}
+      <span class="ak-comments__divider light-backdrop-divider" aria-hidden="true"></span>
+    </header>
+    {% endif %}
+
+    <div class="ak-comments__layout">
+      <div
+        class="ak-comments__notice"
+        data-ak-comments-notice
+        {% if submission_notice %}data-ak-comments-notice-type="{{ submission_notice.type }}"{% endif %}
+        {% if submission_notice and submission_notice.comment_id %}data-ak-comments-notice-target="#comment-{{ submission_notice.comment_id }}"{% endif %}
+        {% if not submission_notice %}hidden{% endif %}
+        role="status"
+        aria-live="polite"
+      >
+        {% if submission_notice %}
+          <p class="ak-comments__notice-text">{{ submission_notice.message }}</p>
+        {% endif %}
+      </div>
+
+      {% if comments_open %}
+        <div class="ak-comments__form-card" id="Comment">
+          <div class="ak-comments__form-head">
+            <span class="ak-comments__form-badge" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </span>
+            <h3 class="ak-comments__form-title">فرم ارسال نظر</h3>
+            <p class="ak-comments__form-lead">نظر شما پس از بررسی توسط تیم تحریریه منتشر می‌شود.</p>
+          </div>
+          {{ function('comment_form', ak_comment_form_args(), comments_post.id) }}
+        </div>
+      {% endif %}
+
+      {% if visible_comments_count > 0 %}
+        {% set comments_page_size = ak_comments_per_page() %}
+        {% set approved_comments_count = ak_post_comments_count(comments_post) %}
+        <div class="ak-comments__list-wrap" id="Comments-list">
+          <ol
+            class="ak-comments__list"
+            aria-label="فهرست نظرات"
+            data-ak-comments-list
+            data-post-id="{{ comments_post.id }}"
+            data-offset="{{ comments_page_size }}"
+            data-total="{{ approved_comments_count }}"
+            data-per-page="{{ comments_page_size }}"
+          >
+            {% for comment in ak_post_comments(comments_post) %}
+              {% include 'partials/comment-item.twig' with { comment: comment } %}
+            {% endfor %}
+          </ol>
+          {% if approved_comments_count > comments_page_size %}
+            <div class="ak-comments__load-sentinel" data-ak-comments-sentinel aria-hidden="true"></div>
+          {% endif %}
+          <p class="ak-comments__load-status" data-ak-comments-status aria-live="polite" hidden></p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}

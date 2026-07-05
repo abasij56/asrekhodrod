@@ -1,0 +1,18 @@
+{% extends 'base.twig' %}
+
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div
+  id="ci-scene-3d"
+  class="carinfo3d-scene"
+  aria-hidden="true"
+  {% if carinfo3d_ads_json %}
+    data-ads-config="{{ carinfo3d_ads_json|e('html_attr') }}"
+  {% endif %}
+></div>
+
+<main class="carinfo3d-main" id="carinfo3d-main">
+  {{ post.content }}
+</main>
+{% endblock %}

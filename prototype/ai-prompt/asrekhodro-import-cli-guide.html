@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AsreKhodro Importer — WP-CLI Guide</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4f;
+      --text: #e6edf3;
+      --muted: #8b9cb3;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --orange: #d29922;
+      --red: #f85149;
+      --code-bg: #0d1117;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      margin: 0;
+      padding: 2rem 1rem 4rem;
+    }
+    .wrap { max-width: 920px; margin: 0 auto; }
+    h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
+    .subtitle { color: var(--muted); margin-bottom: 2rem; }
+    h2 {
+      font-size: 1.25rem;
+      margin-top: 2.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--accent);
+    }
+    h3 { font-size: 1rem; margin-top: 1.5rem; color: var(--green); }
+    p, li { color: var(--text); }
+    li { margin: 0.35rem 0; }
+    a { color: var(--accent); }
+    code {
+      background: var(--code-bg);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      font-size: 0.9em;
+      border: 1px solid var(--border);
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+    pre code { background: none; border: none; padding: 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.6rem 0.75rem;
+      text-align: left;
+    }
+    th { background: var(--surface); color: var(--accent); }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin: 1rem 0;
+    }
+    .card.warn { border-color: var(--orange); }
+    .card.danger { border-color: var(--red); }
+    .card.ok { border-color: var(--green); }
+    .label {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.2em 0.5em;
+      border-radius: 4px;
+      margin-right: 0.5rem;
+    }
+    .label.run { background: #1f3d2a; color: var(--green); }
+    .label.posts { background: #1a2d4a; color: var(--accent); }
+    nav.toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    nav.toc ul { margin: 0.5rem 0 0; padding-left: 1.25rem; }
+    nav.toc a { text-decoration: none; }
+    nav.toc a:hover { text-decoration: underline; }
+    ol.steps { padding-left: 1.25rem; }
+    ol.steps li { margin: 0.75rem 0; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>AsreKhodro Importer — WP-CLI Guide</h1>
+  <p class="subtitle">Plugin v0.3.0 · Linux SSH · Full import via <code>wp asrekhodro-import</code></p>
+
+  <nav class="toc">
+    <strong>Contents</strong>
+    <ul>
+      <li><a href="#prerequisites">Prerequisites</a></li>
+      <li><a href="#run">Command: <code>run</code> (full import)</a></li>
+      <li><a href="#posts">Command: <code>posts</code> (posts only)</a></li>
+      <li><a href="#phases">Import phases</a></li>
+      <li><a href="#background">Run in background (nohup)</a></li>
+      <li><a href="#stop">Stop a background import</a></li>
+      <li><a href="#resume">Resume after stop or error</a></li>
+      <li><a href="#monitor">Monitor progress</a></li>
+      <li><a href="#troubleshooting">Troubleshooting</a></li>
+      <li><a href="#paths">Files &amp; paths</a></li>
+    </ul>
+  </nav>
+
+  <!-- PREREQUISITES -->
+  <h2 id="prerequisites">Prerequisites</h2>
+  <ul>
+    <li>SSH access to Linux server</li>
+    <li>WP-CLI installed (<code>wp --info</code> works)</li>
+    <li>WordPress root = folder containing <code>wp-config.php</code></li>
+    <li>Plugin <strong>asrekhodro-importer</strong> active</li>
+    <li>JSON export in <code>wp-content/asrekhodro-import/</code> (with <code>manifest.json</code>)</li>
+    <li>Theme active (for external media URLs)</li>
+  </ul>
+  <div class="card ok">
+    <strong>Optional — wp-config.php</strong>
+    <pre><code>define('ASREKHODRO_MEDIA_BASE_URL', 'https://www.asrekhodro.com');</code></pre>
+  </div>
+
+  <!-- RUN COMMAND -->
+  <h2 id="run"><span class="label run">run</span> Full import (recommended)</h2>
+  <p>Imports <strong>all phases</strong> in one CLI session: categories, posts, post categories, tags, relations, front sections, videos, reviews, magazines, ads, comments.</p>
+
+  <h3>Go to WordPress root</h3>
+  <pre><code>cd /home/asrekhod/asrekhodro.net</code></pre>
+
+  <h3>Clean full import (first time)</h3>
+  <pre><code>wp asrekhodro-import run \
+  --batch=2000 \
+  --taxonomy-batch=100 \
+  --reset \
+  --reset-content</code></pre>
+
+  <h3>Options — <code>run</code></h3>
+  <table>
+    <thead>
+      <tr><th>Option</th><th>Default</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>--batch=&lt;n&gt;</code></td>
+        <td>500</td>
+        <td>Posts imported per step. Max 10000. Use 1000–5000 on dedicated servers; lower if memory errors.</td>
+      </tr>
+      <tr>
+        <td><code>--taxonomy-batch=&lt;n&gt;</code></td>
+        <td>200</td>
+        <td>Post categories / tags / relations per step. Admin UI default is 25; CLI default is faster.</td>
+      </tr>
+      <tr>
+        <td><code>--import-dir=&lt;path&gt;</code></td>
+        <td><code>wp-content/asrekhodro-import</code></td>
+        <td>Custom JSON folder path.</td>
+      </tr>
+      <tr>
+        <td><code>--reset</code></td>
+        <td>—</td>
+        <td>Delete CLI resume file <code>.wpcli-import.json</code> and start from the beginning.</td>
+      </tr>
+      <tr>
+        <td><code>--reset-content</code></td>
+        <td>—</td>
+        <td>Before import, remove previously imported items for every export type that has data (fast SQL). Same as admin “Reset before import” checkboxes.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="card warn">
+    <strong>Do not use <code>--reset</code> when resuming.</strong> Resume uses the saved state file automatically.
+  </div>
+
+  <!-- POSTS COMMAND -->
+  <h2 id="posts"><span class="label posts">posts</span> Posts only</h2>
+  <p>Imports news posts only — <strong>not</strong> categories, tags, or comments. Use <code>run</code> for a full migration.</p>
+  <pre><code>wp asrekhodro-import posts --batch=5000 --reset</code></pre>
+  <table>
+    <thead>
+      <tr><th>Option</th><th>Default</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>--batch=&lt;n&gt;</code></td><td>1000</td><td>Posts per loop</td></tr>
+      <tr><td><code>--import-dir=&lt;path&gt;</code></td><td>wp-content/asrekhodro-import</td><td>JSON folder</td></tr>
+      <tr><td><code>--reset</code></td><td>—</td><td>Delete <code>.wpcli-post-import.json</code> and start from first chunk</td></tr>
+    </tbody>
+  </table>
+
+  <!-- PHASES -->
+  <h2 id="phases">Import phases (<code>run</code> order)</h2>
+  <ol>
+    <li>Reset (optional, if <code>--reset-content</code>)</li>
+    <li>Categories</li>
+    <li>Posts</li>
+    <li>Post categories</li>
+    <li>Tags (+ legacy redirects file)</li>
+    <li>Post relations</li>
+    <li>Front homepage sections</li>
+    <li>Videos · video categories · reviews · magazines · ads · comments</li>
+  </ol>
+  <p>Example log lines:</p>
+  <pre><code>[Categories] Categories 81–99 of 99 (0% overall)
+[Posts] Posts 1–2000 of 50000 (1% overall)
+[Posts] Post categories 1–100 of 49998 (52% overall)
+...</code></pre>
+
+  <!-- BACKGROUND -->
+  <h2 id="background">Run in background (nohup)</h2>
+  <p>So SSH disconnect does not stop the import:</p>
+  <pre><code>cd /home/asrekhod/asrekhodro.net
+
+# Recommended: disable LiteSpeed during import
+wp plugin deactivate litespeed-cache
+
+nohup wp asrekhodro-import run \
+  --batch=2000 \
+  --taxonomy-batch=100 \
+  > ~/import.log 2>&1 &
+
+# Watch log
+tail -f ~/import.log</code></pre>
+  <p>Append to existing log on resume:</p>
+  <pre><code>nohup wp asrekhodro-import run --batch=2000 --taxonomy-batch=100 >> ~/import.log 2>&1 &</code></pre>
+
+  <!-- STOP -->
+  <h2 id="stop">Stop a background import</h2>
+
+  <h3>1. Find the process</h3>
+  <pre><code>ps aux | grep asrekhodro-import
+# or
+pgrep -af "wp asrekhodro-import"</code></pre>
+  <p>Note the <strong>PID</strong> (first number), e.g. <code>12345</code>.</p>
+
+  <h3>2. Stop gracefully</h3>
+  <pre><code>kill 12345</code></pre>
+
+  <h3>3. Force stop (if still running)</h3>
+  <pre><code>kill -9 12345</code></pre>
+
+  <h3>One-liner — stop all matching imports</h3>
+  <pre><code>pkill -f "asrekhodro-import run"</code></pre>
+  <pre><code>pkill -9 -f "asrekhodro-import run"</code></pre>
+
+  <div class="card danger">
+    <strong>Important</strong>
+    <ul>
+      <li>Stopping does <strong>not</strong> roll back posts already imported.</li>
+      <li>Progress is saved in <code>.wpcli-import.json</code> after each step.</li>
+      <li><code>tail -f</code> — press <kbd>Ctrl+C</kbd> only stops log viewing, not the import.</li>
+    </ul>
+  </div>
+
+  <!-- RESUME -->
+  <h2 id="resume">Resume after stop or error</h2>
+  <pre><code>cd /home/asrekhod/asrekhodro.net
+wp asrekhodro-import run --batch=2000 --taxonomy-batch=100</code></pre>
+  <p>Or in background:</p>
+  <pre><code>nohup wp asrekhodro-import run --batch=2000 --taxonomy-batch=100 >> ~/import.log 2>&1 &</code></pre>
+  <p><strong>Do not</strong> pass <code>--reset</code> when resuming.</p>
+
+  <!-- MONITOR -->
+  <h2 id="monitor">Monitor progress</h2>
+  <pre><code># Post count increasing?
+watch -n 10 'wp db query "SELECT COUNT(*) FROM wp_posts WHERE post_type=\"post\""'
+
+# Resume file updating?
+stat /home/asrekhod/asrekhodro.net/wp-content/asrekhodro-import/.wpcli-import.json
+
+# Process still running?
+ps aux | grep asrekhodro-import</code></pre>
+
+  <!-- TROUBLESHOOTING -->
+  <h2 id="troubleshooting">Troubleshooting</h2>
+
+  <h3>Stuck at low % on posts phase</h3>
+  <div class="card warn">
+    <p>Posts are the slowest phase. Each batch of 2000 can take <strong>15–45+ minutes</strong>. Overall 1% → 2% means ~2000 posts imported — often still working, not frozen.</p>
+  </div>
+
+  <h3><code>Posts -499–0 of 50000</code> in log</h3>
+  <p>Harmless display bug when crossing JSON chunk files (2500 posts per file). Import continues correctly.</p>
+
+  <h3>Many <code>Success: Purged all caches successfully</code> lines</h3>
+  <p>LiteSpeed Cache purges on every save. Deactivate during import:</p>
+  <pre><code>wp plugin deactivate litespeed-cache
+# after import:
+wp plugin activate litespeed-cache</code></pre>
+
+  <h3>Memory errors</h3>
+  <pre><code>wp asrekhodro-import run --batch=500 --taxonomy-batch=50</code></pre>
+
+  <h3>Rough time (50k posts, batch 2000)</h3>
+  <table>
+    <thead><tr><th>Condition</th><th>Estimate</th></tr></thead>
+    <tbody>
+      <tr><td>LiteSpeed active, batch 2000</td><td>8–15+ hours</td></tr>
+      <tr><td>LiteSpeed off, batch 2000</td><td>~6–10 hours</td></tr>
+      <tr><td>batch 500</td><td>Slower overall, safer per step</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Verify WP-CLI command exists</h3>
+  <pre><code>wp asrekhodro-import --help
+wp help asrekhodro-import run</code></pre>
+
+  <!-- PATHS -->
+  <h2 id="paths">Files &amp; paths</h2>
+  <table>
+    <thead><tr><th>Path</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>/home/asrekhod/asrekhodro.net/</code></td>
+        <td>WordPress root (example)</td>
+      </tr>
+      <tr>
+        <td><code>wp-content/asrekhodro-import/</code></td>
+        <td>JSON export (manifest, posts/, tags.json, …)</td>
+      </tr>
+      <tr>
+        <td><code>wp-content/asrekhodro-import/.wpcli-import.json</code></td>
+        <td>Full import resume state (<code>run</code>)</td>
+      </tr>
+      <tr>
+        <td><code>wp-content/asrekhodro-import/.wpcli-post-import.json</code></td>
+        <td>Posts-only resume state (<code>posts</code>)</td>
+      </tr>
+      <tr>
+        <td><code>wp-content/asrekhodro-import/mapping.json</code></td>
+        <td>Written when import completes</td>
+      </tr>
+      <tr>
+        <td><code>~/import.log</code></td>
+        <td>Your nohup log file</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Quick reference</h2>
+  <table>
+    <thead><tr><th>Task</th><th>Command</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Full import (clean)</td>
+        <td><code>wp asrekhodro-import run --batch=2000 --taxonomy-batch=100 --reset --reset-content</code></td>
+      </tr>
+      <tr>
+        <td>Background</td>
+        <td><code>nohup wp asrekhodro-import run --batch=2000 --taxonomy-batch=100 > ~/import.log 2>&1 &amp;</code></td>
+      </tr>
+      <tr>
+        <td>Resume</td>
+        <td><code>wp asrekhodro-import run --batch=2000 --taxonomy-batch=100</code></td>
+      </tr>
+      <tr>
+        <td>Stop</td>
+        <td><code>pkill -f "asrekhodro-import run"</code></td>
+      </tr>
+      <tr>
+        <td>Watch log</td>
+        <td><code>tail -f ~/import.log</code></td>
+      </tr>
+      <tr>
+        <td>Posts only</td>
+        <td><code>wp asrekhodro-import posts --batch=5000 --reset</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p style="margin-top:3rem;color:var(--muted);font-size:0.85rem;">
+    AsreKhodro Importer · WP-CLI · Generated for asrekhodro.net migration
+  </p>
+</div>
+</body>
+</html>

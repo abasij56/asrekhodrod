@@ -1,0 +1,16 @@
+{% if section_title is not defined %}{% set section_title = 'تست و بررسی خودرو' %}{% endif %}
+
+<section class="reviews"{% if section_title|trim != '' %} aria-labelledby="reviews-heading"{% endif %}>
+  {% include 'partials/section-head.twig' with {
+    heading_id: 'reviews-heading',
+    section_link_url: fn('get_post_type_archive_link', 'ak_review'),
+    section_link_label: 'همه بررسی‌ها ←'
+  } %}
+  <div class="review-grid">
+    {% for review in reviews %}
+      {% include 'partials/review-card.twig' with { review: review } %}
+    {% else %}
+      <p>بررسی‌ای ثبت نشده است.</p>
+    {% endfor %}
+  </div>
+</section>

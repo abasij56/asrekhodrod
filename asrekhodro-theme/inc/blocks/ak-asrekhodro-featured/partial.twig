@@ -1,0 +1,39 @@
+{% if section_title is not defined %}{% set section_title = 'اخبار ویژه عصر خودرو' %}{% endif %}
+
+{% if featured_lead %}
+<section{% if section_title|trim != '' %} aria-labelledby="asrekhodro-featured-heading"{% endif %}>
+  {% include 'partials/section-head.twig' with {
+    heading_id: 'asrekhodro-featured-heading',
+    section_link_url: news_archive_url,
+    section_link_label: 'مشاهده همه ←'
+  } %}
+
+  <div class="news-grid news-grid--featured news-grid--asrekhodro-featured">
+    <article class="card card--lead card--featured-lead">
+      <a href="{{ featured_lead.link }}">
+        <div class="card__media">
+          <img src="{{ featured_lead.image }}" width="800" height="600" alt="{{ featured_lead.title }}" loading="eager" decoding="async" />
+          {% if featured_lead.badge %}
+            <span class="tag tag--market">{{ featured_lead.badge }}</span>
+          {% endif %}
+        </div>
+        <div class="card__body">
+          <h3>{{ featured_lead.title }}</h3>
+          <p class="card__excerpt">{{ featured_lead.excerpt }}</p>
+          <div class="card__meta">
+            <time datetime="{{ featured_lead.date_iso }}">{{ featured_lead.date }}</time>
+          </div>
+        </div>
+      </a>
+    </article>
+
+    {% if featured_flip_posts|length > 0 %}
+      {% include 'partials/featured-magazine-flip.twig' with {
+        flip_posts: featured_flip_posts,
+        flip_id: 'asrekhodro-featured-mag-flip',
+        cover_title: 'اخبار ویژه'
+      } %}
+    {% endif %}
+  </div>
+</section>
+{% endif %}

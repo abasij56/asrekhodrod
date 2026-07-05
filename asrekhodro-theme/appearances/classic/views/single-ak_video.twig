@@ -1,0 +1,78 @@
+﻿{% extends 'base.twig' %}
+{% import 'partials/macros.twig' as ak %}
+
+{% block before_main %}
+  {% include 'partials/layout-zone.twig' with { zone: 'before_main' } %}
+{% endblock %}
+
+{% block content %}
+{% embed 'partials/layout-shell.twig' with { shell: 'single', container_modifier: 'single-shell--video single-shell--video-cinema' } %}
+  {% block system_content %}
+    <article class="video-single video-single--cinema">
+      <section class="video-cinema" aria-labelledby="video-single-title">
+        <div class="video-cinema__backdrop" aria-hidden="true"></div>
+
+        <div class="video-cinema__inner">
+          <div class="video-cinema-stage">
+            {% include 'partials/video-cinema-stage.twig' %}
+          </div>
+
+          <header class="video-cinema__meta">
+            {% set vcat = post.terms('video_category')|first %}
+            {% if vcat %}
+              <a class="video-cinema__category" href="{{ vcat.link }}">{{ vcat.name }}</a>
+            {% endif %}
+            <h1 id="video-single-title" class="video-cinema__title">{{ post.title }}</h1>
+            <span class="video-cinema__divider" aria-hidden="true"></span>
+            <div class="video-cinema__meta-row">
+              <time class="video-cinema__date" datetime="{{ post.date('Y-m-d') }}">{{ ak_post_date(post) }}</time>
+              <a class="video-cinema__archive-link" href="{{ fn('get_post_type_archive_link', 'ak_video') }}">همه ویدئوها ←</a>
+            </div>
+          </header>
+
+          {% if video_body_html or post.post_excerpt %}
+            <a
+              href="#video-single-content"
+              class="archive-hero__scroll video-cinema__scroll"
+              data-archive-hero-scroll
+              aria-label="رفتن به توضیحات"
+            >
+              <span class="archive-hero__scroll-icon" aria-hidden="true"></span>
+            </a>
+          {% endif %}
+        </div>
+      </section>
+
+      {% if video_body_html or post.post_excerpt %}
+        <div id="video-single-content" class="video-single__reading archive-section__body">
+          {% if video_body_html %}
+            <div class="video-single__body body-text">
+              {{ video_body_html|raw }}
+            </div>
+          {% endif %}
+          {% if post.post_excerpt %}
+            <p class="video-single__excerpt">{{ post.post_excerpt|striptags }}</p>
+          {% endif %}
+        </div>
+      {% endif %}
+    </article>
+
+    {% if related_videos|length > 0 %}
+      <section class="videos videos--archive video-single__related" aria-labelledby="related-videos-heading">
+        <div class="videos--archive__backdrop" aria-hidden="true"></div>
+        <div class="video-single__related-inner">
+          <header class="video-cinema__related-head">
+            <h2 id="related-videos-heading" class="video-cinema__related-title">ویدئوهای مرتبط</h2>
+            <span class="video-cinema__divider video-cinema__divider--compact" aria-hidden="true"></span>
+          </header>
+          <div class="video-grid video-grid--related">
+            {% for video in related_videos %}
+              {% include 'partials/video-card.twig' with { video: video } %}
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+    {% endif %}
+  {% endblock %}
+{% endembed %}
+{% endblock %}

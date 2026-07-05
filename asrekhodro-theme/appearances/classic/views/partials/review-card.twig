@@ -1,0 +1,14 @@
+{% import 'partials/macros.twig' as ak %}
+
+<article class="review-card">
+  <a href="{{ review.link }}">
+    <div class="review-card__media">
+      {{ ak.post_image(review, 600, 375) }}
+    </div>
+    <div class="review-card__body">
+      <span class="tag tag--review">بررسی</span>
+      <h3>{{ review.title }}</h3>
+      <p>{{ review.post_excerpt|default(review.post_content|striptags|slice(0, 140)) }}</p>
+    </div>
+  </a>
+</article>

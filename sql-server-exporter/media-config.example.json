@@ -1,0 +1,14 @@
+{
+  "mediaColumns": [
+    {
+      "database": "NewsDB",
+      "table": "News",
+      "column": "ImagePath"
+    },
+    {
+      "database": "NewsDB",
+      "table": "Articles",
+      "column": "ThumbnailUrl"
+    }
+  ]
+}

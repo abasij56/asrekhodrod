@@ -1,0 +1,16 @@
+{% if overview_has_content %}
+  <section
+    class="container ci-section ci-section--overview ci-section--rfarda"
+    id="{{ block.anchor|default(overview_default_anchor) }}"
+  >
+    {% if overview_title %}
+      <h2 class="ci-section__title">{{ overview_title }}</h2>
+    {% endif %}
+
+    {% if overview_content %}
+      <div class="body-text">
+        {{ overview_content|raw }}
+      </div>
+    {% endif %}
+  </section>
+{% endif %}

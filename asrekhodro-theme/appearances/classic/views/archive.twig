@@ -1,0 +1,41 @@
+﻿{% extends 'base.twig' %}
+
+{% block before_main %}
+  {% include 'partials/layout-zone.twig' with { zone: 'before_main' } %}
+{% endblock %}
+
+{% block content %}
+{% embed 'partials/layout-shell.twig' with { shell: 'archive', container_modifier: 'archive-shell--news' } %}
+  {% block system_content %}
+    <section class="news news--archive news-list-section" aria-labelledby="news-archive-heading">
+      <div class="news--archive__backdrop" aria-hidden="true"></div>
+
+      {% include 'partials/archive-hero.twig' with {
+        variant: 'light',
+        hero_image: news_archive_hero_image,
+        hero_aspect: news_archive_hero_aspect,
+        hero_aspect_fallback: news_archive_hero_aspect_fallback,
+        heading_id: 'news-archive-heading',
+        title: archive_hero_title|default(news_archive_title|default('اخبار خودرو')),
+        subtitle: news_archive_subtitle|default('آخرین اخبار منتشر شده')
+      } %}
+
+      <div id="archive-content" class="news--archive__body archive-section__body">
+        {% include 'partials/news-archive-date-filter.twig' %}
+        <ul class="news-list" role="list">
+          {% for post in posts %}
+            {% include 'partials/news-list-item.twig' with { post: post } %}
+          {% endfor %}
+        </ul>
+        {% if posts is empty %}
+          <p class="news--archive__empty">خبری ثبت نشده است.</p>
+        {% endif %}
+        {% include 'partials/pagination.twig' with {
+          pagination: posts.pagination,
+          pagination_modifier: 'pagination--news'
+        } %}
+      </div>
+    </section>
+  {% endblock %}
+{% endembed %}
+{% endblock %}

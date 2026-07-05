@@ -1,0 +1,18 @@
+<aside class="rf-sidebar" role="complementary">
+  {% for ad in sidebar_ads %}
+    <a
+      href="{{ ad.link }}"
+      class="rf-ad-slot"
+      target="{{ ad.link_target|default('_blank') }}"
+      rel="{{ ad.link_rel|default('noopener noreferrer') }}"
+    >
+      {% if ad.image %}
+        <img src="{{ ad.image }}" alt="" width="300" height="75" loading="lazy" decoding="async" />
+      {% endif %}
+    </a>
+  {% else %}
+    {% for i in 1..4 %}
+      <div class="rf-ad-slot rf-ad-slot--placeholder" aria-hidden="true"></div>
+    {% endfor %}
+  {% endfor %}
+</aside>

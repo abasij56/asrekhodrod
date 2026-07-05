@@ -1,0 +1,20 @@
+<li id="comment-{{ comment.id }}" class="ak-comments__item">
+  <article class="ak-comment-card">
+    <div class="ak-comment-card__avatar" aria-hidden="true">
+      {{ ak_comment_author_initial(comment.author.name) }}
+    </div>
+    <div class="ak-comment-card__body">
+      <header class="ak-comment-card__head">
+        <strong class="ak-comment-card__author">{{ comment.author.name }}</strong>
+        <time class="ak-comment-card__time" datetime="{{ comment.date('Y-m-d') }}">{{ ak_persian_date(comment) }}</time>
+      </header>
+      <div class="ak-comment-card__content">{{ comment.content|raw }}</div>
+      {% if not comment.approved %}
+        <p class="ak-comment-card__moderation" role="status">این نظر در انتظار تأیید تحریریه است.</p>
+      {% endif %}
+    </div>
+    <span class="ak-comment-card__quote" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 0 1-3.5 3.5 3.871 3.871 0 0 1-2.748-1.179zm10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 0 1-3.5 3.5 3.871 3.871 0 0 1-2.748-1.179z"/></svg>
+    </span>
+  </article>
+</li>

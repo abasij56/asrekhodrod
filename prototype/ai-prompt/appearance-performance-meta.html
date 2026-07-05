@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>عملکرد و متادیتا — refactor ظاهر Classic / Modern</title>
+  <style>
+    :root {
+      --bg: #f8f9fb;
+      --card: #ffffff;
+      --text: #1a1d26;
+      --muted: #5c6370;
+      --accent: #c41e3a;
+      --border: #e4e7ec;
+      --code-bg: #f1f3f6;
+      --good: #0d7a4e;
+      --warn: #b45309;
+      --bad: #b91c1c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, "Vazirmatn", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      font-size: 16px;
+    }
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #1a1d26 0%, #2d3344 100%);
+      color: #fff;
+      padding: 2.5rem 1.25rem;
+      margin-bottom: 2rem;
+    }
+    header .wrap { padding: 0; }
+    header h1 { margin: 0 0 0.5rem; font-size: 1.75rem; }
+    header p { margin: 0; opacity: 0.85; font-size: 0.95rem; }
+    .nav-links { margin-top: 1rem; }
+    .nav-link {
+      display: inline-block;
+      color: #fff;
+      opacity: 0.9;
+      font-size: 0.9rem;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(255,255,255,0.5);
+      margin-left: 1.25rem;
+    }
+    .nav-link:hover { opacity: 1; }
+    h2 {
+      margin: 2.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--accent);
+      font-size: 1.35rem;
+    }
+    h3 { margin: 1.5rem 0 0.75rem; font-size: 1.1rem; color: #2d3344; }
+    p { margin: 0.75rem 0; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .highlight {
+      border-right: 4px solid var(--accent);
+      background: #fff5f6;
+    }
+    .good { border-right-color: var(--good); background: #f0fdf6; }
+    .warn { border-right-color: var(--warn); background: #fffbeb; }
+    .bad { border-right-color: var(--bad); background: #fef2f2; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.95rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.65rem 0.85rem;
+      text-align: right;
+      vertical-align: top;
+    }
+    th { background: #eef0f4; font-weight: 600; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    code, pre {
+      font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+      font-size: 0.88rem;
+      direction: ltr;
+      text-align: left;
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    ul, ol { margin: 0.5rem 0; padding-right: 1.5rem; }
+    li { margin: 0.35rem 0; }
+    .tag {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      margin-left: 0.35rem;
+      vertical-align: middle;
+    }
+    .tag.ok { background: var(--good); }
+    .tag.no { background: var(--bad); }
+    .formula {
+      text-align: center;
+      direction: ltr;
+      font-size: 1.05rem;
+      padding: 1rem;
+      background: var(--code-bg);
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    .summary-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .summary-item strong {
+      display: block;
+      color: var(--accent);
+      margin-bottom: 0.35rem;
+      font-size: 0.9rem;
+    }
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>عملکرد و متادیتا در refactor ظاهر</h1>
+    <p>بدون meta اضافه per-post — تم Asre Khodro</p>
+    <div class="nav-links">
+      <a class="nav-link" href="appearance-separation.html">جداسازی ظاهر از داده</a>
+      <a class="nav-link" href="appearance-blocks.html">معماری بلوک‌ها</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="card good">
+    <p><strong>پاسخ کوتاه:</strong> درست فکر می‌کنید — برای این refactor <strong>نباید meta حجیم per-post</strong> اضافه کنید.</p>
+    <p>سوییچ ظاهر یک <strong>تنظیم سراسری سایت</strong> است (یک مقدار در <code>wp_options</code>)، نه داده‌ای که روی هر یک از ۲۰۰ هزار پست ذخیره شود.</p>
+  </div>
+
+  <h2>داده کجا ذخیره می‌شود؟</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>داده</th>
+        <th>محل ذخیره</th>
+        <th>per-post؟</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>ظاهر فعال (<code>classic</code> / <code>modern</code>)</td>
+        <td><code>wp_options</code> (ACF Options)</td>
+        <td><span class="tag no">خیر</span> — یک مقدار برای کل سایت</td>
+      </tr>
+      <tr>
+        <td>فیلدهای car block (<code>rows</code>, <code>gallery</code>, …)</td>
+        <td>همان post (Gutenberg + ACF) — مثل الان</td>
+        <td><span class="tag ok">بله</span> — refactor تغییری نمی‌دهد</td>
+      </tr>
+      <tr>
+        <td>انتخاب Twig / CSS</td>
+        <td>runtime از ظاهر فعال resolve می‌شود</td>
+        <td><span class="tag no">خیر</span> — در DB ذخیره نمی‌شود</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="card highlight">
+    <p>این refactor <strong>نیازی به meta جدید روی هر پست</strong> ندارد.</p>
+  </div>
+
+  <h2>چه کارهایی نباید انجام دهید</h2>
+
+  <div class="card bad">
+    <table>
+      <thead>
+        <tr>
+          <th>anti-pattern</th>
+          <th>چرا بد است</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>post_meta</code>: <code>_appearance = modern</code> روی هر پست</td>
+          <td>۲۰۰k ردیف اضافه + query اضافه</td>
+        </tr>
+        <tr>
+          <td>فیلد ACF تکراری per appearance روی هر پست</td>
+          <td>۲ برابر شدن حجم داده ذخیره‌شده</td>
+        </tr>
+        <tr>
+          <td>ذخیره HTML رندرشده per post per appearance</td>
+          <td>meta بسیار حجیم</td>
+        </tr>
+        <tr>
+          <td>انتخاب template بلوک در meta هر پست</td>
+          <td>غیرضروری وقتی ظاهر global است</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>هزینه runtime این refactor</h2>
+
+  <p>در هر request تقریباً:</p>
+  <ol>
+    <li>خواندن <code>active_appearance</code> یک‌بار (با object cache → هزینه ~صفر)</li>
+    <li>resolve مسیر template: مثلاً <code>appearances/modern/views/blocks/car/specs.twig</code></li>
+    <li>همان <code>get_fields()</code> و همان محتوای block مثل الان</li>
+  </ol>
+
+  <div class="card good">
+    <p><strong>نسبت به امروز query اضافه per-post ندارید.</strong></p>
+  </div>
+
+  <h2>صفحات car الان</h2>
+
+  <p>داده بلوک‌های car از قبل داخل post است (<code>post_content</code> + داده ACF block). آن حجم <strong>به‌خاطر classic/modern بزرگ‌تر نمی‌شود</strong> — فقط فایل Twig که همان فیلدها را نمایش می‌دهد عوض می‌شود.</p>
+
+  <h2>قانون کلی</h2>
+
+  <div class="formula">
+    <code>Global appearance → wp_options (1 row)</code><br><br>
+    <code>Post content → post + existing block data (unchanged)</code><br><br>
+    <code>Per-post appearance → DON'T</code>
+  </div>
+
+  <p>اگر همه صفحات از یک skin استفاده می‌کنند، <strong>یک option کافی است</strong> — بدون meta حجیم per-post و بدون جریمه عملکرد معنادار از خود refactor.</p>
+
+  <h2>عوامل واقعی عملکرد</h2>
+
+  <div class="summary-grid">
+    <div class="summary-item">
+      <strong>تعداد پست در DB</strong>
+      تأثیر مستقیم روی render ندارد — مهم تعداد query در هر request است
+    </div>
+    <div class="summary-item">
+      <strong>Page cache</strong>
+      مهم‌ترین عامل برای زیر ۱ ثانیه
+    </div>
+    <div class="summary-item">
+      <strong>Object cache</strong>
+      options و queryهای تکراری را سریع می‌کند
+    </div>
+    <div class="summary-item">
+      <strong>داده granular</strong>
+      homepage فقط sectionهای لازم را بگیرد (بهتر از refactor بد است)
+    </div>
+    <div class="summary-item">
+      <strong>سوییچ ظاهر</strong>
+      ~ناچیز — یک lookup + enqueue یک set asset
+    </div>
+    <div class="summary-item">
+      <strong>meta per-post برای ظاهر</strong>
+      لازم نیست — avoid
+    </div>
+  </div>
+
+  <h2>جمع‌بندی</h2>
+
+  <table>
+    <thead>
+      <tr><th>سوال</th><th>پاسخ</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>refactor meta حجیم per-post می‌سازد؟</td>
+        <td><strong>نه</strong> — اگر درست پیاده شود</td>
+      </tr>
+      <tr>
+        <td>ظاهر کجا ذخیره شود؟</td>
+        <td><code>wp_options</code> — یک مقدار سراسری</td>
+      </tr>
+      <tr>
+        <td>داده بلوک car تغییر می‌کند؟</td>
+        <td><strong>نه</strong> — فقط template ظاهر</td>
+      </tr>
+      <tr>
+        <td>۲۰۰k پست مشکل می‌سازد؟</td>
+        <td><strong>نه</strong> — به‌خاطر تعداد ردیف‌های post_meta ظاهر</td>
+      </tr>
+      <tr>
+        <td>چه زمانی per-post لازم است؟</td>
+        <td>فقط اگر عمداً بخواهید بعضی صفحات skin متفاوت داشته باشند</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="card highlight">
+    <p><strong>فرمول نهایی:</strong> یک option سراسری + همان محتوای post + resolve template در runtime = بدون meta اضافه، بدون جریمه عملکرد معنادار.</p>
+  </div>
+
+  <footer>
+    <p>سند عملکرد و متادیتا — تم Asre Khodro — مکمل appearance-separation و appearance-blocks — ژوئن ۲۰۲۶</p>
+  </footer>
+
+</main>
+</body>
+</html>

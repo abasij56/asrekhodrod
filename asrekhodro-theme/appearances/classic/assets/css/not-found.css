@@ -1,0 +1,206 @@
+/* ==========================================================================
+   404 — «مسیر اشتباه» road-sign layout
+   ========================================================================== */
+
+.not-found {
+  position: relative;
+  overflow: hidden;
+  margin: 1.25rem 0 2rem;
+  padding: clamp(2rem, 6vw, 3.5rem) clamp(1rem, 4vw, 2rem);
+  border-radius: var(--radius);
+  border: 1px solid rgba(225, 6, 0, 0.09);
+  background: #fdfdfd;
+  box-shadow:
+    0 6px 28px rgba(61, 61, 61, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+.not-found__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 4px,
+      rgba(225, 6, 0, 0.007) 4px,
+      rgba(225, 6, 0, 0.007) 8px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 96px,
+      rgba(225, 6, 0, 0.012) 96px,
+      rgba(225, 6, 0, 0.012) 97px
+    ),
+    radial-gradient(
+      ellipse 70% 50% at 12% 0%,
+      rgba(225, 6, 0, 0.035) 0%,
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 55% 45% at 98% 100%,
+      rgba(225, 6, 0, 0.022) 0%,
+      transparent 52%
+    ),
+    linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+}
+
+.not-found__panel {
+  position: relative;
+  z-index: 1;
+  max-width: 38rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.not-found__sign-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.35rem;
+}
+
+.not-found__sign-pole {
+  width: 8px;
+  height: 1.75rem;
+  margin-top: -2px;
+  border-radius: 0 0 999px 999px;
+  background: linear-gradient(180deg, #5f5f5f 0%, #8a8a8a 100%);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.not-found__sign {
+  display: grid;
+  place-items: center;
+  min-width: min(100%, 11.5rem);
+  padding: 0.85rem 1.5rem;
+  border: 4px solid var(--brand);
+  border-radius: calc(var(--radius-sm) + 2px);
+  background: linear-gradient(180deg, #ffffff 0%, #fff8f8 100%);
+  box-shadow:
+    0 10px 28px rgba(225, 6, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  transform: rotate(-2deg);
+}
+
+.not-found__sign-code {
+  font-size: clamp(2.5rem, 8vw, 3.35rem);
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: var(--brand);
+  font-variant-numeric: tabular-nums;
+}
+
+.not-found__kicker {
+  margin-bottom: 0.45rem;
+  color: var(--brand);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.not-found__title {
+  margin-bottom: 0.75rem;
+  font-size: clamp(1.35rem, 4vw, 1.85rem);
+  line-height: 1.35;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.not-found__lead {
+  margin-bottom: 1.35rem;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+  line-height: 1.85;
+  text-align: justify;
+  text-align-last: center;
+}
+
+.not-found__search {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.not-found__search input {
+  flex: 1 1 14rem;
+  min-width: 0;
+  padding: 0.72rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  font-size: 0.88rem;
+  outline: none;
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition);
+}
+
+.not-found__search input::placeholder {
+  color: var(--ink-muted);
+}
+
+.not-found__search input:focus {
+  border-color: rgba(225, 6, 0, 0.45);
+  box-shadow: 0 0 0 3px rgba(225, 6, 0, 0.08);
+}
+
+.not-found__search-btn {
+  flex-shrink: 0;
+  padding-inline: 1.15rem;
+  white-space: nowrap;
+}
+
+.not-found__actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.layout-shell--page .not-found {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 767px) {
+  .not-found {
+    padding: 1.75rem 1rem 2rem;
+  }
+
+  .not-found__search {
+    flex-direction: column;
+  }
+
+  .not-found__search input,
+  .not-found__search-btn,
+  .not-found__actions .btn {
+    width: 100%;
+  }
+
+  .not-found__sign {
+    transform: none;
+  }
+}
+
+@media print {
+  .not-found__backdrop,
+  .not-found__sign-wrap {
+    display: none;
+  }
+
+  .not-found {
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+  }
+}

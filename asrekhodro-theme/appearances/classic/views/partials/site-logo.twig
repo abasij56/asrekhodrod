@@ -1,0 +1,22 @@
+{% set logo_image = variant == 'footer' ? (options.site_logo_footer ?: options.site_logo) : options.site_logo %}
+{% set text_heading = brand_heading|default(variant == 'footer' ? site.name : 'عصر خودرو') %}
+{% set logo_tagline = tagline|default(variant == 'footer' ? '' : 'Asre Khodro · مرجع تخصصی صنعت خودرو') %}
+<a href="{{ site.url }}" class="logo{{ class ? ' ' ~ class : '' }}" aria-label="صفحه اصلی {{ site.name }}">
+  {% if logo_image %}
+    <img
+      src="{{ logo_image.url }}"
+      alt="{{ site.name }}"
+      class="logo__image"
+      {% if logo_image.width %}width="{{ logo_image.width }}"{% endif %}
+      {% if logo_image.height %}height="{{ logo_image.height }}"{% endif %}
+    />
+  {% else %}
+    <div class="logo__mark" aria-hidden="true">AK</div>
+    <div class="logo__text">
+      <strong>{{ text_heading }}</strong>
+      {% if logo_tagline %}
+        <span>{{ logo_tagline }}</span>
+      {% endif %}
+    </div>
+  {% endif %}
+</a>

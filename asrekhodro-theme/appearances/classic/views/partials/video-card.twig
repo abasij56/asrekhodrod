@@ -1,0 +1,18 @@
+{% import 'partials/macros.twig' as ak %}
+
+<article class="video-card video-card--archive">
+  <a href="{{ video.link }}">
+    {% if video.thumbnail %}
+      <img src="{{ video.thumbnail.src('medium') }}" alt="{{ video.title }}" loading="lazy" decoding="async" />
+    {% else %}
+      {{ ak.post_image(video, 640, 360) }}
+    {% endif %}
+    {% include 'partials/video-card-play.twig' %}
+    <div class="video-card__info">
+      {% set vcat = video.terms('video_category')|first %}
+      {% if vcat %}<span class="video-card__tag">{{ vcat.name }}</span>{% endif %}
+      <h2>{{ video.title }}</h2>
+      <time datetime="{{ video.date('Y-m-d') }}">{{ ak_post_date(video) }}</time>
+    </div>
+  </a>
+</article>

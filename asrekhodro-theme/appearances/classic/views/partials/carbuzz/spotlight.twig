@@ -1,0 +1,31 @@
+{% import 'partials/macros.twig' as ak %}
+
+{% if cb_spotlight_posts|length > 0 %}
+<section class="cb-section cb-spotlight" aria-labelledby="cb-spotlight-heading">
+  <header class="cb-section__head cb-section__head--dark">
+    <h2 id="cb-spotlight-heading" class="cb-section__title">{{ cb_spotlight.title }}</h2>
+    <a href="{{ cb_spotlight.url }}" class="cb-section__more">مشاهده همه</a>
+  </header>
+  <div class="cb-spotlight__grid">
+    {% for post in cb_spotlight_posts %}
+      <article class="cb-spotlight-card{{ loop.first ? ' cb-spotlight-card--lead' : '' }}">
+        <a href="{{ post.link }}">
+          <div class="cb-spotlight-card__media">{{ ak.post_image(post, loop.first ? 800 : 400, loop.first ? 500 : 250) }}</div>
+          <div class="cb-spotlight-card__body">
+            <h3>{{ post.title }}</h3>
+            {% if loop.first %}
+              <p>{{ ak.list_excerpt(post) }}</p>
+            {% endif %}
+            <div class="cb-spotlight-card__meta">
+              {% if post.meta('_asrekhodro_author') %}
+                <span>{{ post.meta('_asrekhodro_author') }}</span>
+              {% endif %}
+              <time datetime="{{ post.date('Y-m-d') }}">{{ ak_post_date(post) }}</time>
+            </div>
+          </div>
+        </a>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}

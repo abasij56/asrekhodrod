@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>راهنمای Rule بلاک‌های Layout در Cursor</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4f;
+      --text: #e7ecf3;
+      --muted: #9aa8bc;
+      --accent: #5b9fd4;
+      --accent-soft: rgba(91, 159, 212, 0.12);
+      --good: #6bcf8e;
+      --warn: #e8b86d;
+      --code-bg: #0d1117;
+      --radius: 10px;
+      --font: "Segoe UI", Tahoma, "Vazirmatn", system-ui, sans-serif;
+      --mono: "Cascadia Code", "Fira Code", Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      font-size: 16px;
+    }
+
+    .wrap {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    header {
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+      line-height: 1.35;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+      margin: 2.25rem 0 0.85rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    h3 {
+      font-size: 1rem;
+      margin: 1.5rem 0 0.6rem;
+      font-weight: 600;
+    }
+
+    p { margin: 0.6rem 0; }
+
+    .callout {
+      background: var(--accent-soft);
+      border: 1px solid rgba(91, 159, 212, 0.35);
+      border-radius: var(--radius);
+      padding: 1rem 1.15rem;
+      margin: 1.25rem 0;
+    }
+
+    .callout strong { color: var(--accent); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.92rem;
+      background: var(--surface);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      background: rgba(0, 0, 0, 0.25);
+      color: var(--muted);
+      font-weight: 600;
+      width: 28%;
+    }
+
+    tr:last-child td,
+    tr:last-child th { border-bottom: none; }
+
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      overflow-x: auto;
+      margin: 0.85rem 0;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      line-height: 1.55;
+      direction: ltr;
+      text-align: left;
+    }
+
+    code {
+      font-family: var(--mono);
+      font-size: 0.88em;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 0.12em 0.4em;
+      border-radius: 4px;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+    }
+
+    ul, ol {
+      margin: 0.5rem 0;
+      padding-right: 1.35rem;
+    }
+
+    li { margin: 0.35rem 0; }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+
+    .flow span {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.75rem;
+      border-radius: 999px;
+    }
+
+    .flow .arrow { color: var(--muted); border: none; background: none; padding: 0; }
+
+    .steps {
+      display: grid;
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 2.5rem 1fr;
+      gap: 0.75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.85rem 1rem;
+    }
+
+    .step-num {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .step h4 {
+      margin: 0 0 0.2rem;
+      font-size: 0.95rem;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .tag-bad { color: var(--warn); }
+    .tag-good { color: var(--good); }
+
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>چطور الگوی بلاک‌های Layout را در Cursor به‌صورت Rule بنویسیم؟</h1>
+      <p class="subtitle">راهنمای تعریف قانون برای بلاک‌های غیر گوتنبرگ (ak-*) — query → View → partial.twig</p>
+    </header>
+
+    <div class="callout">
+      <strong>پاسخ کوتاه:</strong> بله — بهترین کار ساخت یک <strong>Project Rule</strong> در
+      <code>.cursor/rules/</code> است، نه فقط توضیح در چت.
+    </div>
+
+    <h2>الگوی عمومی (برای همه بلاک‌های query)</h2>
+    <div class="flow">
+      <span>پارامترهای چیدمان</span>
+      <span class="arrow">→</span>
+      <span>query پست‌ها</span>
+      <span class="arrow">→</span>
+      <span>View (مپ داده)</span>
+      <span class="arrow">→</span>
+      <span>partial.twig</span>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">۱</div>
+        <div>
+          <h4>Query</h4>
+          <p>نوع پست، دسته، تعداد، نحوه گزینش → لیست پست</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">۲</div>
+        <div>
+          <h4>View</h4>
+          <p>هر بلاک فقط فیلدهای لازم UI را از پست برمی‌دارد (DTO ساده)</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">۳</div>
+        <div>
+          <h4>partial.twig</h4>
+          <p>همان فیلدها را رندر می‌کند — بدون منطق query و بدون Timber Post خام</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>چه چیزی بسازید؟</h2>
+    <p>مسیر استاندارد Cursor:</p>
+    <pre><code>asrekhodro-theme/.cursor/rules/layout-blocks.mdc</code></pre>
+    <p>فایل‌های Rule با پسوند <code>.mdc</code> و frontmatter YAML هستند. Cursor آن‌ها را وقتی روی فایل‌های مرتبط کار می‌کنید (یا اگر <code>alwaysApply: true</code> باشد همیشه) به context اضافه می‌کند.</p>
+
+    <h2>چه چیزی نسازید (به‌تنهایی)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>روش</th>
+          <th>کاربرد</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>User Rule</strong> (تنظیمات Cursor)</td>
+          <td>برای همه پروژه‌ها — خوب برای اصول کلی، نه جزئیات این تم</td>
+        </tr>
+        <tr>
+          <td><strong>Skill</strong></td>
+          <td>برای workflow چندمرحله‌ای — نه معماری ثابت</td>
+        </tr>
+        <tr>
+          <td><strong>AGENTS.md</strong></td>
+          <td>نقشه کلی repo — مکمل خوب است، جایگزین rule دقیق نیست</td>
+        </tr>
+        <tr>
+          <td><strong>README طولانی</strong></td>
+          <td>AI همیشه نمی‌خواند مگر rule به آن اشاره کند</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>پیشنهاد: یک Rule + glob دقیق</h2>
+    <p>برای بلاک‌های <strong>layout</strong> (<code>ak-*</code>)، نه Gutenberg (<code>cinfo-*</code>):</p>
+    <pre><code>---
+description: الگوی بلاک‌های چیدمان (ak-*) — query → View → partial
+globs: asrekhodro-theme/inc/blocks/ak-*/**
+alwaysApply: false
+---</code></pre>
+
+    <p>اگر روی resolver هم کار می‌کنید، یک rule دوم:</p>
+    <pre><code>globs: asrekhodro-theme/inc/blocks/{BlockDataResolver.php,layout/**}</code></pre>
+
+    <h2>محتوای پیشنهادی Rule</h2>
+    <pre><code># بلاک‌های چیدمان (ak-*) — نه Gutenberg
+
+## الگوی اجباری (source: query)
+
+پارامترهای Layout Builder → query → View.php → partial.twig
+
+1. **config.php** — `type: layout`, `source: query`, `defaults`, `partial`
+2. **BlockDataResolver** — `resolve_{block}()`؛ fallback به HomepageData فقط front_page بدون override
+3. **View.php** — فقط مپ به DTO؛ نه `\Timber\Post` در Twig
+4. **partial.twig** — فقط کلیدهای View؛ بدون `post.meta()` و بدون query
+
+## مرزها
+
+- `ak-*` = Layout Builder
+- `cinfo-*` = ACF/Gutenberg — این rule اعمال نشود
+
+## مرجع
+
+- ساده: `inc/blocks/ak-ticker/`
+- split: `inc/blocks/ak-hero/`, `inc/blocks/ak-asrekhodro-featured/`
+- Resolver: `inc/blocks/BlockDataResolver.php`</code></pre>
+
+    <h2>نکات عملی برای Cursor</h2>
+    <ol>
+      <li><strong>کوتاه بماند</strong> — زیر ~۵۰ خط؛ یک concern در هر rule.</li>
+      <li><strong>مثال واقعی</strong> — <code>ak-ticker</code> و <code>ak-hero</code> بهتر از توضیح abstract است.</li>
+      <li><strong>استثناها</strong> — <code>source: static</code>، <code>composite</code>، <code>sidebar_widget</code>.</li>
+      <li><strong>glob درست</strong> — <code>cinfo-*</code> را exclude کنید.</li>
+      <li><strong>دو rule جدا</strong> — یکی برای <code>ak-*/**</code>، یکی برای <code>BlockDataResolver.php</code>.</li>
+    </ol>
+
+    <h2>اختیاری: AGENTS.md</h2>
+    <pre><code>## Layout blocks (ak-*)
+See `.cursor/rules/layout-blocks.mdc`. Pattern: query → View → partial.twig.</code></pre>
+
+    <h2>چطور بسازید؟</h2>
+    <ol>
+      <li>پوشه: <code>asrekhodro-theme/.cursor/rules/</code></li>
+      <li>فایل: <code>layout-blocks.mdc</code></li>
+      <li>frontmatter + محتوا</li>
+      <li>در Cursor: Rules را باز کنید و فعال بودن rule را بررسی کنید</li>
+    </ol>
+
+    <footer>
+      <p>برای ساخت خودکار فایل rule در پروژه، به <strong>Agent mode</strong> بروید و بگویید: «rule بلاک‌های layout را بساز».</p>
+    </footer>
+  </div>
+</body>
+</html>

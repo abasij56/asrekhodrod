@@ -1,0 +1,33 @@
+{% import 'partials/macros.twig' as ak %}
+
+{% if rf_latest|length > 0 %}
+<section class="rfarda-latest" aria-labelledby="rfarda-latest-heading">
+  {% include 'partials/rfarda/column-head.twig' with { title: 'تازه‌ها', id: 'rfarda-latest-heading', url: news_archive_url } %}
+
+  {% set lead_post = rf_latest|first %}
+  <a href="{{ lead_post.link }}" class="rfarda-latest__lead">
+    <div class="rfarda-latest__lead-image">
+      {{ ak.post_image(lead_post, 480, 270) }}
+    </div>
+    <h3 class="rfarda-latest__lead-title">{{ lead_post.title }}</h3>
+  </a>
+
+  {% if rf_latest|length > 1 %}
+    <ul class="rfarda-latest__list">
+      {% for post in rf_latest|slice(1) %}
+        <li>
+          <a href="{{ post.link }}" class="rfarda-latest__item">
+            <div class="rfarda-latest__body">
+              <h3 class="rfarda-latest__title">{{ post.title }}</h3>
+              <time class="rfarda-latest__date" datetime="{{ post.date('Y-m-d') }}">{{ ak_post_date(post) }}</time>
+            </div>
+            <div class="rfarda-latest__thumb">
+              {{ ak.post_image(post, 96, 72) }}
+            </div>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</section>
+{% endif %}

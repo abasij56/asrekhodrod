@@ -1,0 +1,259 @@
+Act as an award-winning News Portal UI/UX Designer, Creative Director, and Senior Frontend Developer.
+
+Your task is to create a completely new homepage concept for Asre Khodro, a Persian automotive news website.
+
+IMPORTANT:
+This is NOT a WordPress theme.
+This is NOT a React application.
+This is a standalone high-fidelity prototype that will be presented to company management for design approval before WordPress implementation.
+
+Design Goal:
+Create a modern automotive media platform that feels premium, professional, trustworthy, and future-ready for 2026.
+
+The design should be inspired by:
+
+* Motor1
+* TopGear
+* CarBuzz
+* TechCrunch
+* The Verge
+
+while remaining suitable for Persian-speaking audiences.
+
+==================================================
+TECHNICAL REQUIREMENTS
+======================
+
+Generate only:
+
+* index.html
+* assets/css/style.css
+* assets/js/app.js
+
+Requirements:
+
+* Pure HTML5
+* Pure CSS3
+* Vanilla JavaScript
+* No React
+* No Vue
+* No Angular
+* No Bootstrap
+* No Tailwind
+* No external frameworks
+* Fully responsive
+* Mobile-first approach
+* RTL layout
+* Persian typography
+* Semantic HTML structure
+* SEO-friendly markup
+* Clean code organization
+* Easy future conversion to WordPress theme
+
+==================================================
+VISUAL STYLE
+============
+
+The homepage must look like a modern digital media brand.
+
+Design principles:
+
+* Premium editorial appearance
+* Strong visual hierarchy
+* Large imagery
+* Excellent typography
+* Clean spacing
+* Modern cards
+* Subtle animations
+* Professional automotive feel
+* High readability
+
+Avoid:
+
+* Old-fashioned news portal layouts
+* Cluttered interfaces
+* Excessive borders
+* Dense content blocks
+* Outdated visual patterns
+
+==================================================
+HOMEPAGE STRUCTURE
+==================
+
+1. TOP HEADER
+
+* Website logo
+* Date
+* Search
+* Social media icons
+
+2. MAIN NAVIGATION
+
+Categories such as:
+
+* اخبار خودرو
+* بازار خودرو
+* خودروهای داخلی
+* خودروهای خارجی
+* خودروهای برقی
+* تست و بررسی
+* ویدئو
+* مجلات
+
+3. ADVERTISEMENT SLOT
+
+Position:
+Immediately below main navigation
+
+Size:
+333x20
+
+Use realistic placeholder advertisement.
+
+4. HERO SECTION
+
+Large featured story
+
+Include:
+
+* Large automotive image
+* Main headline
+* Short summary
+* Read more button
+
+5. BREAKING NEWS TICKER
+
+Horizontal scrolling latest news section.
+
+6. FEATURED NEWS GRID
+
+Layout:
+
+* 1 large article
+* 4 medium articles
+* Multiple smaller articles
+
+Use realistic Persian automotive content.
+
+7. MAGAZINE SECTION
+
+Title:
+مجلات روز
+
+Display magazine covers using realistic placeholders.
+
+This section should be visually attractive and prominent.
+
+8. VIDEO SECTION
+
+Title:
+ویدئوهای عصر خودرو
+
+Include video thumbnails with play buttons.
+
+9. CAR MARKET SECTION
+
+Title:
+قیمت خودرو
+
+Modern card-based layout.
+
+10. CAR REVIEWS SECTION
+
+Title:
+تست و بررسی خودرو
+
+11. NEWSLETTER SECTION
+
+Modern subscription block.
+
+12. FOOTER
+
+Include:
+
+* About us
+* Contact information
+* Categories
+* Social links
+
+==================================================
+ADVERTISEMENT REQUIREMENTS
+==========================
+
+The website monetizes through advertising.
+
+Design must support ads without feeling cluttered.
+
+A) LEFT SIDEBAR ADS
+
+Size:
+160x80
+
+Requirements:
+
+* Multiple stacked placements
+* Sticky behavior on desktop
+* Visible but not intrusive
+
+B) HORIZONTAL ADS
+
+Size:
+333x20
+
+Positions:
+
+* Below main menu
+* Between news sections
+* Between content blocks
+
+Use realistic advertisement placeholders.
+
+IMPORTANT:
+The layout must remain beautiful even if advertisements are empty.
+
+==================================================
+RESPONSIVE REQUIREMENTS
+=======================
+
+Desktop:
+1440px+
+
+Tablet:
+768px – 1439px
+
+Mobile:
+320px – 767px
+
+On mobile:
+
+* Collapse navigation
+* Reorganize grids
+* Preserve readability
+* Maintain premium appearance
+
+==================================================
+CONTENT REQUIREMENTS
+====================
+
+Generate realistic Persian mock content related to:
+
+* Automotive industry
+* Vehicle launches
+* EVs
+* Market analysis
+* Car reviews
+* Technology
+
+Do NOT use lorem ipsum.
+
+==================================================
+FINAL DELIVERABLE
+=================
+
+Generate complete production-quality files:
+
+* index.html
+* assets/css/style.css
+* assets/js/app.js
+
+The result should look like a premium Persian automotive media platform that management could realistically approve as the future redesign of Asre Khodro.

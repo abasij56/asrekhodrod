@@ -1,0 +1,34 @@
+{% if hero_main %}
+{% if section_title|default('')|trim != '' %}
+  {% include 'partials/section-head.twig' with { heading_id: 'hero-section-heading' } %}
+{% endif %}
+<section class="hero" data-hero-slider data-hero-interval="15000" aria-labelledby="hero-heading">
+  <article class="hero__main" data-hero-main>
+    <img data-hero-image src="{{ hero_main.image }}" width="1200" height="800" alt="{{ hero_main.title }}" loading="eager" decoding="async" />
+    <div class="hero__content">
+      <h1 id="hero-heading"><a data-hero-title-link href="{{ hero_main.link }}"><span data-hero-title>{{ hero_main.title }}</span></a></h1>
+      <p data-hero-excerpt>{{ hero_main.excerpt }}</p>
+      <a data-hero-cta href="{{ hero_main.link }}" class="btn btn--primary">ادامه مطلب</a>
+      {% if hero_side_items|length > 1 %}
+      <div class="hero__progress" data-hero-progress aria-hidden="true">
+        <span class="hero__progress-fill" data-hero-progress-fill></span>
+      </div>
+      {% endif %}
+    </div>
+  </article>
+  <aside class="hero__side" aria-label="اخبار مهم">
+    {% for item in hero_side_items %}
+      <article class="hero-text-item{% if loop.first %} is-active{% endif %}" data-hero-item>
+        <button type="button" class="hero-text-item__trigger" data-hero-trigger aria-pressed="{{ loop.first ? 'true' : 'false' }}">
+          {% if item.badge %}<span class="tag tag--breaking">{{ item.badge }}</span>{% endif %}
+          <h3>{{ item.title }}</h3>
+          <time datetime="{{ item.date_iso }}">{{ item.date }}</time>
+        </button>
+      </article>
+    {% endfor %}
+  </aside>
+  {% if hero_side_panels_json|default('') %}
+    <script type="application/json" data-hero-slides>{{ hero_side_panels_json|raw }}</script>
+  {% endif %}
+</section>
+{% endif %}

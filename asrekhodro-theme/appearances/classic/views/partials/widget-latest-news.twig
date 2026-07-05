@@ -1,0 +1,12 @@
+<section class="rail-widget rail-widget--latest" aria-labelledby="rail-latest-heading">
+  <h2 id="rail-latest-heading" class="rail-widget__title">{{ section_title|default('آخرین اخبار') }}</h2>
+  <ul class="rail-widget__list">
+    {% for post in posts %}
+      <li>
+        <a href="{{ post.link }}" target="_blank" rel="noopener">
+          <h3>{{ post.title }}</h3>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</section>

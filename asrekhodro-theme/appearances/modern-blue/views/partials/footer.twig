@@ -1,0 +1,83 @@
+<footer class="site-footer site-footer--modern-blue mb-footer">
+  <div class="container">
+    <div class="mb-footer__grid">
+      <div class="mb-footer__brand">
+        {% include 'partials/site-logo.twig' with { variant: 'footer', tagline: 'Asre Khodro' } %}
+        <p class="mb-footer__tagline">{{ options.footer_text|default('عصر خودرو بزرگ‌ترین پایگاه خبری–تحلیلی حوزه خودرو در ایران است.') }}</p>
+        {% if options.contact_address or options.contact_phone or options.contact_email %}
+          <address class="mb-footer__contact">
+            <ul>
+              {% if options.contact_address %}<li>{{ options.contact_address }}</li>{% endif %}
+              {% if options.contact_phone %}<li><a href="tel:{{ options.contact_phone }}">{{ options.contact_phone }}</a></li>{% endif %}
+              {% if options.contact_email %}<li><a href="mailto:{{ options.contact_email }}">{{ options.contact_email }}</a></li>{% endif %}
+            </ul>
+          </address>
+        {% endif %}
+      </div>
+
+      <div class="mb-footer__col">
+        <h4 class="mb-footer__heading">درباره ما</h4>
+        {% if footer_nav_about %}
+          <ul class="mb-footer__links">
+            {% for item in footer_nav_about.items %}
+              <li><a href="{{ item.link }}">{{ item.title }}</a></li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <ul class="mb-footer__links">
+            <li><a href="#">تاریخچه</a></li>
+            <li><a href="#">تیم تحریریه</a></li>
+            <li><a href="#">تماس با ما</a></li>
+            <li><a href="#">تبلیغات</a></li>
+          </ul>
+        {% endif %}
+      </div>
+
+      <div class="mb-footer__col">
+        <h4 class="mb-footer__heading">دسته‌بندی‌ها</h4>
+        {% if footer_nav_cats %}
+          <ul class="mb-footer__links">
+            {% for item in footer_nav_cats.items %}
+              <li><a href="{{ item.link }}">{{ item.title }}</a></li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <ul class="mb-footer__links">
+            <li><a href="#">اخبار خودرو</a></li>
+            <li><a href="#">بازار خودرو</a></li>
+            <li><a href="#">خودروهای برقی</a></li>
+            <li><a href="#">تست و بررسی</a></li>
+          </ul>
+        {% endif %}
+
+        {% if options.social_instagram or options.social_telegram or options.social_youtube %}
+          <h4 class="mb-footer__heading mb-footer__heading--social">ما را دنبال کنید</h4>
+          <div class="mb-footer__socials" aria-label="شبکه‌های اجتماعی">
+            {% if options.social_instagram %}
+              <a href="{{ options.social_instagram }}" aria-label="اینستاگرام" rel="noopener noreferrer">IG</a>
+            {% endif %}
+            {% if options.social_telegram %}
+              <a href="{{ options.social_telegram }}" aria-label="تلگرام" rel="noopener noreferrer">TG</a>
+            {% endif %}
+            {% if options.social_youtube %}
+              <a href="{{ options.social_youtube }}" aria-label="یوتیوب" rel="noopener noreferrer">YT</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="mb-footer__col mb-footer__col--newsletter">
+        <h4 class="mb-footer__heading">خبرنامه</h4>
+        <p class="mb-footer__newsletter-lead">جدیدترین اخبار و تحلیل‌های خودرو را در ایمیل خود دریافت کنید.</p>
+        <form class="mb-footer__newsletter" data-ak-newsletter aria-label="فرم عضویت خبرنامه">
+          <input type="email" name="email" placeholder="آدرس ایمیل شما" required autocomplete="email" aria-label="ایمیل" />
+          <button type="submit" class="mb-footer__newsletter-btn">عضویت</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="mb-footer__copyright">
+      <span>© {{ "now"|date("Y") }} عصر خودرو — تمامی حقوق محفوظ است.</span>
+    </div>
+  </div>
+</footer>

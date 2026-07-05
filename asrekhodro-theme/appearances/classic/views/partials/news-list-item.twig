@@ -1,0 +1,21 @@
+{% import 'partials/macros.twig' as ak %}
+
+<li class="news-list__item">
+  <article>
+    <a href="{{ post.link }}" class="news-list__link">
+      <div class="news-list__media">
+        {{ ak.post_image(post, 163, 109) }}
+      </div>
+      <div class="news-list__body">
+        {% set over_title = post.meta('_asrekhodro_over_title')|default('')|trim %}
+        {% if over_title %}
+          <p class="news-list__over">{{ over_title }}</p>
+        {% endif %}
+        <h2 class="news-list__title">{{ post.title }}</h2>
+        {% if show_excerpt is not defined or show_excerpt %}
+          <p class="news-list__excerpt"><strong>عصر خودرو-</strong> {{ ak.list_excerpt(post) }}</p>
+        {% endif %}
+      </div>
+    </a>
+  </article>
+</li>

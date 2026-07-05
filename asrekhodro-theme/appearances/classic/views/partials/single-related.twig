@@ -1,0 +1,15 @@
+{% if related_posts|length > 0 %}
+<section class="single-related" aria-labelledby="single-related-heading">
+  <h2 id="single-related-heading" class="single-section-title">مطالب مرتبط</h2>
+  <ul class="single-related__list">
+    {% for item in related_posts %}
+      <li{% if loop.index > 10 %} class="single-related__item--more" hidden{% endif %}>
+        <a href="{{ item.link }}" target="_blank" rel="noopener">{{ item.title }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+  {% if related_posts|length > 10 %}
+    <button type="button" class="single-related__more" data-ak-related-more>مطالب مرتبط بیشتر</button>
+  {% endif %}
+</section>
+{% endif %}

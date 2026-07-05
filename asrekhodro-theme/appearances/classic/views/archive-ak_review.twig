@@ -1,0 +1,36 @@
+{% extends 'base.twig' %}
+
+{% block before_main %}
+  {% include 'partials/layout-zone.twig' with { zone: 'before_main' } %}
+{% endblock %}
+
+{% block content %}
+{% embed 'partials/layout-shell.twig' with { shell: 'archive', container_modifier: 'archive-shell--reviews' } %}
+  {% block system_content %}
+    <section class="reviews reviews--archive" aria-labelledby="reviews-archive-heading">
+      <div class="reviews--archive__backdrop" aria-hidden="true"></div>
+
+      {% include 'partials/archive-hero.twig' with {
+        variant: 'light',
+        hero_image: review_archive_hero_image,
+        hero_aspect: review_archive_hero_aspect,
+        hero_aspect_fallback: review_archive_hero_aspect_fallback,
+        heading_id: 'reviews-archive-heading',
+        title: review_archive_title|default('تست و بررسی خودرو'),
+        subtitle: review_archive_subtitle|default('آخرین بررسی‌های منتشر شده')
+      } %}
+
+      <div id="archive-content" class="reviews--archive__body archive-section__body">
+        <div class="review-grid">
+          {% for review in posts %}
+            {% include 'partials/review-card.twig' with { review: review } %}
+          {% else %}
+            <p class="reviews--archive__empty">بررسی‌ای ثبت نشده است.</p>
+          {% endfor %}
+        </div>
+        {% include 'partials/pagination.twig' %}
+      </div>
+    </section>
+  {% endblock %}
+{% endembed %}
+{% endblock %}

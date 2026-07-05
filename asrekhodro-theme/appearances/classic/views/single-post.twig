@@ -1,0 +1,81 @@
+﻿{% extends 'base.twig' %}
+
+{% import 'partials/macros.twig' as ak %}
+
+{% block before_main %}
+  {% include 'partials/layout-zone.twig' with { zone: 'before_main' } %}
+{% endblock %}
+
+{% block content %}
+{% embed 'partials/layout-shell.twig' with {
+  shell: 'single',
+  single_main_backdrop: single_main_backdrop|default(false)
+} %}
+  {% block system_content %}
+    <article class="single-article">
+      <div class="single-hero">
+        <div class="single-hero__text">
+          {% if post.meta('_asrekhodro_over_title') %}
+            <p class="single-hero__over">{{ post.meta('_asrekhodro_over_title') }}</p>
+          {% endif %}
+          <h1 class="single-hero__title">{{ post.title }}</h1>
+          {% if post_lead %}
+            <p class="single-hero__lead">{{ post_lead }}</p>
+          {% endif %}
+        </div>
+        {% set hero_image = ak_post_hero_image_url(post) %}
+        {% if hero_image %}
+          <figure class="single-hero__media">
+            <a href="{{ hero_image }}" class="single-hero__zoom" target="_blank" rel="noopener">
+              <img src="{{ hero_image }}" alt="{{ post.title }}" width="455" height="303" loading="eager" fetchpriority="high" decoding="async" />
+              <span class="single-hero__zoom-icon" aria-hidden="true"></span>
+            </a>
+          </figure>
+        {% endif %}
+      </div>
+
+      <div class="single-meta">
+        <div class="single-meta__actions">
+          <button type="button" class="single-print" data-ak-print aria-label="نسخه قابل چاپ">
+            نسخه قابل چاپ
+          </button>
+          {% include 'partials/single-meta-share.twig' %}
+        </div>
+        <time class="single-meta__time" datetime="{{ post.date('c') }}">
+          <span class="single-meta__date-part">{{ ak_post_date(post) }}</span>
+          {% set post_time = ak_post_time(post) %}
+          {% if post_time %}
+            <span class="single-meta__time-part">{{ post_time }}</span>
+          {% endif %}
+        </time>
+      </div>
+
+      <div class="single-article__content body-text">
+        {{ post.content }}
+      </div>
+
+      {% if post.meta('_asrekhodro_under_title') or post.meta('under_title') %}
+        <p class="single-under-title">{{ post.meta('_asrekhodro_under_title')|default(post.meta('under_title')) }}</p>
+      {% endif %}
+
+      {% include 'partials/single-share.twig' %}
+
+      {% if post_tags|length > 0 %}
+        <section class="single-tags" aria-labelledby="single-tags-heading">
+          <h2 id="single-tags-heading" class="single-section-title">برچسب‌ها</h2>
+          <ul class="single-tags__list">
+            {% for tag in post_tags %}
+              <li>
+                <a href="{{ tag.link }}">{{ tag.name }}{% if tag.count > 0 %} <strong>({{ tag.count }})</strong>{% endif %}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endif %}
+
+      {% include 'partials/single-related.twig' %}
+      {% include 'partials/single-comments.twig' %}
+    </article>
+  {% endblock %}
+{% endembed %}
+{% endblock %}

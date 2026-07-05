@@ -1,0 +1,20 @@
+<div class="mag-page mag-page--cover">
+  <div class="mag-page__cover-bg" aria-hidden="true"></div>
+  <div class="mag-page__cover-inner">
+    {% if logo_image %}
+      <img
+        class="mag-page__cover-logo"
+        src="{{ logo_image.url }}"
+        alt="{{ site.name }}"
+        width="{{ logo_image.width|default(180) }}"
+        height="{{ logo_image.height|default(48) }}"
+      />
+    {% else %}
+      <div class="mag-page__cover-mark" aria-hidden="true">AK</div>
+      <strong class="mag-page__cover-brand">{{ site.name|default('عصر خودرو') }}</strong>
+    {% endif %}
+    <p class="mag-page__cover-kicker">ویژه‌نامه</p>
+    <h3 class="mag-page__cover-title">{{ cover_title|default('اخبار ویژه') }}</h3>
+    <p class="mag-page__cover-hint">گوشه صفحه را بزنید</p>
+  </div>
+</div>

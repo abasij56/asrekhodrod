@@ -1,0 +1,26 @@
+{% if section_title is not defined %}{% set section_title = 'ویدئوهای عصر خودرو' %}{% endif %}
+<section class="videos"{% if section_title|trim != '' %} aria-labelledby="videos-heading"{% endif %}>
+  {% include 'partials/section-head.twig' with {
+    heading_id: 'videos-heading',
+    section_link_url: fn('get_post_type_archive_link', 'ak_video'),
+    section_link_label: 'همه ویدئوها ←'
+  } %}
+  <div class="video-grid">
+    {% for video in videos %}
+      <article class="video-card{{ loop.first ? ' video-card--lead' : '' }}">
+        <a href="{{ video.link }}">
+          {% if video.thumbnail %}
+            <img src="{{ video.thumbnail.src(loop.first ? 'large' : 'medium') }}" alt="{{ video.title }}" loading="lazy" />
+          {% endif %}
+          {% include 'partials/video-card-play.twig' %}
+          <div class="video-card__info">
+            <h3>{{ video.title }}</h3>
+            <span>{{ ak_post_date(video) }}</span>
+          </div>
+        </a>
+      </article>
+    {% else %}
+      <p>ویدئویی ثبت نشده است.</p>
+    {% endfor %}
+  </div>
+</section>

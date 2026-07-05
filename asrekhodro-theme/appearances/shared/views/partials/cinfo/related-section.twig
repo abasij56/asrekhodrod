@@ -1,0 +1,55 @@
+{% if related_has_content and (related_cards|length > 0 or related_has_archive) %}
+  <section
+    class="ci-related-slide ci-section--related {{ section_modifier_class }}"
+    id="{{ block.anchor|default(related_default_anchor) }}"
+  >
+    <div class="container ci-related__inner">
+      <div class="ci-related__panel">
+        {% if related_title %}
+          <h2 class="ci-related__title">{{ related_title }}</h2>
+        {% endif %}
+
+        <div class="ci-related">
+          {% for card in related_cards %}
+            {% if card.link %}
+              <a href="{{ card.link }}" class="ci-related-card">
+            {% else %}
+              <div class="ci-related-card">
+            {% endif %}
+              {% if card.image %}
+                <img
+                  src="{{ card.image.url }}"
+                  alt="{{ card.image.alt }}"
+                  width="{{ card.image.width }}"
+                  height="{{ card.image.height }}"
+                  loading="lazy"
+                  decoding="async"
+                />
+              {% endif %}
+              {% if card.title or card.subtitle %}
+                <div class="ci-related-card__body">
+                  {% if card.title %}
+                    <strong>{{ card.title }}</strong>
+                  {% endif %}
+                  {% if card.subtitle %}
+                    <div class="ci-related-card__score">{{ card.subtitle }}</div>
+                  {% endif %}
+                </div>
+              {% endif %}
+            {% if card.link %}
+              </a>
+            {% else %}
+              </div>
+            {% endif %}
+          {% endfor %}
+
+          {% if related_has_archive %}
+            <a href="{{ related_archive_href }}" class="ci-related-card ci-related-card--more">
+              {{ related_archive_title }}
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+{% endif %}

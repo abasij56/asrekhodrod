@@ -1,0 +1,31 @@
+{
+  "name": "sql-server-exporter",
+  "version": "1.0.0",
+  "description": "Internal migration utility to extract SQL Server data for WordPress migration",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "docs": "node scripts/generate-db-docs.mjs --all --fresh",
+    "export:sample": "node scripts/export-wordpress-sample.mjs --limit 100",
+    "export:all": "node scripts/export-wordpress-sample.mjs --all",
+    "export:magazines": "node scripts/export-wordpress-sample.mjs --magazine-limit 0",
+    "enrich:post-images": "node scripts/export-wordpress-sample.mjs --enrich-images-only --no-resume --source=front",
+    "enrich:post-images:skip": "node scripts/export-wordpress-sample.mjs --enrich-images-only --skip-content-file-images --source=front",
+    "test:back-recovery": "node scripts/test-back-recovery.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "mssql": "^11.0.1"
+  },
+  "devDependencies": {
+    "@types/mssql": "^9.1.5",
+    "@types/node": "^22.10.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}

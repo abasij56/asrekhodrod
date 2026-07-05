@@ -1,0 +1,28 @@
+{% set rail = sidebar_rail|default({}) %}
+{% set show_popular_2day = show_popular_2day|default(true) %}
+{% set show_kiosk = show_kiosk|default(true) %}
+{% set show_latest = show_latest|default(true) %}
+
+<aside class="sidebar-rail" role="complementary" aria-label="ستون جانبی">
+  {% if show_popular_2day and rail.popular_2day|length > 0 %}
+    {% include 'partials/widget-popular-posts.twig' with {
+      widget_id: 'popular-week',
+      title: 'پربازدید های هفته',
+      posts: rail.popular_2day,
+      archive_url: rail.popular_2day_archive_url|default('')
+    } only %}
+  {% endif %}
+
+  {% if show_kiosk and rail.kiosk_items|length > 0 %}
+    {% include 'partials/widget-kiosk.twig' with {
+      items: rail.kiosk_items,
+      archive_url: rail.kiosk_archive_url
+    } %}
+  {% endif %}
+
+  {% if show_latest and rail.latest_posts|length > 0 %}
+    {% include 'partials/widget-latest-news.twig' with {
+      posts: rail.latest_posts
+    } %}
+  {% endif %}
+</aside>

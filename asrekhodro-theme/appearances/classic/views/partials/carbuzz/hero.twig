@@ -1,0 +1,29 @@
+{% import 'partials/macros.twig' as ak %}
+
+{% if hero_main %}
+<section class="cb-hero" aria-labelledby="cb-hero-heading">
+  <a href="{{ hero_main.link }}" class="cb-hero__link">
+    <div class="cb-hero__media">
+      {{ ak.post_image(hero_visual|default(hero_main), 1400, 720, 'eager') }}
+    </div>
+    <div class="cb-hero__overlay">
+      <div class="container cb-hero__content">
+        {% set lead_cat = hero_main.categories|first %}
+        {% if lead_cat %}
+          <span class="cb-hero__tag">{{ lead_cat.name }}</span>
+        {% elseif hero_main.meta('_asrekhodro_over_title') %}
+          <span class="cb-hero__tag">{{ hero_main.meta('_asrekhodro_over_title') }}</span>
+        {% endif %}
+        <h1 id="cb-hero-heading" class="cb-hero__title">{{ hero_main.title }}</h1>
+        <p class="cb-hero__excerpt">{{ ak.list_excerpt(hero_main) }}</p>
+        <div class="cb-hero__meta">
+          {% if hero_main.meta('_asrekhodro_author') %}
+            <span>{{ hero_main.meta('_asrekhodro_author') }}</span>
+          {% endif %}
+          <time datetime="{{ hero_main.date('Y-m-d') }}">{{ ak_post_date(hero_main) }}</time>
+        </div>
+      </div>
+    </div>
+  </a>
+</section>
+{% endif %}

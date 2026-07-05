@@ -1,0 +1,101 @@
+{% if section_title is not defined %}{% set section_title = 'در قاب تصویر' %}{% endif %}
+<section class="picture-frame"{% if section_title|trim != '' %} aria-labelledby="picture-frame-heading"{% endif %}>
+  <div class="picture-frame__stage" data-ak-picture-frame>
+    <div class="picture-frame__backdrops" aria-hidden="true">
+      {% for item in picture_frame_items %}
+        <div class="picture-frame__backdrop{{ loop.last ? ' is-active' : '' }}" data-pf-backdrop>
+          <img src="{{ item.image }}" alt="" width="1920" height="1080" loading="{{ loop.last ? 'eager' : 'lazy' }}" decoding="async" />
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="picture-frame__scrim" aria-hidden="true"></div>
+    <div class="picture-frame__grain" aria-hidden="true"></div>
+
+    <div class="picture-frame__progress" aria-hidden="true">
+      <span class="picture-frame__progress-bar" data-pf-bar></span>
+    </div>
+
+    <header class="picture-frame__header container">
+      <div class="picture-frame__brand">
+        <span class="picture-frame__brand-mark" aria-hidden="true"></span>
+        <div>
+          <p class="picture-frame__kicker">گالری ویژه</p>
+          {% if section_title|trim != '' %}
+            <h2 id="picture-frame-heading">{{ section_title }}</h2>
+          {% endif %}
+        </div>
+      </div>
+      <div class="picture-frame__meta">
+        {% if picture_frame_items|length > 1 %}
+          <span class="picture-frame__counter" data-pf-counter aria-live="polite">
+            <span data-pf-current>01</span>
+            <span class="picture-frame__counter-sep">/</span>
+            <span data-pf-total>{{ '%02d'|format(picture_frame_items|length) }}</span>
+          </span>
+        {% endif %}
+        {% if picture_frame_archive_url %}
+          <a href="{{ picture_frame_archive_url }}" class="picture-frame__archive">آرشیو گالری</a>
+        {% endif %}
+      </div>
+    </header>
+
+    <div class="picture-frame__content container">
+      <div class="picture-frame__slides" data-pf-slides>
+        {% for item in picture_frame_items %}
+          <article class="picture-frame__slide{{ loop.last ? ' is-active' : '' }}" data-pf-slide>
+            <div class="picture-frame__copy">
+              <span class="picture-frame__badge">در قاب تصویر</span>
+              {% if item.caption %}
+                <p class="picture-frame__lead">{{ item.caption }}</p>
+              {% endif %}
+              <h3 class="picture-frame__title">{{ item.title }}</h3>
+              {% if item.link %}
+                <a href="{{ item.link }}" class="picture-frame__cta">
+                  <span>مشاهده مطلب</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+              {% endif %}
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if picture_frame_items|length > 1 %}
+      <div class="picture-frame__dock">
+        <div class="picture-frame__dock-inner container">
+          <button type="button" class="picture-frame__nav picture-frame__nav--prev" data-pf-prev aria-label="اسلاید قبلی">
+            <svg class="picture-frame__nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="picture-frame__filmstrip" data-pf-thumbs role="tablist" aria-label="انتخاب تصویر">
+            {% for item in picture_frame_items %}
+              <button
+                type="button"
+                class="picture-frame__thumb{{ loop.last ? ' is-active' : '' }}"
+                data-pf-thumb="{{ loop.index0 }}"
+                role="tab"
+                aria-selected="{{ loop.last ? 'true' : 'false' }}"
+                aria-label="اسلاید {{ item.rank|persian_digits }}: {{ item.title }}"
+              >
+                <span class="picture-frame__thumb-frame">
+                  <img src="{{ item.thumb }}" alt="" width="120" height="80" loading="lazy" decoding="async" />
+                </span>
+                <span class="picture-frame__thumb-label">{{ item.rank|persian_digits }}</span>
+              </button>
+            {% endfor %}
+          </div>
+
+          <button type="button" class="picture-frame__nav picture-frame__nav--next" data-pf-next aria-label="اسلاید بعدی">
+            <svg class="picture-frame__nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>

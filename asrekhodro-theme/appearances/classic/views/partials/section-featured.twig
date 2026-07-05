@@ -1,0 +1,70 @@
+{% import 'partials/macros.twig' as ak %}
+{% if section_title is not defined %}{% set section_title = 'اخبار ویژه' %}{% endif %}
+
+<section{% if section_title|trim != '' %} aria-labelledby="featured-heading"{% endif %}>
+  {% include 'partials/section-head.twig' with {
+    heading_id: 'featured-heading',
+    section_link_url: news_archive_url,
+    section_link_label: 'مشاهده همه ←'
+  } %}
+
+  {% if featured_posts|length > 0 %}
+    {% set flip_posts = featured_posts|slice(0, 5) %}
+    {% set side_posts = featured_posts|slice(5, 1) %}
+    <div class="news-grid news-grid--featured">
+      {% include 'partials/featured-magazine-flip.twig' with { flip_posts: flip_posts } %}
+      {% for post in side_posts %}
+        <article class="card">
+          <a href="{{ post.link }}">
+            <div class="card__media">
+              {{ ak.post_image(post, 500, 312) }}
+            </div>
+            <div class="card__body">
+              <h3>{{ post.title }}</h3>
+              <div class="card__meta"><time datetime="{{ post.date('Y-m-d') }}">{{ ak_post_date(post) }}</time></div>
+            </div>
+          </a>
+        </article>
+      {% endfor %}
+    </div>
+
+    {% if content_row_ad|length > 0 %}
+    <div class="ad-banner ad-banner--row" role="complementary">
+      <div class="ad-banner__inner">
+        <a
+          href="{{ content_row_ad[0].link }}"
+          class="ad-banner__slot"
+          target="{{ content_row_ad[0].link_target|default('_blank') }}"
+          rel="{{ content_row_ad[0].link_rel|default('noopener noreferrer') }}"
+          {% if content_row_ad[0].image %} style="background-image:url('{{ content_row_ad[0].image }}')"{% endif %}
+        ></a>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="news-grid news-grid--medium">
+      {% for post in featured_posts|slice(6, 4) %}
+        <article class="card card--compact">
+          <a href="{{ post.link }}">
+            <div class="card__media">{{ ak.post_image(post, 400, 250) }}</div>
+            <div class="card__body">
+              <h3>{{ post.title }}</h3>
+              <div class="card__meta"><time datetime="{{ post.date('Y-m-d') }}">{{ ak_post_date(post) }}</time></div>
+            </div>
+          </a>
+        </article>
+      {% endfor %}
+    </div>
+
+    <div class="news-grid news-grid--small">
+      {% for post in featured_posts|slice(11, 3) %}
+        <article class="card card--compact">
+          <a href="{{ post.link }}">
+            <div class="card__media">{{ ak.post_image(post, 400, 250) }}</div>
+            <div class="card__body"><h3>{{ post.title }}</h3></div>
+          </a>
+        </article>
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>

@@ -1,0 +1,41 @@
+{#
+  Homepage main zone: full-bleed blocks (e.g. magazines) render outside .container.page-shell
+  so they can use the same viewport breakout as picture-frame.
+#}
+{% set main_placements = layout_zones.main ?? [] %}
+{% set shell_open = false %}
+{% set main_segment = 0 %}
+{% set sidebar_rendered = false %}
+
+{% for placement in main_placements %}
+  {% if placement.partial and not (placement.block == 'ak-picture-frame' and picture_frame_items|default([])|length == 0) %}
+    {% if placement.full_bleed|default(false) %}
+      {% if shell_open %}
+        </main>
+        {% if has_sidebar and not sidebar_rendered %}
+          {% include 'partials/layout-zone.twig' with { zone: 'sidebar' } %}
+          {% set sidebar_rendered = true %}
+        {% endif %}
+      </div>
+      {% set shell_open = false %}
+      {% endif %}
+      {% include 'partials/layout-placement.twig' with { placement: placement } %}
+    {% else %}
+      {% if not shell_open %}
+        {% set main_segment = main_segment + 1 %}
+        <div class="container page-shell{% if main_segment > 1 or not has_sidebar %} page-shell--full{% endif %}{% if main_segment > 1 %} page-shell--segment{% endif %}">
+          <main class="page-content"{% if main_segment == 1 %} id="main-content"{% endif %}>
+        {% set shell_open = true %}
+      {% endif %}
+      {% include 'partials/layout-placement.twig' with { placement: placement } %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+{% if shell_open %}
+    </main>
+    {% if has_sidebar and not sidebar_rendered %}
+      {% include 'partials/layout-zone.twig' with { zone: 'sidebar' } %}
+    {% endif %}
+  </div>
+{% endif %}

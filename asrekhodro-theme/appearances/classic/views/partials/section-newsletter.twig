@@ -1,0 +1,13 @@
+{% if section_title is not defined %}{% set section_title = 'خبرنامه عصر خودرو' %}{% endif %}
+<section class="newsletter"{% if section_title|trim != '' %} aria-labelledby="newsletter-heading"{% endif %}>
+  <div class="newsletter__content">
+    {% if section_title|trim != '' %}
+      <h2 id="newsletter-heading">{{ section_title }}</h2>
+    {% endif %}
+    <p>هر صبح مهم‌ترین اخبار خودرو، تحلیل بازار و ویدئوهای ویژه را در ایمیل خود دریافت کنید.</p>
+  </div>
+  <form class="newsletter__form" id="newsletter-form" data-ak-newsletter aria-label="فرم عضویت خبرنامه">
+    <input type="email" placeholder="آدرس ایمیل شما" required aria-label="ایمیل" autocomplete="email" />
+    <button type="submit" class="btn btn--primary">عضویت رایگان</button>
+  </form>
+</section>

@@ -1,0 +1,14 @@
+{% if facts_items|length > 0 %}
+  <div class="container ci-facts ci-facts--rfarda" role="list"{% if block.anchor %} id="{{ block.anchor }}"{% endif %}>
+    {% for item in facts_items %}
+      <div class="ci-fact" role="listitem">
+        {% if item.label %}
+          <div class="ci-fact__label">{{ item.label }}</div>
+        {% endif %}
+        {% if item.value %}
+          <div class="ci-fact__value">{{ item.value }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

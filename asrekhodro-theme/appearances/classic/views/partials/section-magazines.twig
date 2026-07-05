@@ -1,0 +1,27 @@
+{% import 'partials/macros.twig' as ak %}
+{% if section_title is not defined %}{% set section_title = 'مجلات روز' %}{% endif %}
+
+<section class="magazines"{% if section_title|trim != '' %} aria-labelledby="magazines-heading"{% endif %}>
+  <div class="container">
+    {% include 'partials/section-head.twig' with {
+      heading_id: 'magazines-heading',
+      section_link_url: ak_magazine_archive_url(),
+      section_link_label: 'آرشیو مجلات ←'
+    } %}
+    <div class="magazine-grid">
+      {% for mag in magazines %}
+        <article class="magazine-item">
+          <a href="{{ mag.link }}">
+            <div class="magazine-item__cover">
+              {{ ak.post_image(mag, 300, 400) }}
+            </div>
+            <h3>{{ mag.title }}</h3>
+            <time>{{ ak_post_date(mag) }}</time>
+          </a>
+        </article>
+      {% else %}
+        <p>مجله‌ای ثبت نشده است.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,15 @@
+{% set ad_limit = placement.data_count|default(placement.count|default(6)) %}
+{% set sidebar_ad_items = placement.sidebar_ads|default([])|slice(0, ad_limit) %}
+{% if sidebar_ad_items|length > 0 %}
+<div class="page-sidebar page-sidebar-ads">
+  <div class="page-sidebar-ads__grid" role="list">
+    {% for ad in sidebar_ad_items %}
+      <a href="{{ ad.link }}" class="ad-sidebar__slot" role="listitem" target="_blank" rel="noopener noreferrer">
+        {% if ad.image %}
+          <img src="{{ ad.image }}" alt="" width="160" height="80" loading="lazy" decoding="async" />
+        {% endif %}
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}

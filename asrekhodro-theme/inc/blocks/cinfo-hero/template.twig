@@ -1,0 +1,33 @@
+<header class="ci-hero ci-hero--classic"{% if block.anchor %} id="{{ block.anchor }}"{% endif %}>
+  <div class="container ci-hero__grid">
+    <div>
+      {% if hero_badge %}
+        <span class="ci-hero__badge">{{ hero_badge }}</span>
+      {% endif %}
+
+      {% if hero_title %}
+        <h1 class="ci-hero__title">{{ hero_title }}</h1>
+      {% endif %}
+
+      {% if hero_subtitle %}
+        <p class="ci-hero__subtitle">{{ hero_subtitle }}</p>
+      {% endif %}
+
+      {% include 'partials/cinfo/hero-score.twig' %}
+    </div>
+
+    {% if hero_image_url %}
+      <figure class="ci-hero__media">
+        <img
+          src="{{ hero_image_url }}"
+          alt="{{ hero_image_alt ?: hero_title }}"
+          width="{{ hero_image_width }}"
+          height="{{ hero_image_height }}"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </figure>
+    {% endif %}
+  </div>
+</header>

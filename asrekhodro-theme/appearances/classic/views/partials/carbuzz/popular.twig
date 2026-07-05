@@ -1,0 +1,20 @@
+{% import 'partials/macros.twig' as ak %}
+
+{% if cb_popular|length > 0 %}
+<section class="cb-section cb-popular" aria-labelledby="cb-popular-heading">
+  <header class="cb-section__head">
+    <h2 id="cb-popular-heading" class="cb-section__title">پربازدیدترین اخبار</h2>
+    <a href="{{ cb_archive_url }}" class="cb-section__more">بیشتر</a>
+  </header>
+  <div class="cb-popular__grid">
+    {% for post in cb_popular %}
+      <article class="cb-popular-card">
+        <a href="{{ post.link }}">
+          <div class="cb-popular-card__media">{{ ak.post_image(post, 400, 250) }}</div>
+          <h3 class="cb-popular-card__title">{{ post.title }}</h3>
+        </a>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}

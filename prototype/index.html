@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="عصر خودرو — مرجع تخصصی اخبار، تحلیل بازار، تست و بررسی خودرو در ایران. آخرین اخبار صنعت خودرو، خودروهای برقی و قیمت روز." />
+  <meta name="keywords" content="اخبار خودرو, قیمت خودرو, خودرو برقی, تست خودرو, عصر خودرو" />
+  <meta name="author" content="عصر خودرو" />
+  <title>عصر خودرو | پایگاه خبری تخصصی صنعت خودرو ایران</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://images.unsplash.com" />
+  <link rel="preconnect" href="https://images.pexels.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+  <!-- 1. TOP HEADER -->
+  <div class="top-header">
+    <div class="container top-header__inner">
+      <div class="top-header__date">
+        <span>امروز:</span>
+        <time id="current-date" datetime=""></time>
+      </div>
+      <form class="top-header__search" role="search" aria-label="جستجو در سایت">
+        <input type="search" placeholder="جستجو در اخبار، خودروها و ویدئوها..." aria-label="عبارت جستجو" />
+        <button type="submit" aria-label="جستجو">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </button>
+      </form>
+      <div class="top-header__social" aria-label="شبکه‌های اجتماعی">
+        <a href="#" title="اینستاگرام" aria-label="اینستاگرام">IG</a>
+        <a href="#" title="تلگرام" aria-label="تلگرام">TG</a>
+        <a href="#" title="یوتیوب" aria-label="یوتیوب">YT</a>
+        <a href="#" title="لینکدین" aria-label="لینکدین">IN</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGO + MAIN NAV -->
+  <header class="site-header">
+    <div class="container">
+      <div class="site-header__brand">
+        <a href="/" class="logo" aria-label="صفحه اصلی عصر خودرو">
+          <div class="logo__mark" aria-hidden="true">AK</div>
+          <div class="logo__text">
+            <strong>عصر خودرو</strong>
+            <span>Asre Khodro · مرجع تخصصی صنعت خودرو</span>
+          </div>
+        </a>
+        <button class="nav-toggle" id="nav-toggle" type="button" aria-label="باز کردن منو" aria-expanded="false" aria-controls="main-nav">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+      <nav class="main-nav" id="main-nav" aria-label="منوی اصلی">
+        <ul class="main-nav__list">
+          <li><a href="#" class="is-active">اخبار خودرو</a></li>
+          <li><a href="#">بازار خودرو</a></li>
+          <li><a href="#">خودروهای داخلی</a></li>
+          <li><a href="#">خودروهای خارجی</a></li>
+          <li><a href="#">خودروهای برقی</a></li>
+          <li><a href="#">تست و بررسی</a></li>
+          <li><a href="#">ویدئو</a></li>
+          <li><a href="#">مجلات</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ADS BELOW NAV — 3 equal slots = site container width -->
+  <div class="container ad-strip">
+    <div class="ad-strip__inner" role="complementary" aria-label="تبلیغات">
+      <a href="#" class="ad-strip__slot"><span>ایران‌خودا · پیش‌فروش پژو ۲۰۷ و تارا</span></a>
+      <a href="#" class="ad-strip__slot"><span>سایپا · خدمات پس از فروش سراسری</span></a>
+      <a href="#" class="ad-strip__slot"><span>بهمن موتور · دیگنیتی پرایم ۱۴۰۵</span></a>
+    </div>
+  </div>
+
+  <!-- BREAKING NEWS — full site width -->
+  <div class="container ticker-wrap">
+    <aside class="ticker" aria-label="آخرین خبرهای فوری">
+      <div class="ticker__inner">
+        <div class="ticker__label">خبر فوری</div>
+        <div class="ticker__track">
+          <ul class="ticker__list">
+            <li><a href="#">قیمت دلار بازار خودرو را متلاطم کرد — جزئیات نوسانات امروز</a></li>
+            <li><a href="#">رونمایی رسمی شاسی‌بلند برقی جدید در نمایشگاه شانگهای ۲۰۲۶</a></li>
+            <li><a href="#">ایران‌خودو برنامه تولید ۱۴۰۵ را اعلام کرد</a></li>
+            <li><a href="#">سقف واردات خودروهای هیبریدی تغییر کرد</a></li>
+            <li><a href="#">تست تصادفی پنج ستاره برای کراس‌اوور جدید چینی</a></li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="container page-shell">
+    <!-- MAIN CONTENT -->
+    <main class="page-content" id="main-content">
+
+      <!-- HERO — large image + 4 text news on left -->
+      <section class="hero" aria-labelledby="hero-heading">
+        <article class="hero__main">
+          <img src="https://images.unsplash.com/photo-1617788138017-80ad40651399?w=1200&q=80&auto=format&fit=crop" alt="خودروی برقی تسلا در جاده" width="1200" height="800" loading="eager" />
+          <div class="hero__content">
+            <span class="tag tag--ev">خودرو برقی</span>
+            <h1 id="hero-heading">انقلاب برقی در ایران: آیا بازار ۱۴۰۵ آماده تحول است؟</h1>
+            <p>با افزایش تقاضا برای خودروهای برقی و ورود برندهای جدید، کارشناسان پیش‌بینی می‌کنند سهم EVها در بازار ایران تا پایان decade به ۱۵ درصد برسد.</p>
+            <a href="#" class="btn btn--primary">ادامه مطلب</a>
+          </div>
+        </article>
+        <aside class="hero__side" aria-label="اخبار مهم">
+          <article class="hero-text-item">
+            <a href="#">
+              <span class="tag tag--breaking">فوری</span>
+              <h3>سایپا طرح پیش‌فروش جدید خودروهای دنا و شاهین را اعلام کرد</h3>
+              <time datetime="2026-06-10">۱۰ خرداد ۱۴۰۵</time>
+            </a>
+          </article>
+          <article class="hero-text-item">
+            <a href="#">
+              <h3>پژو ۲۰۸ فیس‌لیفت ۲۰۲۶ با موتور هیبریدی معرفی شد</h3>
+              <time datetime="2026-06-10">۱۰ خرداد ۱۴۰۵</time>
+            </a>
+          </article>
+          <article class="hero-text-item">
+            <a href="#">
+              <h3>فراری اولین مدل تمام‌برقی خود را در موناکو رونمایی کرد</h3>
+              <time datetime="2026-06-09">۹ خرداد ۱۴۰۵</time>
+            </a>
+          </article>
+          <article class="hero-text-item">
+            <a href="#">
+              <span class="tag tag--market">بازار</span>
+              <h3>تحلیل بازار خودرو در خرداد ۱۴۰۵: روند قیمت‌ها و پیش‌بینی کارشناسان</h3>
+              <time datetime="2026-06-08">۸ خرداد ۱۴۰۵</time>
+            </a>
+          </article>
+        </aside>
+      </section>
+
+      <!-- 6. FEATURED NEWS GRID -->
+      <section aria-labelledby="featured-heading">
+        <div class="section-head">
+          <h2 id="featured-heading">اخبار ویژه</h2>
+          <a href="#">مشاهده همه ←</a>
+        </div>
+
+        <div class="news-grid news-grid--featured">
+          <article class="card card--lead">
+            <a href="#">
+              <div class="card__media">
+                <img src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&q=80&auto=format&fit=crop" alt="مرسدس بنز لوکس" width="800" height="600" loading="lazy" />
+                <span class="tag tag--market">بازار خودرو</span>
+              </div>
+              <div class="card__body">
+                <h3>تحلیل بازار خودرو در خرداد ۱۴۰۵: روند قیمت‌ها و پیش‌بینی کارشناسان</h3>
+                <p>با ثبات نسبی نرخ ارز، بازار خودرو در هفته گذشته روند متعادلی را تجربه کرد. کارشناسان عصر خودرو عوامل مؤثر بر قیمت‌ها در ماه‌های پیش‌رو را بررسی کرده‌اند.</p>
+                <div class="card__meta"><time datetime="2026-06-10">۱۰ خرداد ۱۴۰۵</time><span>۸ دقیقه مطالعه</span></div>
+              </div>
+            </a>
+          </article>
+          <article class="card">
+            <a href="#">
+              <div class="card__media">
+                <img src="https://images.pexels.com/photos/1149137/pexels-photo-1149137.jpeg?auto=compress&cs=tinysrgb&w=500" alt="خودروی آفرود" width="500" height="312" loading="lazy" />
+                <span class="tag tag--breaking">فوری</span>
+              </div>
+              <div class="card__body">
+                <h3>سایپا طرح پیش‌فروش جدید خودروهای دنا و شاهین را اعلام کرد</h3>
+                <div class="card__meta"><time datetime="2026-06-10">امروز</time></div>
+              </div>
+            </a>
+          </article>
+          <article class="card">
+            <a href="#">
+              <div class="card__media">
+                <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=500&q=80&auto=format&fit=crop" alt="خودروی اسپرت" width="500" height="312" loading="lazy" />
+                <span class="tag tag--ev">برقی</span>
+              </div>
+              <div class="card__body">
+                <h3>BYD Atto 3 رکورد فروش ماهانه در اروپا را شکست</h3>
+                <div class="card__meta"><time datetime="2026-06-09">دیروز</time></div>
+              </div>
+            </a>
+          </article>
+        </div>
+
+        <div class="ad-banner ad-banner--row" role="complementary" aria-label="تبلیغات">
+          <div class="ad-banner__inner">
+            <a href="#" class="ad-banner__slot"><span>سایپا · خدمات پس از فروش سراسری — ۱۵۰۰</span></a>
+          </div>
+        </div>
+
+        <div class="news-grid news-grid--medium">
+          <article class="card card--compact">
+            <a href="#"><div class="card__media"><img src="https://images.pexels.com/photos/359392/pexels-photo-359392.jpeg?auto=compress&cs=tinysrgb&w=400" alt="" width="400" height="250" loading="lazy" /></div><div class="card__body"><h3>تغییرات جدید در آیین‌نامه واردات خودرو اعلام شد</h3><div class="card__meta"><time>۸ خرداد</time></div></div></a>
+          </article>
+          <article class="card card--compact">
+            <a href="#"><div class="card__media"><img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&q=80&auto=format&fit=crop" alt="" width="400" height="250" loading="lazy" /></div><div class="card__body"><h3>پورشه ۹۱۱ جدید با موتور ۶ سیلندر توربو معرفی شد</h3><div class="card__meta"><time>۷ خرداد</time></div></div></a>
+          </article>
+          <article class="card card--compact">
+            <a href="#"><div class="card__media"><img src="https://images.pexels.com/photos/919073/pexels-photo-919073.jpeg?auto=compress&cs=tinysrgb&w=400" alt="" width="400" height="250" loading="lazy" /></div><div class="card__body"><h3>رشد ۳۲ درصدی فروش خودروهای لوکس در خاورمیانه</h3><div class="card__meta"><time>۶ خرداد</time></div></div></a>
+          </article>
+          <article class="card card--compact">
+            <a href="#"><div class="card__media"><img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400&q=80&auto=format&fit=crop" alt="" width="400" height="250" loading="lazy" /></div><div class="card__body"><h3>شتاب‌گیری تولید باتری لیتیومی در منطقه آزاد چابهار</h3><div class="card__meta"><time>۵ خرداد</time></div></div></a>
+          </article>
+        </div>
+
+        <div class="news-grid news-grid--small">
+          <article class="card card--compact"><a href="#"><div class="card__media"><img src="https://images.pexels.com/photos/112460/pexels-photo-112460.jpeg?auto=compress&cs=tinysrgb&w=400" alt="" loading="lazy" /></div><div class="card__body"><h3>مجلس طرح حمایت از خودروسازان داخلی را بررسی می‌کند</h3></div></a></article>
+          <article class="card card--compact"><a href="#"><div class="card__media"><img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400&q=80&auto=format&fit=crop" alt="" loading="lazy" /></div><div class="card__body"><h3>هیوندای سوناتا ۲۰۲۶ با طراحی جدید وارد بازار جهانی شد</h3></div></a></article>
+          <article class="card card--compact"><a href="#"><div class="card__media"><img src="https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?auto=compress&cs=tinysrgb&w=400" alt="" loading="lazy" /></div><div class="card__body"><h3>ایستگاه‌های شارژ سریع در بزرگراه‌های تهران تا ۲۰۰ واحد افزایش می‌یابد</h3></div></a></article>
+        </div>
+      </section>
+
+      <!-- NEWS LIST — asrekhodro classic format (~40 items), 2 columns -->
+      <section class="news-list-section" aria-labelledby="news-list-heading">
+        <div class="section-head">
+          <h2 id="news-list-heading">آخرین اخبار خودرو</h2>
+          <a href="#">آرشیو اخبار ←</a>
+        </div>
+        <ul class="news-list" id="news-list" role="list">
+          <!-- populated by app.js -->
+        </ul>
+        <div class="news-list__more">
+          <a href="#" class="btn btn--outline">مشاهده اخبار بیشتر</a>
+        </div>
+      </section>
+
+      <!-- 7. MAGAZINE SECTION -->
+      <section class="magazines" aria-labelledby="magazines-heading">
+        <div class="container">
+          <div class="section-head">
+            <h2 id="magazines-heading">مجلات روز</h2>
+            <a href="#">آرشیو مجلات ←</a>
+          </div>
+          <div class="magazine-grid">
+            <article class="magazine-item">
+              <a href="#"><div class="magazine-item__cover"><img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=300&q=80&auto=format&fit=crop" alt="جلد مجله شماره ۴۵۲" width="300" height="400" loading="lazy" /></div><h3>شماره ۴۵۲ — ویژه خودروهای برقی</h3><time>خرداد ۱۴۰۵</time></a>
+            </article>
+            <article class="magazine-item">
+              <a href="#"><div class="magazine-item__cover"><img src="https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg?auto=compress&cs=tinysrgb&w=300" alt="جلد مجله شماره ۴۵۱" width="300" height="400" loading="lazy" /></div><h3>شماره ۴۵۱ — نمایشگاه ژنو</h3><time>اردیبهشت ۱۴۰۵</time></a>
+            </article>
+            <article class="magazine-item">
+              <a href="#"><div class="magazine-item__cover"><img src="https://images.unsplash.com/photo-1583121274602-3e2820c59d9f?w=300&q=80&auto=format&fit=crop" alt="جلد مجله شماره ۴۵۰" width="300" height="400" loading="lazy" /></div><h3>شماره ۴۵۰ — ابرخودروها</h3><time>اردیبهشت ۱۴۰۵</time></a>
+            </article>
+            <article class="magazine-item">
+              <a href="#"><div class="magazine-item__cover"><img src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=300&q=80&auto=format&fit=crop" alt="جلد مجله شماره ۴۴۹" width="300" height="400" loading="lazy" /></div><h3>شماره ۴۴۹ — لوکس و پریمیوم</h3><time>فروردین ۱۴۰۵</time></a>
+            </article>
+            <article class="magazine-item">
+              <a href="#"><div class="magazine-item__cover"><img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=300&q=80&auto=format&fit=crop" alt="جلد مجله شماره ۴۴۸" width="300" height="400" loading="lazy" /></div><h3>شماره ۴۴۸ — آفرود و SUV</h3><time>فروردین ۱۴۰۵</time></a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <div class="ad-banner ad-banner--row" role="complementary" aria-label="تبلیغات">
+        <div class="ad-banner__inner">
+          <a href="#" class="ad-banner__slot"><span>بیمه خودرو · تخفیف ویژه تمدید — همین حالا</span></a>
+        </div>
+      </div>
+
+      <!-- 8. VIDEO SECTION -->
+      <section class="videos" aria-labelledby="videos-heading">
+        <div class="section-head">
+          <h2 id="videos-heading">ویدئوهای عصر خودرو</h2>
+          <a href="#">همه ویدئوها ←</a>
+        </div>
+        <div class="video-grid">
+          <article class="video-card video-card--lead">
+            <img src="https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?auto=compress&cs=tinysrgb&w=900" alt="تست رانندگی خودرو برقی" width="900" height="506" loading="lazy" />
+            <div class="video-card__play" aria-hidden="true"></div>
+            <div class="video-card__info">
+              <h3>تست و بررسی کامل تسلا مدل Y در جاده‌های ایران — آیا ارزش خرید دارد؟</h3>
+              <span>۲۴:۱۵ · ۱۴۵ هزار بازدید</span>
+            </div>
+          </article>
+          <article class="video-card">
+            <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=500&q=80&auto=format&fit=crop" alt="مقایسه خودرو" width="500" height="281" loading="lazy" />
+            <div class="video-card__play" aria-hidden="true"></div>
+            <div class="video-card__info"><h3>مقایسه تیگو ۸ پرو و هایما S7</h3><span>۱۲:۴۰</span></div>
+          </article>
+          <article class="video-card">
+            <img src="https://images.pexels.com/photos/1149137/pexels-photo-1149137.jpeg?auto=compress&cs=tinysrgb&w=500" alt="رونمایی خودرو" width="500" height="281" loading="lazy" />
+            <div class="video-card__play" aria-hidden="true"></div>
+            <div class="video-card__info"><h3>گزارش زنده از نمایشگاه تهران</h3><span>۱۸:۰۵</span></div>
+          </article>
+          <article class="video-card">
+            <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500&q=80&auto=format&fit=crop" alt="تست شتاب" width="500" height="281" loading="lazy" />
+            <div class="video-card__play" aria-hidden="true"></div>
+            <div class="video-card__info"><h3>تست شتاب ۰ تا ۱۰۰ پورشه</h3><span>۸:۲۰</span></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- 9. CAR MARKET -->
+      <section class="market" aria-labelledby="market-heading">
+        <div class="section-head">
+          <h2 id="market-heading">قیمت خودرو</h2>
+          <a href="#">جدول کامل قیمت‌ها ←</a>
+        </div>
+        <div class="market-grid">
+          <article class="market-card">
+            <div class="market-card__brand">ایران‌خودا</div>
+            <h3>پژو ۲۰۷ اتوماتیک</h3>
+            <div class="market-card__price">۱,۲۸۵,۰۰۰,۰۰۰ تومان</div>
+            <div class="market-card__change market-card__change--up">▲ ۱.۲٪ نسبت به هفته قبل</div>
+          </article>
+          <article class="market-card">
+            <div class="market-card__brand">سایپا</div>
+            <h3>شاهین G اتوماتیک</h3>
+            <div class="market-card__price">۹۸۵,۰۰۰,۰۰۰ تومان</div>
+            <div class="market-card__change market-card__change--down">▼ ۰.۸٪ نسبت به هفته قبل</div>
+          </article>
+          <article class="market-card">
+            <div class="market-card__brand">بهمن موتور</div>
+            <h3>دیگنیتی پرایم</h3>
+            <div class="market-card__price">۱,۵۶۰,۰۰۰,۰۰۰ تومان</div>
+            <div class="market-card__change market-card__change--stable">— بدون تغییر</div>
+          </article>
+          <article class="market-card">
+            <div class="market-card__brand">مدیران خودرو</div>
+            <h3>تیگو ۷ پرو MHEV</h3>
+            <div class="market-card__price">۱,۷۲۰,۰۰۰,۰۰۰ تومان</div>
+            <div class="market-card__change market-card__change--up">▲ ۲.۱٪ نسبت به هفته قبل</div>
+          </article>
+        </div>
+      </section>
+
+      <div class="ad-banner ad-banner--row" role="complementary" aria-label="تبلیغات">
+        <div class="ad-banner__inner">
+          <a href="#" class="ad-banner__slot"><span>نمایندگی رسمی · تست رانندگی رایگان — رزرو کنید</span></a>
+        </div>
+      </div>
+
+      <!-- 10. CAR REVIEWS -->
+      <section class="reviews" aria-labelledby="reviews-heading">
+        <div class="section-head">
+          <h2 id="reviews-heading">تست و بررسی خودرو</h2>
+          <a href="#">همه بررسی‌ها ←</a>
+        </div>
+        <div class="review-grid">
+          <article class="review-card">
+            <a href="#">
+              <div class="review-card__media">
+                <img src="https://images.unsplash.com/photo-1617788138017-80ad40651399?w=600&q=80&auto=format&fit=crop" alt="تست تسلا" width="600" height="375" loading="lazy" />
+                <div class="review-card__score">9.2</div>
+              </div>
+              <div class="review-card__body">
+                <span class="tag tag--review">بررسی اختصاصی</span>
+                <h3>تسلا مدل ۳ های‌لند: بهترین EV در کلاس خود؟</h3>
+                <p>پس از ۵۰۰ کیلومتر رانندگی در شرایط شهری و برون‌شهری، نقاط قوت و ضعف پرفروش‌ترین خودروی برقی جهان را بررسی کردیم.</p>
+              </div>
+            </a>
+          </article>
+          <article class="review-card">
+            <a href="#">
+              <div class="review-card__media">
+                <img src="https://images.pexels.com/photos/919073/pexels-photo-919073.jpeg?auto=compress&cs=tinysrgb&w=600" alt="تست BMW" width="600" height="375" loading="lazy" />
+                <div class="review-card__score">8.7</div>
+              </div>
+              <div class="review-card__body">
+                <span class="tag tag--review">مقایسه</span>
+                <h3>BMW سری ۵ در برابر مرسدس کلاس E</h3>
+                <p>دو غول آلمانی در نبرد سدان‌های لوکس — کدام‌یک برای راننده ایرانی انتخاب بهتری است؟</p>
+              </div>
+            </a>
+          </article>
+          <article class="review-card">
+            <a href="#">
+              <div class="review-card__media">
+                <img src="https://images.pexels.com/photos/359392/pexels-photo-359392.jpeg?auto=compress&cs=tinysrgb&w=600" alt="تست شاسی‌بلند" width="600" height="375" loading="lazy" />
+                <div class="review-card__score">8.1</div>
+              </div>
+              <div class="review-card__body">
+                <span class="tag tag--review">تست طولانی‌مدت</span>
+                <h3>یک ماه با کوپه رنگ ROX — تجربه مالکیت</h3>
+                <p>هزینه نگهداری، مصرف سوخت واقعی و رضایت کلی پس از ۳۰ روز استفاده روزانه در تهران.</p>
+              </div>
+            </a>
+          </article>
+        </div>
+      </section>
+
+      <!-- 11. NEWSLETTER -->
+      <section class="newsletter" aria-labelledby="newsletter-heading">
+        <div class="newsletter__content">
+          <h2 id="newsletter-heading">خبرنامه عصر خودرو</h2>
+          <p>هر صبح مهم‌ترین اخبار خودرو، تحلیل بازار و ویدئوهای ویژه را در ایمیل خود دریافت کنید. بیش از ۸۵ هزار خودرویی عضو خبرنامه ما هستند.</p>
+        </div>
+        <form class="newsletter__form" id="newsletter-form" aria-label="فرم عضویت خبرنامه">
+          <input type="email" placeholder="آدرس ایمیل شما" required aria-label="ایمیل" autocomplete="email" />
+          <button type="submit" class="btn btn--primary">عضویت رایگان</button>
+        </form>
+      </section>
+
+    </main>
+
+    <!-- LEFT SIDEBAR ADS (160×80) -->
+    <aside class="page-sidebar" role="complementary" aria-label="تبلیغات کناری">
+      <p class="ad-sidebar__label">تبلیغات</p>
+      <a href="#" class="ad-sidebar__slot">بانک ملت · وام خودرو</a>
+      <a href="#" class="ad-sidebar__slot">کاسترول · روغن موتور</a>
+      <a href="#" class="ad-sidebar__slot">بیمه پارسیان</a>
+      <a href="#" class="ad-sidebar__slot">لاستیک بارز</a>
+      <a href="#" class="ad-sidebar__slot">هیوندای · آوان</a>
+      <a href="#" class="ad-sidebar__slot">MVM · مدیران خودرو</a>
+    </aside>
+  </div>
+
+  <!-- 12. FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="logo">
+            <div class="logo__mark" aria-hidden="true">AK</div>
+            <div class="logo__text">
+              <strong>عصر خودرو</strong>
+              <span>Asre Khodro</span>
+            </div>
+          </a>
+          <p>عصر خودرو بزرگ‌ترین پایگاه خبری–تحلیلی حوزه خودرو در ایران است. ما با تیمی از روزنامه‌نگاران و کارشناسان صنعت خودرو، آخرین اخبار، تحلیل بازار و بررسی تخصصی را ارائه می‌دهیم.</p>
+        </div>
+        <div class="footer-col">
+          <h4>درباره ما</h4>
+          <ul>
+            <li><a href="#">تاریخچه</a></li>
+            <li><a href="#">تیم تحریریه</a></li>
+            <li><a href="#">تماس با ما</a></li>
+            <li><a href="#">تبلیغات</a></li>
+            <li><a href="#">فرصت‌های شغلی</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>دسته‌بندی‌ها</h4>
+          <ul>
+            <li><a href="#">اخبار خودرو</a></li>
+            <li><a href="#">بازار خودرو</a></li>
+            <li><a href="#">خودروهای برقی</a></li>
+            <li><a href="#">تست و بررسی</a></li>
+            <li><a href="#">ویدئو</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>تماس</h4>
+          <address>
+            <ul>
+              <li>تهران، خیابان ولیعصر، برج میلاد</li>
+              <li><a href="tel:+982188888888">۰۲۱-۸۸۸۸۸۸۸۸</a></li>
+              <li><a href="mailto:info@asrekhodro.com">info@asrekhodro.com</a></li>
+            </ul>
+          </address>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© ۱۴۰۵ عصر خودرو — تمامی حقوق محفوظ است.</span>
+        <div class="footer-bottom__social" aria-label="شبکه‌های اجتماعی">
+          <a href="#" aria-label="اینستاگرام">IG</a>
+          <a href="#" aria-label="تلگرام">TG</a>
+          <a href="#" aria-label="یوتیوب">YT</a>
+          <a href="#" aria-label="توییتر">X</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/app.js" defer></script>
+</body>
+</html>

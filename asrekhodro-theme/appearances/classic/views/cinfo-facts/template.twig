@@ -1,0 +1,16 @@
+{% if facts_items|length > 0 %}
+  <section class="ci-facts-section">
+    <div class="container ci-facts ci-facts--classic" role="list"{% if block.anchor %} id="{{ block.anchor }}"{% endif %}>
+      {% for item in facts_items %}
+        <div class="ci-fact" role="listitem">
+          {% if item.label %}
+            <div class="ci-fact__label">{{ item.label }}</div>
+          {% endif %}
+          {% if item.value %}
+            <div class="ci-fact__value">{{ item.value }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}

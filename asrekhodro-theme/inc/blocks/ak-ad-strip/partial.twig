@@ -1,0 +1,22 @@
+{% set strip_ads = placement.menu_strip_ads is defined ? placement.menu_strip_ads : (menu_strip_ads|default([])) %}
+{% if strip_ads|length > 0 %}
+<div class="container ad-strip{% if strip_ads|length == 1 %} ad-strip--single{% endif %}">
+  <div
+    class="ad-strip__inner"
+    role="complementary"
+    aria-label="نوار تبلیغات"
+    style="--ad-strip-cols: {{ strip_ads|length }}"
+  >
+    {% for ad in strip_ads %}
+      <a
+        href="{{ ad.link }}"
+        class="ad-strip__slot"
+        target="_blank"
+        rel="noopener noreferrer"
+        {% if ad.title|default('') %}title="{{ ad.title }}"{% endif %}
+        {% if ad.image %} style="background-image:url('{{ ad.image }}')"{% endif %}
+      ></a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
