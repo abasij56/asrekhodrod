@@ -164,6 +164,14 @@ return array(
 				array( 'zone' => 'main', 'block' => 'ak-page-content' ),
 			),
 		),
+		'page_carsinfo_directory' => array(
+			'label'       => 'دانشنامه خودرو',
+			'layout_mode' => 'blocks',
+			'zones'       => $block_page_zones,
+			'defaults'    => array(
+				array( 'zone' => 'main', 'block' => 'ak-page-content' ),
+			),
+		),
 		'carsinfo_3d2' => array(
 			'label'       => 'اطلاعات خودرو — 3D2',
 			'layout_mode' => 'system',

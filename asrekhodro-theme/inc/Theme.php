@@ -43,11 +43,15 @@ final class Theme {
 		require_once ASREKHODRO_THEME_DIR . '/inc/AcfFields.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/FooterSocial.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/CarsInfo.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/CarsInfoDirectory.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/CarInfo3d.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/ThemeModels.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/CinfoToc.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/AdminPostList.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/AdminAds.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/AdminCategoryParent.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/CarBrandAssets.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/AdminCategoryBrandLogo.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/Appearances/ClassicAppearance.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/Appearances/ModernAppearance.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/Appearances/ModernBlueAppearance.php';
@@ -77,6 +81,8 @@ final class Theme {
 		AjaxSearch::init();
 		AdminPostList::init();
 		AdminAds::init();
+		AdminCategoryParent::init();
+		AdminCategoryBrandLogo::init();
 		ContactForm::init();
 		Comments::init();
 		SinglePost::init();

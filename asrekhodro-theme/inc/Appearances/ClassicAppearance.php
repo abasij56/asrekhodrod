@@ -5,6 +5,7 @@ namespace AsreKhodro\Theme\Appearances;
 use AsreKhodro\Theme\AboutPage;
 use AsreKhodro\Theme\Appearance;
 use AsreKhodro\Theme\CarInfo3d;
+use AsreKhodro\Theme\CarsInfoDirectory;
 use AsreKhodro\Theme\CinfoBlocks;
 use AsreKhodro\Theme\Comments;
 use AsreKhodro\Theme\Setup;
@@ -64,6 +65,26 @@ class ClassicAppearance {
 				Appearance::asset_url( 'css/not-found.css' ),
 				array( 'asrekhodro-style' ),
 				ASREKHODRO_THEME_VERSION
+			);
+		}
+
+		if ( CarsInfoDirectory::needs_assets() ) {
+			wp_enqueue_style(
+				'asrekhodro-carsinfo-directory',
+				Appearance::asset_url( 'css/carsinfo-directory.css' ),
+				array( 'asrekhodro-style' ),
+				ASREKHODRO_THEME_VERSION
+			);
+
+			wp_enqueue_script(
+				'asrekhodro-carsinfo-directory',
+				Appearance::asset_url( 'js/carsinfo-directory.js' ),
+				array(),
+				ASREKHODRO_THEME_VERSION,
+				array(
+					'strategy'  => 'defer',
+					'in_footer' => true,
+				)
 			);
 		}
 

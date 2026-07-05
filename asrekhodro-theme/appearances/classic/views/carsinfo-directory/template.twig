@@ -1,0 +1,94 @@
+<section
+  class="carsinfo-directory"
+  data-carsinfo-directory
+  {% if block.anchor %}id="{{ block.anchor }}"{% endif %}
+  aria-label="{{ directory_title|default('دانشنامه خودرو')|e('html_attr') }}"
+>
+  <div class="container">
+    {% if not directory_configured %}
+      <div class="carsinfo-directory__notice" role="status">
+        {{ directory_config_message }}
+      </div>
+    {% else %}
+      <header class="carsinfo-directory__hero">
+        {% if directory_eyebrow %}
+          <p class="carsinfo-directory__eyebrow">{{ directory_eyebrow }}</p>
+        {% endif %}
+        {% if directory_title %}
+          <h1 class="carsinfo-directory__title">{{ directory_title }}</h1>
+        {% endif %}
+        {% if directory_lead %}
+          <p class="carsinfo-directory__lead">{{ directory_lead }}</p>
+        {% endif %}
+
+        {% if directory_show_steps %}
+          <div class="carsinfo-directory__steps" aria-label="مراحل">
+            <div class="carsinfo-directory__step is-active" data-dir-step="brands">
+              <span class="carsinfo-directory__step-num">۱</span>
+              انتخاب برند
+            </div>
+            <div class="carsinfo-directory__step" data-dir-step="models">
+              <span class="carsinfo-directory__step-num">۲</span>
+              انتخاب مدل
+            </div>
+            <div class="carsinfo-directory__step" data-dir-step="hub">
+              <span class="carsinfo-directory__step-num">۳</span>
+              صفحه خودرو
+            </div>
+          </div>
+        {% endif %}
+      </header>
+
+      <div class="carsinfo-directory__toolbar">
+        <label class="carsinfo-directory__search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input
+            type="search"
+            data-dir-search
+            placeholder="{{ directory_search_placeholder|e('html_attr') }}"
+            autocomplete="off"
+          />
+        </label>
+        <span class="carsinfo-directory__count" data-dir-count aria-live="polite"></span>
+      </div>
+
+      {% if not directory_has_items and directory_empty_hint %}
+        <div class="carsinfo-directory__notice carsinfo-directory__notice--empty" role="status">
+          {{ directory_empty_hint }}
+        </div>
+      {% endif %}
+
+      <section class="carsinfo-directory__view is-visible" data-dir-view="brands" aria-label="لیست برندها">
+        <div class="carsinfo-directory__filters" data-dir-filters role="group" aria-label="فیلتر کشور"></div>
+        <div class="carsinfo-directory__brands" data-dir-brands></div>
+        <div class="carsinfo-directory__empty" data-dir-brands-empty hidden>
+          <strong>برندی یافت نشد</strong>
+          عبارت جستجو یا فیلتر را تغییر دهید.
+        </div>
+      </section>
+
+      <section class="carsinfo-directory__view" data-dir-view="models" aria-label="لیست مدل‌ها" hidden>
+        <div class="carsinfo-directory__models-head">
+          <button type="button" class="carsinfo-directory__back" data-dir-back>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+            بازگشت به برندها
+          </button>
+          <div class="carsinfo-directory__models-brand">
+            <div class="carsinfo-directory__models-logo" data-dir-models-logo aria-hidden="true"></div>
+            <div>
+              <h2 data-dir-models-name></h2>
+              <p data-dir-models-desc></p>
+            </div>
+          </div>
+        </div>
+        <div class="carsinfo-directory__models" data-dir-models></div>
+        <div class="carsinfo-directory__empty" data-dir-models-empty hidden>
+          <strong>مدلی یافت نشد</strong>
+          عبارت جستجو را تغییر دهید.
+        </div>
+      </section>
+
+      <script type="application/json" data-carsinfo-directory-data>{{ directory_json|raw }}</script>
+    {% endif %}
+  </div>
+</section>

@@ -1,0 +1,464 @@
+body.carsinfo-directory-page {
+  background: var(--surface-alt, #f7f5f1);
+}
+
+.carsinfo-directory {
+  padding: 2rem 0 3rem;
+}
+
+.carsinfo-directory__notice {
+  padding: 1.25rem 1.5rem;
+  border-radius: var(--radius, 12px);
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink-soft);
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.carsinfo-directory__notice--empty {
+  border-color: rgba(225, 6, 0, 0.25);
+  background: var(--brand-soft);
+}
+
+.carsinfo-directory__hero {
+  padding: 0 0 1.5rem;
+  text-align: center;
+}
+
+.carsinfo-directory__eyebrow {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--brand);
+  text-transform: uppercase;
+}
+
+.carsinfo-directory__title {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin-top: 0.5rem;
+}
+
+.carsinfo-directory__lead {
+  margin-top: 0.75rem;
+  color: var(--ink-muted);
+  font-size: 0.95rem;
+  max-width: 520px;
+  margin-inline: auto;
+  line-height: 1.8;
+}
+
+.carsinfo-directory__steps {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.carsinfo-directory__step {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+
+.carsinfo-directory__step.is-active {
+  border-color: var(--brand);
+  color: var(--ink);
+  background: var(--brand-soft);
+}
+
+.carsinfo-directory__step.is-done {
+  color: var(--brand);
+}
+
+.carsinfo-directory__step-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.72rem;
+  background: var(--line-soft);
+}
+
+.carsinfo-directory__step.is-active .carsinfo-directory__step-num,
+.carsinfo-directory__step.is-done .carsinfo-directory__step-num {
+  background: var(--brand);
+  color: #fff;
+}
+
+.carsinfo-directory__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1.75rem 0 1.25rem;
+}
+
+.carsinfo-directory__search {
+  flex: 1;
+  min-width: 220px;
+  max-width: 400px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  transition: border-color var(--transition, 0.2s ease);
+}
+
+.carsinfo-directory__search:focus-within {
+  border-color: var(--brand);
+}
+
+.carsinfo-directory__search svg {
+  width: 18px;
+  height: 18px;
+  color: var(--ink-muted);
+  flex-shrink: 0;
+}
+
+.carsinfo-directory__search input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font: inherit;
+  font-size: 0.9rem;
+  background: transparent;
+}
+
+.carsinfo-directory__count {
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+
+.carsinfo-directory__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.carsinfo-directory__filter {
+  padding: 0.4rem 0.95rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all var(--transition, 0.2s ease);
+}
+
+.carsinfo-directory__filter:hover {
+  border-color: var(--brand);
+  color: var(--ink);
+}
+
+.carsinfo-directory__filter.is-active {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+
+.carsinfo-directory__view {
+  display: none;
+  animation: carsinfoDirFade 0.35s ease;
+}
+
+.carsinfo-directory__view.is-visible {
+  display: block;
+}
+
+@keyframes carsinfoDirFade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.carsinfo-directory__brands {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.carsinfo-directory__brand {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius, 12px);
+  padding: 1.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color var(--transition, 0.2s ease),
+    box-shadow var(--transition, 0.2s ease),
+    transform var(--transition, 0.2s ease);
+}
+
+.carsinfo-directory__brand:hover {
+  border-color: var(--brand);
+  box-shadow: var(--shadow, 0 8px 24px rgba(0, 0, 0, 0.08));
+  transform: translateY(-4px);
+}
+
+.carsinfo-directory__brand-logo {
+  width: 84px;
+  height: 84px;
+  margin: 0 auto 0.85rem;
+  border-radius: 50%;
+  border: 1px solid var(--line-soft);
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 1.28rem;
+  color: var(--brand);
+  background: var(--brand-soft);
+  overflow: hidden;
+}
+
+.carsinfo-directory__brand-logo--image {
+  background: #fff;
+  padding: 0.68rem;
+}
+
+.carsinfo-directory__models-logo img,
+.carsinfo-directory__brand-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.carsinfo-directory__brand-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.carsinfo-directory__brand-meta {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  margin-top: 0.3rem;
+}
+
+.carsinfo-directory__brand-origin {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+  background: var(--surface-alt, #f7f5f1);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.carsinfo-directory__models-head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.carsinfo-directory__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  padding: 0.5rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fff;
+  cursor: pointer;
+  transition: all var(--transition, 0.2s ease);
+}
+
+.carsinfo-directory__back:hover {
+  border-color: var(--brand);
+  color: var(--ink);
+}
+
+.carsinfo-directory__back svg {
+  width: 16px;
+  height: 16px;
+}
+
+.carsinfo-directory__models-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.carsinfo-directory__models-logo {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 1px solid rgba(225, 6, 0, 0.25);
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 1.2rem;
+  color: var(--brand);
+  background: var(--brand-soft);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.carsinfo-directory__models-logo.carsinfo-directory__brand-logo--image {
+  background: #fff;
+  padding: 0.53rem;
+}
+
+.carsinfo-directory__models-brand h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.carsinfo-directory__models-brand p {
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  margin-top: 0.15rem;
+}
+
+.carsinfo-directory__models {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.carsinfo-directory__model {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius, 12px);
+  overflow: hidden;
+  transition:
+    box-shadow var(--transition, 0.2s ease),
+    transform var(--transition, 0.2s ease);
+}
+
+.carsinfo-directory__model:hover {
+  box-shadow: var(--shadow-lg, 0 16px 40px rgba(0, 0, 0, 0.12));
+  transform: translateY(-4px);
+}
+
+.carsinfo-directory__model-link {
+  display: block;
+  color: inherit;
+}
+
+.carsinfo-directory__model-media {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--ink);
+  position: relative;
+}
+
+.carsinfo-directory__model-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.45s ease;
+}
+
+.carsinfo-directory__model:hover .carsinfo-directory__model-media img {
+  transform: scale(1.05);
+}
+
+.carsinfo-directory__model-body {
+  padding: 1.1rem 1.25rem;
+}
+
+.carsinfo-directory__model-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.carsinfo-directory__model-sub {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  margin-top: 0.25rem;
+}
+
+.carsinfo-directory__model-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line-soft);
+}
+
+.carsinfo-directory__model-spec {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: var(--surface-alt, #f7f5f1);
+  padding: 0.25rem 0.55rem;
+  border-radius: 4px;
+}
+
+.carsinfo-directory__model-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--brand);
+}
+
+.carsinfo-directory__empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--ink-muted);
+}
+
+.carsinfo-directory__empty[hidden] {
+  display: none;
+}
+
+.carsinfo-directory__empty strong {
+  display: block;
+  font-size: 1.1rem;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  .carsinfo-directory__brands {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .carsinfo-directory__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .carsinfo-directory__search {
+    max-width: none;
+  }
+}

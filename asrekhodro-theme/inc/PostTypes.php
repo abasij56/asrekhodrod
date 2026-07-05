@@ -147,7 +147,7 @@ final class PostTypes {
 				'has_archive'  => false,
 				'rewrite'      => array( 'slug' => 'carsinfo' ),
 				'menu_icon'    => 'dashicons-car',
-				'supports'     => array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes' ),
+				'supports'     => array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'comments' ),
 				'show_in_rest' => true,
 				'taxonomies'   => array( 'category' ),
 			)

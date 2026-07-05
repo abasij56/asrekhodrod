@@ -1,0 +1,160 @@
+.acf-field[data-key="field_ak_category_brand_logo"] .select2-container,
+.acf-field[data-key="field_ak_category_brand_logo"] .acf-selection {
+  display: none !important;
+}
+
+.ak-brand-logo-picker {
+  position: relative;
+  max-width: 100%;
+  width: min(100%, 460px);
+}
+
+.ak-brand-logo-picker__native {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.ak-brand-logo-picker__control {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  min-height: 42px;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid #8c8f94;
+  border-radius: 4px;
+  background: #fff;
+  color: #2c3338;
+  text-align: start;
+  cursor: pointer;
+  box-shadow: 0 0 0 transparent;
+}
+
+.ak-brand-logo-picker__control:hover,
+.ak-brand-logo-picker.is-open .ak-brand-logo-picker__control {
+  border-color: #2271b1;
+}
+
+.ak-brand-logo-picker__control:focus {
+  border-color: #2271b1;
+  box-shadow: 0 0 0 1px #2271b1;
+  outline: 2px solid transparent;
+}
+
+.ak-brand-logo-picker__thumb {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid #dcdcde;
+  background: #fff;
+  object-fit: contain;
+  display: block;
+}
+
+.ak-brand-logo-picker__thumb.is-empty {
+  background: #f6f7f7;
+}
+
+.ak-brand-logo-picker__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ak-brand-logo-picker__arrow {
+  flex: 0 0 auto;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid #50575e;
+}
+
+.ak-brand-logo-picker__dropdown {
+  position: absolute;
+  z-index: 100000;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  padding: 0.5rem;
+  border: 1px solid #c3c4c7;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.ak-brand-logo-picker__search {
+  display: block;
+  width: 100%;
+  margin: 0 0 0.5rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid #8c8f94;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.ak-brand-logo-picker__search:focus {
+  border-color: #2271b1;
+  box-shadow: 0 0 0 1px #2271b1;
+  outline: 2px solid transparent;
+}
+
+.ak-brand-logo-picker__list {
+  max-height: 280px;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+}
+
+.ak-brand-logo-picker__option,
+.ak-brand-logo-picker__empty {
+  margin: 0;
+  padding: 0.45rem 0.55rem;
+  border-radius: 3px;
+  line-height: 1.4;
+}
+
+.ak-brand-logo-picker__option {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+}
+
+.ak-brand-logo-picker__option:hover,
+.ak-brand-logo-picker__option.is-selected {
+  background: #f0f6fc;
+  color: #1d2327;
+}
+
+.ak-brand-logo-picker__option img {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  border: 1px solid #dcdcde;
+  background: #fff;
+  object-fit: contain;
+}
+
+.ak-brand-logo-picker__option-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ak-brand-logo-picker__empty {
+  color: #646970;
+}

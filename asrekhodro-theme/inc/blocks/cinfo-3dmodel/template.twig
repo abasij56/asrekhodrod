@@ -27,8 +27,8 @@
 
   <div
     class="ci-3dmodel__inner"
-    {% if model_url and model_colors|length %}
-      style="--ci3d-color-swatches: {{ model_colors|length }}"
+    {% if model_url %}
+      style="--ci3d-color-swatches: {{ model_colors|length }}; --ci3d-toolbar-gap-size: {% if model_colors|length %}0.625rem{% else %}0rem{% endif %}"
     {% endif %}
   >
     {% if model_title %}
@@ -39,19 +39,39 @@
       <div class="ci-3dmodel__info">{{ model_extra_info_html|raw }}</div>
     {% endif %}
 
-    {% if model_url and model_colors|length %}
-      <div class="ci-3dmodel__colors" role="group" aria-label="رنگ بدنه">
-        {% for color in model_colors %}
-          {% set is_default = loop.index == model_default_color_index %}
-          <button
-            type="button"
-            class="ci-3dmodel__color{% if is_default %} is-active{% endif %}"
-            data-color="{{ color.hex|e('html_attr') }}"
-            style="--ci3d-color: {{ color.hex|e('html_attr') }}"
-            aria-label="{{ color.label|e('html_attr') }}"
-            aria-pressed="{{ is_default ? 'true' : 'false' }}"
-          ></button>
-        {% endfor %}
+    {% if model_url %}
+      <div class="ci-3dmodel__toolbar">
+        {% if model_colors|length %}
+          <div class="ci-3dmodel__colors" role="group" aria-label="رنگ بدنه">
+            {% for color in model_colors %}
+              {% set is_default = loop.index == model_default_color_index %}
+              <button
+                type="button"
+                class="ci-3dmodel__color{% if is_default %} is-active{% endif %}"
+                data-color="{{ color.hex|e('html_attr') }}"
+                style="--ci3d-color: {{ color.hex|e('html_attr') }}"
+                aria-label="{{ color.label|e('html_attr') }}"
+                aria-pressed="{{ is_default ? 'true' : 'false' }}"
+              ></button>
+            {% endfor %}
+          </div>
+        {% endif %}
+        <div class="ci-3dmodel__zoom" role="group" aria-label="بزرگ‌نمایی مدل">
+          <button type="button" class="ci-3dmodel__zoom-btn" data-ci3d-zoom="in" aria-label="بزرگ‌نمایی" title="Ctrl + اسکرول بالا">
+            <svg class="ci-3dmodel__zoom-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.75"/>
+              <path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+              <path d="M11 8.25v5.5M8.25 11h5.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <button type="button" class="ci-3dmodel__zoom-btn" data-ci3d-zoom="out" aria-label="کوچک‌نمایی" title="Ctrl + اسکرول پایین">
+            <svg class="ci-3dmodel__zoom-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.75"/>
+              <path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+              <path d="M8.25 11h5.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
       </div>
     {% endif %}
   </div>

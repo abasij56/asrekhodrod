@@ -1,0 +1,9 @@
+{% extends 'base.twig' %}
+
+{% block before_main %}
+  {% include 'partials/layout-zone.twig' with { zone: 'before_main' } %}
+{% endblock %}
+
+{% block content %}
+{% embed 'partials/layout-shell.twig' with { shell: 'page', container_modifier: 'page-shell--carsinfo-directory' } %}{% endembed %}
+{% endblock %}

@@ -1,4 +1,5 @@
 {% set is_car_page = 'car-page' in body_class|default('') %}
+{% set is_carsinfo_directory_page = 'carsinfo-directory-page' in body_class|default('') %}
 {% set is_about_page = is_about_page|default(false)
   or layout_page|default('') == 'page_about'
   or placement.layout_page|default('') == 'page_about'
@@ -12,6 +13,12 @@
     </div>
   {% endif %}
 </article>
+{% elseif is_carsinfo_directory_page %}
+<div class="carsinfo-directory-page__content layout-page-content">
+  {% if post.content %}
+    {{ post.content }}
+  {% endif %}
+</div>
 {% elseif is_about_page %}
 <section class="about about--page layout-page-content" aria-labelledby="about-page-title">
   <div class="about--page__backdrop" aria-hidden="true"></div>

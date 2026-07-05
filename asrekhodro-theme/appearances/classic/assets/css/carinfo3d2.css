@@ -133,7 +133,8 @@ body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-comments__panel::after {
 
 body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-specs__panel .ci-table-wrap,
 body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-faq__panel .ci-faq__list,
-body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-comments__panel .ak-comments--embedded.ak-comments--cinfo {
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-comments__panel .ak-comments--embedded.ak-comments--cinfo,
+body.carinfo3d2-page .carinfo3d2-scroll-panel .ci-comments__panel .ak-comments__layout {
   max-height: none;
   overflow: visible;
 }

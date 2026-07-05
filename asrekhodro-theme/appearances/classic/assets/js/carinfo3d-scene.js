@@ -17,17 +17,32 @@ function getIntroCameraDistance() {
   return INTRO_CAMERA_DISTANCE * getResponsiveSceneFactors().cameraDistanceMul;
 }
 
-function bindCanvasZoomControls(controls, domElement) {
+function bindCanvasZoomControls(controls, domElement, camera, syncCameraTargets) {
   controls.enableZoom = true;
-  controls.enablePan = false;
-  controls.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.ROTATE, RIGHT: MOUSE.ROTATE };
-  // Two-finger pinch zoom on touch devices (pan disabled → dolly only).
+  controls.enablePan = true;
+  controls.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.ROTATE, RIGHT: MOUSE.PAN };
+  // One finger rotate; two finger pinch zoom + drag pan.
   controls.touches = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN };
+
+  const dollyOffset = new THREE.Vector3();
 
   const applyZoomLimits = () => {
     const baseDistance = getIntroCameraDistance();
     controls.minDistance = baseDistance * 0.45;
     controls.maxDistance = baseDistance * 1.9;
+  };
+
+  const zoomBy = (factor) => {
+    dollyOffset.subVectors(camera.position, controls.target);
+    const nextDistance = THREE.MathUtils.clamp(
+      dollyOffset.length() * factor,
+      controls.minDistance,
+      controls.maxDistance
+    );
+    dollyOffset.setLength(nextDistance);
+    camera.position.copy(controls.target).add(dollyOffset);
+    syncCameraTargets?.();
+    controls.update();
   };
 
   applyZoomLimits();
@@ -45,7 +60,11 @@ function bindCanvasZoomControls(controls, domElement) {
     { capture: true }
   );
 
-  return applyZoomLimits;
+  return {
+    applyZoomLimits,
+    zoomIn: () => zoomBy(0.86),
+    zoomOut: () => zoomBy(1.16),
+  };
 }
 
 function getResponsiveSceneFactors() {
@@ -186,6 +205,221 @@ const adBoards = {
   gap: AD_BOARD_GAP,
   rowY: 1.05,
 };
+
+const FLOOR_GRID_SIZE = 44;
+const FLOOR_GRID_DIVISIONS = 88;
+const FLOOR_CELL_SIZE = FLOOR_GRID_SIZE / FLOOR_GRID_DIVISIONS;
+const FLOOR_GRID_HALF = FLOOR_GRID_SIZE / 2;
+const FLOOR_WAVE_LINE_COUNT = 2;
+const FLOOR_WAVE_SEGMENT = 5;
+const FLOOR_WAVE_FADE = 5;
+const FLOOR_WAVE_LEAD_FADE = 1.35;
+const FLOOR_WAVE_Y = 0.018;
+const FLOOR_WAVE_COLOR_STRENGTH = 0.9;
+const FLOOR_BASE_COLOR = new THREE.Color(0xf8fafc);
+const _floorWaveDisplayColor = new THREE.Color();
+
+const floorGridWaves3d2 = {
+  group: null,
+  lines: [],
+  dummy: new THREE.Object3D(),
+};
+
+function smoothWaveOpacity(value) {
+  const t = THREE.MathUtils.clamp(value, 0, 1);
+  return t * t * (3 - 2 * t);
+}
+
+function randomFloorWaveTrackIndex() {
+  return THREE.MathUtils.randInt(0, FLOOR_GRID_DIVISIONS - 1);
+}
+
+function createFloorWaveLineConfig(horizontal) {
+  const direction = Math.random() >= 0.5 ? 1 : -1;
+
+  return {
+    horizontal,
+    trackIndex: randomFloorWaveTrackIndex(),
+    direction,
+    head: direction > 0 ? 0 : FLOOR_GRID_DIVISIONS - 1,
+    speed: THREE.MathUtils.lerp(7.5, 11, Math.random()),
+    cellCount: FLOOR_GRID_DIVISIONS,
+  };
+}
+
+function normalizeFloorWaveHead(head) {
+  const count = FLOOR_GRID_DIVISIONS;
+  return ((head % count) + count) % count;
+}
+
+function getFloorWaveDistanceBehind(head, cellIndex, direction) {
+  const count = FLOOR_GRID_DIVISIONS;
+  const raw = direction > 0 ? head - cellIndex : cellIndex - head;
+  const distance = ((raw % count) + count) % count;
+
+  if (distance > count / 2) {
+    return -1;
+  }
+
+  return distance;
+}
+
+function getFloorWaveCellOpacity(distance) {
+  if (distance < 0 || distance >= FLOOR_WAVE_SEGMENT + FLOOR_WAVE_FADE) {
+    return 0;
+  }
+
+  let opacity = 1;
+
+  if (distance < FLOOR_WAVE_LEAD_FADE) {
+    opacity = smoothWaveOpacity(distance / FLOOR_WAVE_LEAD_FADE);
+  }
+
+  if (distance >= FLOOR_WAVE_SEGMENT) {
+    const fadeT = (distance - FLOOR_WAVE_SEGMENT) / FLOOR_WAVE_FADE;
+    opacity *= smoothWaveOpacity(1 - fadeT);
+  }
+
+  return opacity;
+}
+
+function getFloorWaveCellPosition(line, cellIndex) {
+  const along = -FLOOR_GRID_HALF + (cellIndex + 0.5) * FLOOR_CELL_SIZE;
+  const track = -FLOOR_GRID_HALF + (line.trackIndex + 0.5) * FLOOR_CELL_SIZE;
+
+  if (line.horizontal) {
+    return { x: along, y: FLOOR_WAVE_Y, z: track };
+  }
+
+  return { x: track, y: FLOOR_WAVE_Y, z: along };
+}
+
+function getFloorWaveDisplayColor(baseColor, opacity, target = _floorWaveDisplayColor) {
+  const tint = opacity * FLOOR_WAVE_COLOR_STRENGTH;
+  return target.copy(FLOOR_BASE_COLOR).lerp(baseColor, tint);
+}
+
+function initFloorGridWaves3d2(stageGroup) {
+  if (!isCarInfo3d2Page()) {
+    return;
+  }
+
+  const group = new THREE.Group();
+  group.name = 'floor-grid-waves-3d2';
+
+  const cellGeometry = new THREE.PlaneGeometry(
+    FLOOR_CELL_SIZE * 0.94,
+    FLOOR_CELL_SIZE * 0.94
+  );
+  cellGeometry.rotateX(-Math.PI / 2);
+
+  const orientations = [true, false];
+
+  for (let lineIndex = 0; lineIndex < FLOOR_WAVE_LINE_COUNT; lineIndex += 1) {
+    const line = createFloorWaveLineConfig(orientations[lineIndex]);
+    const material = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 1,
+      depthWrite: false,
+    });
+    const mesh = new THREE.InstancedMesh(cellGeometry, material, line.cellCount);
+    mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    mesh.frustumCulled = false;
+
+    for (let cellIndex = 0; cellIndex < line.cellCount; cellIndex += 1) {
+      const position = getFloorWaveCellPosition(line, cellIndex);
+      floorGridWaves3d2.dummy.position.set(position.x, position.y, position.z);
+      floorGridWaves3d2.dummy.scale.set(0, 0, 0);
+      floorGridWaves3d2.dummy.updateMatrix();
+      mesh.setMatrixAt(cellIndex, floorGridWaves3d2.dummy.matrix);
+    }
+
+    mesh.instanceMatrix.needsUpdate = true;
+    group.add(mesh);
+    floorGridWaves3d2.lines.push({ mesh, line, material });
+  }
+
+  floorGridWaves3d2.group = group;
+  stageGroup.add(group);
+  syncFloorGridWavesColor();
+}
+
+function applyFloorWaveLineVisuals(mesh, line, baseColor) {
+  for (let cellIndex = 0; cellIndex < line.cellCount; cellIndex += 1) {
+    const distance = getFloorWaveDistanceBehind(line.head, cellIndex, line.direction);
+    const opacity = getFloorWaveCellOpacity(distance);
+    const scale = opacity > 0.001 ? THREE.MathUtils.lerp(0.88, 1, opacity) : 0;
+    const position = getFloorWaveCellPosition(line, cellIndex);
+
+    floorGridWaves3d2.dummy.position.set(position.x, position.y, position.z);
+    floorGridWaves3d2.dummy.scale.set(scale, scale, scale);
+    floorGridWaves3d2.dummy.updateMatrix();
+    mesh.setMatrixAt(cellIndex, floorGridWaves3d2.dummy.matrix);
+    mesh.setColorAt(
+      cellIndex,
+      getFloorWaveDisplayColor(baseColor, opacity, _floorWaveDisplayColor)
+    );
+  }
+
+  mesh.instanceMatrix.needsUpdate = true;
+
+  if (mesh.instanceColor) {
+    mesh.instanceColor.needsUpdate = true;
+  }
+}
+
+function getFloorWaveBaseColor(vibrancy = carPaint.currentVibrancy) {
+  const fadedBody = new THREE.Color(0xb8c2d0);
+  return fadedBody.lerp(
+    carPaint.selectedBodyColor,
+    THREE.MathUtils.clamp(vibrancy, 0, 1)
+  );
+}
+
+function resetFloorWaveLineAfterLap(line) {
+  line.trackIndex = randomFloorWaveTrackIndex();
+  line.head = line.direction > 0 ? 0 : FLOOR_GRID_DIVISIONS - 1;
+}
+
+function updateFloorGridWaves3d2(delta) {
+  if (!floorGridWaves3d2.lines.length) {
+    return;
+  }
+
+  const baseColor = getFloorWaveBaseColor();
+  const dt = Math.min(delta, 1 / 20);
+
+  floorGridWaves3d2.lines.forEach(({ mesh, line }) => {
+    const previousHead = line.head;
+    line.head += line.direction * line.speed * dt;
+
+    const previousNorm = normalizeFloorWaveHead(previousHead);
+    const nextNorm = normalizeFloorWaveHead(line.head);
+    const wrappedForward = line.direction > 0 && nextNorm < previousNorm;
+    const wrappedBackward = line.direction < 0 && nextNorm > previousNorm;
+
+    if (wrappedForward || wrappedBackward) {
+      resetFloorWaveLineAfterLap(line);
+    } else if (Math.abs(line.head) > FLOOR_GRID_DIVISIONS * 100) {
+      line.head = normalizeFloorWaveHead(line.head);
+    }
+
+    applyFloorWaveLineVisuals(mesh, line, baseColor);
+  });
+}
+
+function syncFloorGridWavesColor(vibrancy = carPaint.currentVibrancy) {
+  if (!floorGridWaves3d2.lines.length) {
+    return;
+  }
+
+  const baseColor = getFloorWaveBaseColor(vibrancy);
+
+  floorGridWaves3d2.lines.forEach(({ mesh, line }) => {
+    applyFloorWaveLineVisuals(mesh, line, baseColor);
+  });
+}
 
 function isCarInfo3d2Page() {
   return document.body.classList.contains('carinfo3d2-page');
@@ -429,11 +663,11 @@ function applyCarMaterials(model, bodyColor = DEFAULT_BODY_COLOR) {
 function setCarBodyColor(hex) {
   carPaint.selectedBodyColor.set(hex);
 
-  if (!carPaint.bodyMaterial) {
-    return;
+  if (carPaint.bodyMaterial) {
+    carPaint.bodyMaterial.color.set(hex);
   }
 
-  carPaint.bodyMaterial.color.set(hex);
+  syncFloorGridWavesColor();
 }
 
 function applyCarVibrancy(amount) {
@@ -466,6 +700,8 @@ function applyCarVibrancy(amount) {
       }
     });
   }
+
+  syncFloorGridWavesColor(t);
 }
 
 function parseAdsPayload(raw) {
@@ -611,6 +847,27 @@ async function initAdBoards(scene, renderer) {
   if (adBoards.posters.length) {
     applyCarVibrancy(carPaint.currentVibrancy);
   }
+}
+
+function initZoomButtons(zoomControls, onInteraction) {
+  const block =
+    document.querySelector('#carinfo3d-main [data-cinfo-3dmodel]') ||
+    document.querySelector('[data-cinfo-3dmodel]');
+  if (!block || !zoomControls) {
+    return;
+  }
+
+  block.querySelectorAll('[data-ci3d-zoom]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const action = button.getAttribute('data-ci3d-zoom');
+      if (action === 'in') {
+        zoomControls.zoomIn();
+      } else if (action === 'out') {
+        zoomControls.zoomOut();
+      }
+      onInteraction?.();
+    });
+  });
 }
 
 function initColorSwatches() {
@@ -1082,8 +1339,16 @@ function initScene(container) {
   controls.target.set(...heroWorld.target);
   controls.enableDamping = true;
   controls.dampingFactor = 0.05;
-  controls.enablePan = false;
-  const applyZoomLimits = bindCanvasZoomControls(controls, renderer.domElement);
+  const syncCameraTargets = () => {
+    targetCam.copy(camera.position);
+    targetLook.copy(controls.target);
+  };
+  const zoomControls = bindCanvasZoomControls(
+    controls,
+    renderer.domElement,
+    camera,
+    syncCameraTargets
+  );
   controls.minPolarAngle = Math.PI / 5;
   controls.maxPolarAngle = Math.PI / 2.1;
   controls.autoRotate = true;
@@ -1096,8 +1361,7 @@ function initScene(container) {
 
   controls.addEventListener('end', () => {
     userOrbiting = false;
-    targetCam.copy(camera.position);
-    targetLook.copy(controls.target);
+    syncCameraTargets();
     window.setTimeout(() => {
       if (!userOrbiting) {
         controls.autoRotate = true;
@@ -1124,6 +1388,10 @@ function initScene(container) {
   const grid = new THREE.GridHelper(44, 88, 0xc8d0dc, 0xdce4ee);
   grid.position.y = 0.01;
   stageGroup.add(grid);
+
+  if (isCarInfo3d2Page()) {
+    initFloorGridWaves3d2(stageGroup);
+  }
 
   const rearGrid = new THREE.GridHelper(30, 60, 0xd0d8e4, 0xe4eaf2);
   rearGrid.rotation.x = Math.PI / 2;
@@ -1229,6 +1497,15 @@ function initScene(container) {
 
   if (hasModel) {
     initColorSwatches();
+    initZoomButtons(zoomControls, () => {
+      controls.autoRotate = false;
+      syncCameraTargets();
+      window.setTimeout(() => {
+        if (!userOrbiting) {
+          controls.autoRotate = true;
+        }
+      }, 3000);
+    });
 
     const initialBodyColor = blockConfig.defaultColor || DEFAULT_BODY_COLOR;
 
@@ -1269,7 +1546,7 @@ function initScene(container) {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
     setChromeHeight();
-    applyZoomLimits();
+    zoomControls.applyZoomLimits();
     applyResponsiveModelScale();
 
     if (!userOrbiting && isIntroViewport()) {
@@ -1281,7 +1558,10 @@ function initScene(container) {
 
   const clock = new THREE.Clock();
   renderer.setAnimationLoop(() => {
+    const delta = clock.getDelta();
     const elapsed = clock.getElapsedTime();
+
+    updateFloorGridWaves3d2(delta);
 
     if (!userOrbiting) {
       stageGroup.rotation.y = stageSpinOffset + elapsed * stageSpinSpeed;

@@ -52,6 +52,7 @@ final class LayoutSchema {
 		'page_about'  => 'درباره ما',
 		'page_contact'=> 'تماس با ما',
 		'page_car'      => 'صفحه خودرو',
+		'page_carsinfo_directory' => 'دانشنامه خودرو',
 		'carsinfo_3d2'  => 'اطلاعات خودرو — 3D2',
 		'not_found'     => 'صفحه ۴۰۴',
 	);

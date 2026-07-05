@@ -103,6 +103,8 @@
 .acf-admin-page .acf-field[data-key="field_ak_contact_intro"],
 .acf-admin-page .acf-field[data-key="field_ak_contact_form_card_title"],
 .acf-admin-page .acf-field[data-key="field_ak_contact_form_card_lead"],
+.acf-admin-page .acf-field[data-key="field_ak_carsinfo_country_category"],
+.acf-admin-page .acf-field[data-key="field_ak_carsinfo_brand_category"],
 .acf-admin-page .acf-field[data-key="field_ak_site_logo_footer"],
 .acf-admin-page .acf-field[data-key="field_ak_footer_logo_tagline"],
 .acf-admin-page .acf-field[data-key="field_ak_footer_text"],

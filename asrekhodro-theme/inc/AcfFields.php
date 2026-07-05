@@ -25,6 +25,9 @@ final class AcfFields {
 
 		add_action( 'acf/include_fields', array( self::class, 'register_field_groups' ) );
 		add_action( 'acf/input/admin_enqueue_scripts', array( self::class, 'enqueue_admin_assets' ) );
+		add_filter( 'acf/load_field/key=field_ak_carsinfo_country_category', array( self::class, 'load_carsinfo_category_select_field' ) );
+		add_filter( 'acf/load_field/key=field_ak_carsinfo_brand_category', array( self::class, 'load_carsinfo_category_select_field' ) );
+		add_filter( 'acf/load_field/key=field_ak_category_brand_logo', array( CarBrandAssets::class, 'load_acf_select_field' ) );
 	}
 
 	public static function enqueue_admin_assets(): void {
@@ -78,6 +81,7 @@ final class AcfFields {
 					self::homepage_option_fields(),
 					self::archive_option_fields(),
 					self::contact_option_fields(),
+					self::carsinfo_option_fields(),
 					self::footer_option_fields()
 				),
 				'location' => array(
@@ -86,6 +90,23 @@ final class AcfFields {
 							'param'    => 'options_page',
 							'operator' => '==',
 							'value'    => 'asrekhodro-settings',
+						),
+					),
+				),
+			)
+		);
+
+		acf_add_local_field_group(
+			array(
+				'key'      => 'group_ak_category_term',
+				'title'    => 'تصویر دسته‌بندی',
+				'fields'   => self::category_term_fields(),
+				'location' => array(
+					array(
+						array(
+							'param'    => 'taxonomy',
+							'operator' => '==',
+							'value'    => 'category',
 						),
 					),
 				),
@@ -934,6 +955,148 @@ final class AcfFields {
 				'conditional_logic' => $when_form,
 			),
 		);
+	}
+
+	/**
+	 * Cars encyclopedia settings under Theme Settings.
+	 *
+	 * @return list<array<string, mixed>>
+	 */
+	private static function carsinfo_option_fields(): array {
+		return array(
+			array(
+				'key'       => 'field_ak_tab_carsinfo',
+				'label'     => 'تنظیمات دانشنامه خودرو',
+				'name'      => '',
+				'type'      => 'tab',
+				'placement' => 'left',
+			),
+			array(
+				'key'           => 'field_ak_carsinfo_settings_intro',
+				'label'         => '',
+				'name'          => '',
+				'type'          => 'message',
+				'message'       => 'کتگوری‌های وردپرس را برای ساختار دانشنامه خودرو مشخص کنید: یک کتگوری والد برای کشور (مثل ایران) و یک کتگوری برای برند (مثل ایران خودرو).',
+				'new_lines'     => 'wpautop',
+				'esc_html'      => 0,
+			),
+			array(
+				'key'           => 'field_ak_carsinfo_country_category',
+				'label'         => 'کتگوری کشور',
+				'name'          => 'carsinfo_country_category',
+				'type'          => 'select',
+				'choices'       => array(),
+				'default_value' => '',
+				'allow_null'    => 1,
+				'ui'            => 1,
+				'ajax'          => 0,
+				'return_format' => 'value',
+				'instructions'  => '',
+			),
+			array(
+				'key'           => 'field_ak_carsinfo_brand_category',
+				'label'         => 'کتگوری برند',
+				'name'          => 'carsinfo_brand_category',
+				'type'          => 'select',
+				'choices'       => array(),
+				'default_value' => '',
+				'allow_null'    => 1,
+				'ui'            => 1,
+				'ajax'          => 0,
+				'return_format' => 'value',
+				'instructions'  => '',
+			),
+		);
+	}
+
+	/**
+	 * @return list<array<string, mixed>>
+	 */
+	private static function category_term_fields(): array {
+		return array(
+			array(
+				'key'           => 'field_ak_category_image',
+				'label'         => 'تصویر',
+				'name'          => 'ak_category_image',
+				'type'          => 'image',
+				'return_format' => 'id',
+				'preview_size'  => 'thumbnail',
+				'library'       => 'all',
+				'instructions'  => 'اولویت اول در دانشنامه خودرو: اگر تصویر آپلود کنید، همان روی کارت برند نمایش داده می‌شود.',
+			),
+			array(
+				'key'           => 'field_ak_category_brand_logo',
+				'label'         => 'لوگوی آماده برند',
+				'name'          => 'ak_category_brand_logo',
+				'type'          => 'select',
+				'choices'       => array(),
+				'allow_null'    => 1,
+				'ui'            => 0,
+				'ajax'          => 0,
+				'return_format' => 'value',
+				'instructions'  => 'اولویت دوم در دانشنامه خودرو: فقط وقتی فیلد «تصویر» خالی باشد، لوگوی انتخاب‌شده از car-brands روی کارت برند می‌آید.',
+			),
+		);
+	}
+
+	/**
+	 * Populate searchable category dropdowns on Theme Settings.
+	 *
+	 * @param array<string, mixed> $field
+	 * @return array<string, mixed>
+	 */
+	public static function load_carsinfo_category_select_field( array $field ): array {
+		$field['choices'] = self::category_select_choices();
+
+		return $field;
+	}
+
+	/**
+	 * @return array<string, string>
+	 */
+	private static function category_select_choices(): array {
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'category',
+				'hide_empty' => false,
+				'orderby'    => 'name',
+				'order'      => 'ASC',
+			)
+		);
+
+		if ( is_wp_error( $terms ) || ! is_array( $terms ) ) {
+			return array();
+		}
+
+		$choices = array();
+		foreach ( $terms as $term ) {
+			if ( ! $term instanceof \WP_Term ) {
+				continue;
+			}
+
+			$choices[ (string) $term->term_id ] = self::format_category_choice_label( $term );
+		}
+
+		return $choices;
+	}
+
+	private static function format_category_choice_label( \WP_Term $term ): string {
+		$ancestors = get_ancestors( $term->term_id, 'category', 'taxonomy' );
+		if ( $ancestors === array() ) {
+			return $term->name;
+		}
+
+		$parts = array();
+		foreach ( array_reverse( $ancestors ) as $ancestor_id ) {
+			$ancestor = get_term( (int) $ancestor_id, 'category' );
+			if ( $ancestor instanceof \WP_Term ) {
+				$parts[] = $ancestor->name;
+			}
+		}
+
+		$parts[] = $term->name;
+
+		return implode( ' › ', $parts );
 	}
 
 	/**
