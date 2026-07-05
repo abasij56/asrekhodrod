@@ -3,6 +3,7 @@
 namespace AsreKhodro\Theme\AcfBlocks\Cinfo3dmodel;
 
 use AsreKhodro\Theme\Appearance;
+use AsreKhodro\Theme\CarInfo3d;
 use AsreKhodro\Theme\ThemeModels;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -59,6 +60,7 @@ final class View {
 		);
 
 		return array(
+			'model_show_title'          => ! CarInfo3d::is_immersive(),
 			'model_title'               => $title,
 			'model_url'                 => $model_url,
 			'model_extra_info_html'     => $extra,

@@ -25,13 +25,20 @@
     </div>
   {% endif %}
 
+  {% if model_url %}
+    <div class="ci-3dmodel__loader" data-ci3d-loader hidden aria-live="polite" aria-busy="true">
+      <span class="ci-3dmodel__loader-spinner" aria-hidden="true"></span>
+      <span class="ci-3dmodel__loader-text">در حال بارگذاری مدل…</span>
+    </div>
+  {% endif %}
+
   <div
     class="ci-3dmodel__inner"
     {% if model_url %}
       style="--ci3d-color-swatches: {{ model_colors|length }}; --ci3d-toolbar-gap-size: {% if model_colors|length %}0.625rem{% else %}0rem{% endif %}"
     {% endif %}
   >
-    {% if model_title %}
+    {% if model_show_title and model_title %}
       <h1 class="ci-3dmodel__title">{{ model_title }}</h1>
     {% endif %}
 

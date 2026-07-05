@@ -39,7 +39,8 @@ final class CarsInfoDirectory {
 		$country_root = CarsInfo::country_category_id();
 		$brand_root   = CarsInfo::brand_category_id();
 		$configured   = $country_root > 0 && $brand_root > 0;
-		$brands       = $configured ? self::brand_payload( $brand_root ) : array();
+		$brands          = $configured ? self::brand_payload( $brand_root ) : array();
+		$featured_models = self::featured_models( self::featured_post_ids( $fields ) );
 
 		return array(
 			'directory_eyebrow'           => trim( (string) ( $fields['eyebrow'] ?? '' ) ) ?: 'Car Encyclopedia',
@@ -64,7 +65,59 @@ final class CarsInfoDirectory {
 					JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
 				)
 				: '{}',
+			'directory_featured_title'    => trim( (string) ( $fields['featured_title'] ?? '' ) ) ?: 'منتخب‌ها',
+			'directory_featured_cars'     => $featured_models,
+			'directory_has_featured'      => $featured_models !== array(),
 		);
+	}
+
+	/**
+	 * @param array<string, mixed> $fields
+	 * @return list<int>
+	 */
+	private static function featured_post_ids( array $fields ): array {
+		$value = $fields['featured_cars'] ?? array();
+		if ( ! is_array( $value ) ) {
+			return array();
+		}
+
+		$ids = array();
+		foreach ( $value as $post_id ) {
+			$post_id = (int) $post_id;
+			if ( $post_id > 0 ) {
+				$ids[] = $post_id;
+			}
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * @param list<int> $post_ids
+	 * @return list<array<string, mixed>>
+	 */
+	public static function featured_models( array $post_ids ): array {
+		if ( $post_ids === array() ) {
+			return array();
+		}
+
+		$country_root = CarsInfo::country_category_id();
+		$models       = array();
+
+		foreach ( $post_ids as $post_id ) {
+			$post = get_post( $post_id );
+			if ( ! $post instanceof \WP_Post ) {
+				continue;
+			}
+
+			if ( $post->post_type !== 'carsinfo' || $post->post_status !== 'publish' ) {
+				continue;
+			}
+
+			$models[] = self::format_model( $post, $country_root );
+		}
+
+		return $models;
 	}
 
 	private static function empty_hint( int $brand_root, int $country_root ): string {

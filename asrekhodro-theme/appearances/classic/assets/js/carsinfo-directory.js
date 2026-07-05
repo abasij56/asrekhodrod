@@ -221,7 +221,7 @@
     var visible = 0;
     els.brandsGrid.innerHTML = "";
 
-    brands.forEach(function (brand) {
+    brands.forEach(function (brand, brandIndex) {
       if (!brandMatches(brand)) {
         return;
       }
@@ -232,6 +232,7 @@
       var card = document.createElement("button");
       card.type = "button";
       card.className = "carsinfo-directory__brand";
+      card.style.setProperty("--ci-dir-i", String(brandIndex));
       card.setAttribute("data-brand-id", String(brand.id));
 
       var logo = document.createElement("div");

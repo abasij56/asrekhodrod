@@ -16,6 +16,7 @@
         {% endif %}
         {% if directory_title %}
           <h1 class="carsinfo-directory__title">{{ directory_title }}</h1>
+          <div class="carsinfo-directory__hero-divider" aria-hidden="true"></div>
         {% endif %}
         {% if directory_lead %}
           <p class="carsinfo-directory__lead">{{ directory_lead }}</p>
@@ -39,6 +40,7 @@
         {% endif %}
       </header>
 
+      <div class="carsinfo-directory__shell">
       <div class="carsinfo-directory__toolbar">
         <label class="carsinfo-directory__search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -87,6 +89,56 @@
           عبارت جستجو را تغییر دهید.
         </div>
       </section>
+
+      {% if directory_has_featured %}
+        <section
+          class="carsinfo-directory__featured"
+          data-dir-featured
+          aria-label="{{ directory_featured_title|default('منتخب‌ها')|e('html_attr') }}"
+        >
+          {% if directory_featured_title %}
+            <div class="carsinfo-directory__featured-head">
+              <h2 class="carsinfo-directory__featured-title">{{ directory_featured_title }}</h2>
+            </div>
+          {% endif %}
+          <div class="carsinfo-directory__featured-grid">
+            {% for model in directory_featured_cars %}
+              <article class="carsinfo-directory__model carsinfo-directory__model--featured">
+                <a class="carsinfo-directory__model-link" href="{{ model.url|default('#')|e('html_attr') }}">
+                  <div class="carsinfo-directory__model-media">
+                    {% if model.image.url %}
+                      <img
+                        src="{{ model.image.url|e('html_attr') }}"
+                        alt="{{ (model.image.alt ?: model.title)|e('html_attr') }}"
+                        width="{{ model.image.width|default(600) }}"
+                        height="{{ model.image.height|default(375) }}"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    {% endif %}
+                  </div>
+                  <div class="carsinfo-directory__model-body">
+                    <div class="carsinfo-directory__model-title">{{ model.title }}</div>
+                    {% if model.subtitle %}
+                      <div class="carsinfo-directory__model-sub">{{ model.subtitle }}</div>
+                    {% endif %}
+                    {% if model.specs is defined and model.specs|length %}
+                      <div class="carsinfo-directory__model-specs">
+                        {% for spec in model.specs %}
+                          <span class="carsinfo-directory__model-spec">{{ spec }}</span>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                    <div class="carsinfo-directory__model-cta">ورود به صفحه خودرو</div>
+                  </div>
+                </a>
+              </article>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
+
+      </div>
 
       <script type="application/json" data-carsinfo-directory-data>{{ directory_json|raw }}</script>
     {% endif %}

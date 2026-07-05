@@ -425,6 +425,34 @@ function isCarInfo3d2Page() {
   return document.body.classList.contains('carinfo3d2-page');
 }
 
+function getModelLoader() {
+  return document.querySelector('[data-cinfo-3dmodel] [data-ci3d-loader]');
+}
+
+function showModelLoader() {
+  if (!isCarInfo3d2Page()) {
+    return;
+  }
+
+  const loader = getModelLoader();
+  if (!loader) {
+    return;
+  }
+
+  loader.setAttribute('aria-busy', 'true');
+  loader.removeAttribute('hidden');
+}
+
+function hideModelLoader() {
+  const loader = getModelLoader();
+  if (!loader) {
+    return;
+  }
+
+  loader.setAttribute('aria-busy', 'false');
+  loader.setAttribute('hidden', '');
+}
+
 function shouldRun() {
   if (!document.body.classList.contains('carinfo3d-page')) {
     return false;
@@ -1509,8 +1537,11 @@ function initScene(container) {
 
     const initialBodyColor = blockConfig.defaultColor || DEFAULT_BODY_COLOR;
 
+    showModelLoader();
+
     loadGltfModel(blockConfig.modelUrl, blockConfig.dracoPath, initialBodyColor)
       .then((model) => {
+        hideModelLoader();
         hideHeroVisual();
         stageGroup.add(model);
         stageModel = model;
@@ -1519,6 +1550,7 @@ function initScene(container) {
         applyCarVibrancy(carVibrancy);
       })
       .catch((error) => {
+        hideModelLoader();
         console.warn('[carinfo3d] Model load failed:', error);
         if (hasImage) {
           showHeroVisual();
