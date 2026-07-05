@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="دانشنامه خودرو عصر خودرو — انتخاب برند و مدل" />
+  <title>دانشنامه خودرو | انتخاب برند — عصر خودرو</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <style>
+    :root {
+      --dir-black: #0a0a0c;
+      --dir-cream: #f7f5f1;
+      --dir-gold: #c9a227;
+      --dir-gold-soft: rgba(201, 162, 39, 0.12);
+    }
+
+    body.car-directory-page { background: var(--dir-cream); }
+
+    .proto-badge {
+      position: fixed; bottom: 1rem; left: 1rem; z-index: 9999;
+      background: rgba(10,10,12,.9); color: #fff; font-size: .7rem; font-weight: 600;
+      padding: .4rem .7rem; border-radius: 6px; pointer-events: none;
+    }
+
+    /* Page hero */
+    .dir-page-hero {
+      padding: 2rem 0 1.5rem;
+      text-align: center;
+    }
+    .dir-page-hero__eyebrow {
+      font-size: .78rem; font-weight: 600; letter-spacing: .18em;
+      color: var(--dir-gold); text-transform: uppercase;
+    }
+    .dir-page-hero__title {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 900; letter-spacing: -.03em; margin-top: .5rem;
+    }
+    .dir-page-hero__lead {
+      margin-top: .75rem; color: var(--ink-muted); font-size: .95rem;
+      max-width: 520px; margin-inline: auto; line-height: 1.8;
+    }
+
+    /* Steps */
+    .dir-steps {
+      display: flex; justify-content: center; gap: .5rem;
+      margin-top: 1.5rem; flex-wrap: wrap;
+    }
+    .dir-step {
+      display: flex; align-items: center; gap: .45rem;
+      font-size: .8rem; font-weight: 600; color: var(--ink-muted);
+      padding: .45rem .9rem; border-radius: 999px;
+      background: #fff; border: 1px solid var(--line);
+    }
+    .dir-step.is-active {
+      border-color: var(--dir-gold); color: var(--ink);
+      background: var(--dir-gold-soft);
+    }
+    .dir-step.is-done { color: var(--dir-gold); }
+    .dir-step__num {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: grid; place-items: center; font-size: .72rem;
+      background: var(--line-soft);
+    }
+    .dir-step.is-active .dir-step__num,
+    .dir-step.is-done .dir-step__num {
+      background: var(--dir-gold); color: #fff;
+    }
+
+    /* Toolbar */
+    .dir-toolbar {
+      display: flex; flex-wrap: wrap; gap: 1rem;
+      align-items: center; justify-content: space-between;
+      margin: 1.75rem 0 1.25rem;
+    }
+    .dir-search {
+      flex: 1; min-width: 220px; max-width: 400px;
+      display: flex; align-items: center; gap: .5rem;
+      background: #fff; border: 1px solid var(--line);
+      border-radius: 999px; padding: .55rem 1rem;
+      transition: border-color var(--transition);
+    }
+    .dir-search:focus-within { border-color: var(--dir-gold); }
+    .dir-search svg { width: 18px; height: 18px; color: var(--ink-muted); flex-shrink: 0; }
+    .dir-search input {
+      flex: 1; border: none; outline: none; font: inherit; font-size: .9rem;
+      background: transparent;
+    }
+    .dir-count {
+      font-size: .82rem; color: var(--ink-muted); font-weight: 600;
+    }
+
+    /* Filters */
+    .dir-filters {
+      display: flex; flex-wrap: wrap; gap: .5rem;
+      margin-bottom: 1.5rem;
+    }
+    .dir-filter {
+      padding: .4rem .95rem; border-radius: 999px;
+      font-size: .82rem; font-weight: 600;
+      border: 1px solid var(--line); background: #fff;
+      color: var(--ink-soft); cursor: pointer;
+      transition: all var(--transition);
+    }
+    .dir-filter:hover { border-color: var(--dir-gold); color: var(--ink); }
+    .dir-filter.is-active {
+      background: var(--dir-black); color: #fff; border-color: var(--dir-black);
+    }
+
+    /* Views */
+    .dir-view { display: none; animation: dirFade .35s ease; }
+    .dir-view.is-visible { display: block; }
+    @keyframes dirFade {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Brand grid */
+    .dir-brands {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1rem;
+    }
+    .dir-brand {
+      background: #fff; border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 1.5rem 1rem;
+      text-align: center; cursor: pointer;
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+    }
+    .dir-brand:hover {
+      border-color: var(--dir-gold);
+      box-shadow: var(--shadow);
+      transform: translateY(-4px);
+    }
+    .dir-brand.is-hidden { display: none; }
+    .dir-brand__logo {
+      width: 56px; height: 56px; margin: 0 auto .85rem;
+      border-radius: 50%; border: 1px solid var(--line-soft);
+      display: grid; place-items: center;
+      font-weight: 900; font-size: .85rem;
+      color: var(--dir-gold); background: var(--dir-gold-soft);
+    }
+    .dir-brand__name { font-size: .95rem; font-weight: 700; }
+    .dir-brand__meta {
+      font-size: .75rem; color: var(--ink-muted); margin-top: .3rem;
+    }
+    .dir-brand__origin {
+      display: inline-block; margin-top: .5rem;
+      font-size: .68rem; font-weight: 600; letter-spacing: .06em;
+      color: var(--ink-muted); background: var(--surface-alt);
+      padding: .2rem .5rem; border-radius: 4px;
+    }
+
+    /* Models view header */
+    .dir-models-head {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 1.5rem; flex-wrap: wrap;
+    }
+    .dir-back {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-size: .88rem; font-weight: 700; color: var(--ink-soft);
+      padding: .5rem .85rem; border-radius: 999px;
+      border: 1px solid var(--line); background: #fff;
+      cursor: pointer; transition: all var(--transition);
+    }
+    .dir-back:hover { border-color: var(--dir-gold); color: var(--ink); }
+    .dir-back svg { width: 16px; height: 16px; }
+    .dir-models-brand {
+      display: flex; align-items: center; gap: .75rem; flex: 1;
+    }
+    .dir-models-brand__logo {
+      width: 48px; height: 48px; border-radius: 50%;
+      border: 1px solid rgba(201,162,39,.4);
+      display: grid; place-items: center;
+      font-weight: 900; font-size: .8rem; color: var(--dir-gold);
+      background: var(--dir-gold-soft);
+    }
+    .dir-models-brand h2 {
+      font-size: 1.35rem; font-weight: 800;
+    }
+    .dir-models-brand p {
+      font-size: .82rem; color: var(--ink-muted); margin-top: .15rem;
+    }
+
+    /* Model grid */
+    .dir-models {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+    .dir-model {
+      background: #fff; border: 1px solid var(--line);
+      border-radius: var(--radius); overflow: hidden;
+      transition: box-shadow var(--transition), transform var(--transition);
+    }
+    .dir-model.is-hidden { display: none; }
+    .dir-model:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px);
+    }
+    .dir-model__link { display: block; color: inherit; }
+    .dir-model__media {
+      aspect-ratio: 16/10; overflow: hidden; background: var(--dir-black);
+      position: relative;
+    }
+    .dir-model__media img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform .45s ease;
+    }
+    .dir-model:hover .dir-model__media img { transform: scale(1.05); }
+    .dir-model__badge {
+      position: absolute; top: .75rem; right: .75rem;
+      background: var(--dir-gold); color: var(--dir-black);
+      font-size: .68rem; font-weight: 800; padding: .25rem .55rem;
+      border-radius: 4px;
+    }
+    .dir-model__body { padding: 1.1rem 1.25rem; }
+    .dir-model__title { font-size: 1.05rem; font-weight: 800; }
+    .dir-model__sub {
+      font-size: .8rem; color: var(--ink-muted); margin-top: .25rem;
+    }
+    .dir-model__specs {
+      display: flex; flex-wrap: wrap; gap: .5rem;
+      margin-top: .75rem; padding-top: .75rem;
+      border-top: 1px solid var(--line-soft);
+    }
+    .dir-model__spec {
+      font-size: .72rem; font-weight: 600; color: var(--ink-soft);
+      background: var(--surface-alt); padding: .25rem .55rem;
+      border-radius: 4px;
+    }
+    .dir-model__cta {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: .85rem; font-size: .82rem; font-weight: 700;
+      color: var(--brand);
+    }
+    .dir-model__cta svg { width: 16px; height: 16px; }
+
+    /* Empty */
+    .dir-empty {
+      text-align: center; padding: 3rem 1rem;
+      color: var(--ink-muted); display: none;
+    }
+    .dir-empty.is-visible { display: block; }
+    .dir-empty strong { display: block; font-size: 1.1rem; color: var(--ink); margin-bottom: .5rem; }
+
+    @media (max-width: 600px) {
+      .dir-brands { grid-template-columns: repeat(2, 1fr); }
+      .dir-toolbar { flex-direction: column; align-items: stretch; }
+      .dir-search { max-width: none; }
+    }
+  </style>
+</head>
+<body class="car-directory-page">
+
+  <div class="proto-badge">پروتوتایپ — car-directory.html</div>
+
+  <header class="site-header">
+    <div class="container">
+      <div class="site-header__brand">
+        <a href="../index.html" class="logo">
+          <div class="logo__mark">AK</div>
+          <div class="logo__text">
+            <strong>عصر خودرو</strong>
+            <span>Asre Khodro · مرجع تخصصی صنعت خودرو</span>
+          </div>
+        </a>
+      </div>
+      <nav class="main-nav">
+        <ul class="main-nav__list">
+          <li><a href="../index.html">صفحه اصلی</a></li>
+          <li><a href="car-directory.html" class="is-active">دانشنامه خودرو</a></li>
+          <li><a href="#">اخبار</a></li>
+          <li><a href="#">تست و بررسی</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <header class="dir-page-hero">
+      <p class="dir-page-hero__eyebrow">Car Encyclopedia</p>
+      <h1 class="dir-page-hero__title">دانشنامه خودرو</h1>
+      <p class="dir-page-hero__lead">
+        ابتدا برند را انتخاب کنید، سپس مدل مورد نظر را بیابید و وارد صفحه اختصاصی آن شوید.
+      </p>
+      <div class="dir-steps" aria-label="مراحل">
+        <div class="dir-step is-active" id="step-brands">
+          <span class="dir-step__num">۱</span>
+          انتخاب برند
+        </div>
+        <div class="dir-step" id="step-models">
+          <span class="dir-step__num">۲</span>
+          انتخاب مدل
+        </div>
+        <div class="dir-step" id="step-hub">
+          <span class="dir-step__num">۳</span>
+          صفحه خودرو
+        </div>
+      </div>
+    </header>
+
+    <!-- Toolbar (shared) -->
+    <div class="dir-toolbar">
+      <label class="dir-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="dir-search" placeholder="جستجوی برند یا مدل..." autocomplete="off" />
+      </label>
+      <span class="dir-count" id="dir-count" aria-live="polite"></span>
+    </div>
+
+    <!-- VIEW 1: Brands -->
+    <section class="dir-view is-visible" id="view-brands" aria-label="لیست برندها">
+      <div class="dir-filters" id="dir-filters" role="group" aria-label="فیلتر برندها">
+        <button type="button" class="dir-filter is-active" data-filter="all">همه</button>
+        <button type="button" class="dir-filter" data-filter="luxury">لوکس</button>
+        <button type="button" class="dir-filter" data-filter="german">آلمانی</button>
+        <button type="button" class="dir-filter" data-filter="italian">ایتالیایی</button>
+        <button type="button" class="dir-filter" data-filter="japanese">ژاپنی</button>
+        <button type="button" class="dir-filter" data-filter="chinese">چینی</button>
+        <button type="button" class="dir-filter" data-filter="iranian">ایرانی</button>
+      </div>
+      <div class="dir-brands" id="dir-brands"></div>
+      <div class="dir-empty" id="brands-empty">
+        <strong>برندی یافت نشد</strong>
+        عبارت جستجو یا فیلتر را تغییر دهید.
+      </div>
+    </section>
+
+    <!-- VIEW 2: Models -->
+    <section class="dir-view" id="view-models" aria-label="لیست مدل‌ها">
+      <div class="dir-models-head">
+        <button type="button" class="dir-back" id="dir-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+          بازگشت به برندها
+        </button>
+        <div class="dir-models-brand">
+          <div class="dir-models-brand__logo" id="models-brand-logo" aria-hidden="true"></div>
+          <div>
+            <h2 id="models-brand-name"></h2>
+            <p id="models-brand-desc"></p>
+          </div>
+        </div>
+      </div>
+      <div class="dir-models" id="dir-models"></div>
+      <div class="dir-empty" id="models-empty">
+        <strong>مدلی یافت نشد</strong>
+        عبارت جستجو را تغییر دهید.
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+  (function () {
+    "use strict";
+
+    var BRANDS = [
+      {
+        id: "ferrari", name: "فراری", nameEn: "Ferrari", abbr: "F",
+        origin: "ایتالیا", tags: ["luxury", "italian"],
+        desc: "۴ مدل در دانشنامه",
+        models: [
+          { name: "۲۹۶ GTB", sub: "سوپراسپرت هیبریدی V6", specs: ["۸۳۰ اسب", "۲.۹ ثانیه", "هیبرید"], img: "https://images.unsplash.com/photo-1583121274602-3e2820c59d9f?w=600&q=80&auto=format&fit=crop", url: "car-hub-ferrari.html", featured: true },
+          { name: "SF90 Stradale", sub: "سوپراسپرت پلاگین هیبرید", specs: ["۱,۰۰۰ اسب", "۲.۵ ثانیه", "AWD"], img: "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=600&q=80&auto=format&fit=crop", url: "#", featured: false },
+          { name: "Roma", sub: "گرند تورر مدرن", specs: ["۶۲۰ اسب", "۳.۴ ثانیه", "GT"], img: "https://images.pexels.com/photos/919073/pexels-photo-919073.jpeg?auto=compress&cs=tinysrgb&w=600", url: "#", featured: false },
+          { name: "Purosangue", sub: "اولین SUV فراری", specs: ["۷۲۹ اسب", "۳.۳ ثانیه", "SUV"], img: "https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?auto=compress&cs=tinysrgb&w=600", url: "#", featured: false }
+        ]
+      },
+      {
+        id: "lamborghini", name: "لامبورگینی", nameEn: "Lamborghini", abbr: "L",
+        origin: "ایتالیا", tags: ["luxury", "italian"],
+        desc: "۳ مدل در دانشنامه",
+        models: [
+          { name: "Revuelto", sub: "جایگزین اونتادور", specs: ["۱,۰۰۱ اسب", "۲.۵ ثانیه", "V12 HEV"], img: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=600&q=80&auto=format&fit=crop", url: "#", featured: false },
+          { name: "Urus", sub: "سوپر SUV", specs: ["۶۵۷ اسب", "۳.۶ ثانیه", "SUV"], img: "https://images.pexels.com/photos/1149137/pexels-photo-1149137.jpeg?auto=compress&cs=tinysrgb&w=600", url: "#", featured: false },
+          { name: "Huracán", sub: "سوپراسپرت V10", specs: ["۶۴۰ اسب", "۲.۹ ثانیه", "RWD"], img: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=600&q=80&auto=format&fit=crop", url: "#", featured: false }
+        ]
+      },
+      {
+        id: "porsche", name: "پورشه", nameEn: "Porsche", abbr: "P",
+        origin: "آلمان", tags: ["luxury", "german"],
+        desc: "۳ مدل در دانشنامه",
+        models: [
+          { name: "۹۱۱", sub: "آیکون اسپرت", specs: ["۳۸۵ اسب", "۴.۲ ثانیه", "RWD"], img: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&q=80&auto=format&fit=crop", url: "#", featured: false },
+          { name: "Taycan", sub: "اسپرت الکتریکی", specs: ["۵۶۱ اسب", "۳.۲ ثانیه", "EV"], img: "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=600&q=80&auto=format&fit=crop", url: "#", featured: false },
+          { name: "Cayenne", sub: "SUV لوکس", specs: ["۴۵۹ اسب", "۵.۲ ثانیه", "SUV"], img: "https://images.pexels.com/photos/359392/pexels-photo-359392.jpeg?auto=compress&cs=tinysrgb&w=600", url: "#", featured: false }
+        ]
+      },
+      {
+        id: "bmw", name: "بی‌ام‌و", nameEn: "BMW", abbr: "B",
+        origin: "آلمان", tags: ["german"],
+        desc: "۴ مدل در دانشنامه",
+        models: [
+          { name: "سری ۳", sub: "سدان اسپرت", specs: ["۲۵۵ اسب", "۵.۸ ثانیه", "RWD"], img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=600&q=80&auto=format&fit=crop", url: "#", featured: false },
+          { name: "X5", sub: "SUV لوکس", specs: ["۳۷۵ اسب", "۵.۵ ثانیه", "AWD"], img: "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg?auto=compress&cs=tinysrgb&w=600", url: "#", featured: false },
+          { name: "iX", sub: "SUV برقی", specs: ["۵۲۶ اسب", "۴.۶ ثانیه", "EV"], img: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600&q=80&auto=format&fit=crop", url: "#", featured: false },
+          { name: "M4", sub: "کوپه پرفورمنس", specs: ["۵۰۳ اسب", "۳.۹ ثانیه", "RWD"], img: "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=600&q=80&auto=format&fit=crop", url: "#", featured: false }
+        ]
+      },
+      {
+        id: "mercedes", name: "مرسدس", nameEn: "Mercedes-Benz", abbr: "M",
+        origin: "آلمان", tags: ["luxury", "german"],
+        desc: "۳ مدل در دانشنامه",
+        models: [
+          { name: "C-Class", sub: "سدان لوکس", specs: ["۲۵۵ اسب", "۶.۰ ثانیه", "RWD"], img: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600&q=80&auto=format&fit=crop", url: "#", featured: false },
+          { name: "GLE", sub: "SUV لوکس", specs: ["۳۶۲ اسب", "۵.۳ ثانیه", "AWD"], img: "https://images.pexels.com/photos/919073/pexels-photo-919073.jpeg?auto=compress&cs=tinysrgb&w=600", url: "#", featured: false },
+          { name: "EQS", sub: "سدان برقی", specs: ["۵۱۶ اسب", "۴.۳ ثانیه", "EV"], img: "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=600&q=80&auto=format&fit=crop", url: "#", featured: false }
+        ]
+      },
+      {
+        id: "toyota", name: "تویوتا", nameEn: "Toyota", abbr: "T",
+        origin: "ژاپن", tags: ["japanese"],
+        desc: "۳ مدل در دانشنامه",
+        models: [
+          { name: "کمری", sub: "سدان محبوب", specs: ["۲۰۳ اسب", "هیبرید", "FWD"], img: "https://images.unsplash.com/photo-1621007947382-b6263a107184?w=600&q=80&auto=format&fit=crop", url: "#", featured: false },
+          { name: "RAV4", sub: "کراس‌اوور", specs: ["۲۱۹ اسب", "هیبرید", "AWD"], img: "https://images.pexels.com/photos/112460/pexels-photo-112460.jpeg?auto=compress&cs=tinysrgb&w=600", url: "#", featured: false },
+          { name: "Land Cruiser", sub: "آفرود لوکس", specs: ["۴۰۹ اسب", "۳.۵ ثانیه", "AWD"], img: "https://images.pexels.com/photos/1149137/pexels-photo-1149137.jpeg?auto=compress&cs=tinysrgb&w=600", url: "#", featured: false }
+        ]
+      },
+      {
+        id: "chery", name: "چری", nameEn: "Chery", abbr: "چ",
+        origin: "چین", tags: ["chinese"],
+        desc: "۲ مدل در دانشنامه",
+        models: [
+          { name: "تیگو ۸ پرو", sub: "شاسی‌بلند خانوادگی", specs: ["۱۹۷ اسب", "۷ نفره", "FWD"], img: "https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?auto=compress&cs=tinysrgb&w=600", url: "#", featured: false },
+          { name: "آریزو ۶ پرو", sub: "سدان جمع‌وجور", specs: ["۱۵۶ اسب", "CVT", "FWD"], img: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=600&q=80&auto=format&fit=crop", url: "#", featured: false }
+        ]
+      },
+      {
+        id: "ikco", name: "ایران‌خودرو", nameEn: "IKCO", abbr: "ای",
+        origin: "ایران", tags: ["iranian"],
+        desc: "۳ مدل در دانشنامه",
+        models: [
+          { name: "تارا", sub: "سدان ملی", specs: ["۱۱۰ اسب", "دنده‌ای", "FWD"], img: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=600&q=80&auto=format&fit=crop", url: "#", featured: false },
+          { name: "دنا پلاس", sub: "سدان ارتقایافته", specs: ["۱۷۰ اسب", "اتومات", "FWD"], img: "https://images.pexels.com/photos/359392/pexels-photo-359392.jpeg?auto=compress&cs=tinysrgb&w=600", url: "#", featured: false },
+          { name: "هایما S7", sub: "شاسی‌بلند", specs: ["۱۶۰ اسب", "اتومات", "FWD"], img: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=600&q=80&auto=format&fit=crop", url: "#", featured: false }
+        ]
+      },
+      {
+        id: "saipa", name: "سایپا", nameEn: "SAIPA", abbr: "س",
+        origin: "ایران", tags: ["iranian"],
+        desc: "۲ مدل در دانشنامه",
+        models: [
+          { name: "شاهین", sub: "سدان جدید", specs: ["۱۱۱ اسب", "اتومات", "FWD"], img: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=600&q=80&auto=format&fit=crop", url: "#", featured: false },
+          { name: "کوییک", sub: "هاچ‌بک شهری", specs: ["۸۷ اسب", "دنده‌ای", "FWD"], img: "https://images.pexels.com/photos/112460/pexels-photo-112460.jpeg?auto=compress&cs=tinysrgb&w=600", url: "#", featured: false }
+        ]
+      }
+    ];
+
+    var state = {
+      view: "brands",
+      brandId: null,
+      filter: "all",
+      query: ""
+    };
+
+    var els = {
+      viewBrands: document.getElementById("view-brands"),
+      viewModels: document.getElementById("view-models"),
+      brandsGrid: document.getElementById("dir-brands"),
+      modelsGrid: document.getElementById("dir-models"),
+      brandsEmpty: document.getElementById("brands-empty"),
+      modelsEmpty: document.getElementById("models-empty"),
+      search: document.getElementById("dir-search"),
+      count: document.getElementById("dir-count"),
+      filters: document.getElementById("dir-filters"),
+      back: document.getElementById("dir-back"),
+      stepBrands: document.getElementById("step-brands"),
+      stepModels: document.getElementById("step-models"),
+      stepHub: document.getElementById("step-hub"),
+      modelsBrandLogo: document.getElementById("models-brand-logo"),
+      modelsBrandName: document.getElementById("models-brand-name"),
+      modelsBrandDesc: document.getElementById("models-brand-desc")
+    };
+
+    function normalize(str) {
+      return (str || "").toLowerCase().trim();
+    }
+
+    function brandMatches(brand) {
+      var q = normalize(state.query);
+      if (state.view === "brands") {
+        if (state.filter !== "all" && brand.tags.indexOf(state.filter) === -1) return false;
+        if (!q) return true;
+        return normalize(brand.name).indexOf(q) !== -1
+          || normalize(brand.nameEn).indexOf(q) !== -1
+          || normalize(brand.origin).indexOf(q) !== -1;
+      }
+      return true;
+    }
+
+    function modelMatches(model, brand) {
+      var q = normalize(state.query);
+      if (!q) return true;
+      return normalize(model.name).indexOf(q) !== -1
+        || normalize(model.sub).indexOf(q) !== -1
+        || normalize(brand.name).indexOf(q) !== -1;
+    }
+
+    function setSteps() {
+      els.stepBrands.className = "dir-step" + (state.view === "brands" ? " is-active" : " is-done");
+      els.stepModels.className = "dir-step" + (state.view === "models" ? " is-active" : (state.view === "brands" ? "" : " is-done"));
+      els.stepHub.className = "dir-step";
+    }
+
+    function showView(name) {
+      state.view = name;
+      els.viewBrands.classList.toggle("is-visible", name === "brands");
+      els.viewModels.classList.toggle("is-visible", name === "models");
+      document.getElementById("dir-filters").style.display = name === "brands" ? "" : "none";
+      setSteps();
+      render();
+    }
+
+    function renderBrands() {
+      var visible = 0;
+      els.brandsGrid.innerHTML = "";
+      BRANDS.forEach(function (brand) {
+        if (!brandMatches(brand)) return;
+        visible++;
+        var card = document.createElement("button");
+        card.type = "button";
+        card.className = "dir-brand";
+        card.setAttribute("data-brand", brand.id);
+        card.innerHTML =
+          '<div class="dir-brand__logo">' + brand.abbr + '</div>' +
+          '<div class="dir-brand__name">' + brand.name + '</div>' +
+          '<div class="dir-brand__meta">' + brand.models.length + ' مدل</div>' +
+          '<span class="dir-brand__origin">' + brand.origin + '</span>';
+        card.addEventListener("click", function () { openBrand(brand.id); });
+        els.brandsGrid.appendChild(card);
+      });
+      els.brandsEmpty.classList.toggle("is-visible", visible === 0);
+      els.count.textContent = visible + " برند";
+    }
+
+    function renderModels() {
+      var brand = BRANDS.find(function (b) { return b.id === state.brandId; });
+      if (!brand) return showView("brands");
+
+      els.modelsBrandLogo.textContent = brand.abbr;
+      els.modelsBrandName.textContent = brand.name;
+      els.modelsBrandDesc.textContent = brand.desc + " · " + brand.origin;
+
+      var visible = 0;
+      els.modelsGrid.innerHTML = "";
+      brand.models.forEach(function (model) {
+        if (!modelMatches(model, brand)) return;
+        visible++;
+        var card = document.createElement("article");
+        card.className = "dir-model";
+        var href = model.url;
+        var badge = model.featured ? '<span class="dir-model__badge">صفحه آماده</span>' : "";
+        card.innerHTML =
+          '<a class="dir-model__link" href="' + href + '">' +
+            '<div class="dir-model__media">' + badge +
+              '<img src="' + model.img + '" alt="' + brand.name + ' ' + model.name + '" loading="lazy" />' +
+            '</div>' +
+            '<div class="dir-model__body">' +
+              '<div class="dir-model__title">' + model.name + '</div>' +
+              '<div class="dir-model__sub">' + model.sub + '</div>' +
+              '<div class="dir-model__specs">' +
+                model.specs.map(function (s) { return '<span class="dir-model__spec">' + s + '</span>'; }).join("") +
+              '</div>' +
+              '<div class="dir-model__cta">' +
+                (model.featured ? 'ورود به صفحه خودرو' : 'به‌زودی') +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>' +
+              '</div>' +
+            '</div>' +
+          '</a>';
+        els.modelsGrid.appendChild(card);
+      });
+      els.modelsEmpty.classList.toggle("is-visible", visible === 0);
+      els.count.textContent = visible + " مدل · " + brand.name;
+    }
+
+    function render() {
+      if (state.view === "brands") renderBrands();
+      else renderModels();
+    }
+
+    function openBrand(id) {
+      state.brandId = id;
+      state.query = "";
+      els.search.value = "";
+      showView("models");
+    }
+
+    els.search.addEventListener("input", function () {
+      state.query = els.search.value;
+      if (state.view === "brands") {
+        renderBrands();
+      } else {
+        var q = normalize(state.query);
+        if (q) {
+          var match = BRANDS.find(function (b) {
+            return normalize(b.name).indexOf(q) !== -1
+              || normalize(b.nameEn).indexOf(q) !== -1
+              || b.models.some(function (m) { return normalize(m.name).indexOf(q) !== -1; });
+          });
+          if (match && match.id !== state.brandId) {
+            state.brandId = match.id;
+          }
+        }
+        renderModels();
+      }
+    });
+
+    els.filters.addEventListener("click", function (e) {
+      var btn = e.target.closest(".dir-filter");
+      if (!btn) return;
+      state.filter = btn.getAttribute("data-filter");
+      els.filters.querySelectorAll(".dir-filter").forEach(function (b) {
+        b.classList.toggle("is-active", b === btn);
+      });
+      renderBrands();
+    });
+
+    els.back.addEventListener("click", function () {
+      state.brandId = null;
+      state.query = "";
+      els.search.value = "";
+      showView("brands");
+    });
+
+    renderBrands();
+  })();
+  </script>
+</body>
+</html>

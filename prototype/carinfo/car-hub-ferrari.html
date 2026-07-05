@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="فراری ۲۹۶ GTB — دانشنامه خودرو عصر خودرو. مشخصات، گالری و ورود به نمایش سه‌بعدی." />
+  <title>فراری ۲۹۶ GTB | دانشنامه خودرو — عصر خودرو</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <style>
+    /* ── Car Hub — luxury gateway before 3D2 ── */
+    :root {
+      --hub-black: #0a0a0c;
+      --hub-charcoal: #141418;
+      --hub-cream: #f7f5f1;
+      --hub-gold: #c9a227;
+      --hub-gold-soft: rgba(201, 162, 39, 0.15);
+      --hub-ferrari: #dc0000;
+      --hub-line-gold: rgba(201, 162, 39, 0.35);
+    }
+
+    body.car-hub-page {
+      background: var(--hub-cream);
+    }
+
+    .proto-badge {
+      position: fixed;
+      bottom: 1rem;
+      left: 1rem;
+      z-index: 9999;
+      background: rgba(10, 10, 12, 0.9);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.4rem 0.7rem;
+      border-radius: 6px;
+      pointer-events: none;
+    }
+
+    /* Breadcrumb */
+    .hub-breadcrumb {
+      padding: 1.1rem 0 0.5rem;
+      font-size: 0.82rem;
+      color: var(--ink-muted);
+    }
+    .hub-breadcrumb ol {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      list-style: none;
+    }
+    .hub-breadcrumb li + li::before {
+      content: "‹";
+      margin-inline: 0.4rem;
+      color: #bbb;
+    }
+    .hub-breadcrumb a:hover { color: var(--brand); }
+
+    /* ── Hero cinematic ── */
+    .hub-hero {
+      position: relative;
+      margin-top: 0.5rem;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--hub-black);
+      color: #fff;
+      min-height: 520px;
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .hub-hero__content {
+      position: relative;
+      z-index: 2;
+      padding: 3rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hub-hero__content::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 90% 70% at 0% 50%, rgba(220, 0, 0, 0.18), transparent 55%),
+        linear-gradient(90deg, var(--hub-black) 40%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .hub-hero__inner { position: relative; }
+
+    .hub-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .hub-brand__crest {
+      width: 52px;
+      height: 52px;
+      border: 1px solid var(--hub-line-gold);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      color: var(--hub-gold);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .hub-brand__name {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--hub-gold);
+    }
+
+    .hub-hero__eyebrow {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.55);
+      letter-spacing: 0.06em;
+      margin-bottom: 0.5rem;
+    }
+
+    .hub-hero__title {
+      font-size: clamp(2rem, 4.5vw, 3.25rem);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+    }
+
+    .hub-hero__title span {
+      display: block;
+      font-weight: 300;
+      font-size: 0.45em;
+      color: rgba(255, 255, 255, 0.65);
+      margin-top: 0.35rem;
+      letter-spacing: 0.02em;
+    }
+
+    .hub-hero__lead {
+      margin-top: 1.25rem;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.85;
+      color: rgba(255, 255, 255, 0.72);
+      max-width: 420px;
+    }
+
+    .hub-hero__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      margin-top: 2rem;
+    }
+
+    .hub-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.5rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+    }
+
+    .hub-btn--primary {
+      background: linear-gradient(135deg, var(--hub-gold) 0%, #a8841e 100%);
+      color: var(--hub-black);
+      box-shadow: 0 8px 28px rgba(201, 162, 39, 0.35);
+    }
+
+    .hub-btn--primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 36px rgba(201, 162, 39, 0.45);
+    }
+
+    .hub-btn--ghost {
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #fff;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(8px);
+    }
+
+    .hub-btn--ghost:hover {
+      border-color: var(--hub-gold);
+      color: var(--hub-gold);
+    }
+
+    .hub-btn__icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .hub-hero__visual {
+      position: relative;
+      min-height: 320px;
+    }
+
+    .hub-hero__visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 60%;
+    }
+
+    .hub-hero__visual::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(270deg, transparent 30%, var(--hub-black) 95%);
+    }
+
+    .hub-hero__shine {
+      position: absolute;
+      bottom: 2rem;
+      left: 2rem;
+      z-index: 3;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      color: var(--hub-gold);
+      opacity: 0.8;
+    }
+
+    /* Stats ribbon */
+    .hub-stats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+      margin: -2rem 2rem 0;
+      position: relative;
+      z-index: 5;
+      background: #fff;
+      border: 1px solid var(--hub-line-gold);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hub-stat {
+      padding: 1.35rem 1rem;
+      text-align: center;
+      border-inline-start: 1px solid var(--line-soft);
+    }
+
+    .hub-stat:first-child { border-inline-start: none; }
+
+    .hub-stat__label {
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.04em;
+    }
+
+    .hub-stat__value {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-top: 0.3rem;
+      color: var(--ink);
+    }
+
+    .hub-stat__value small {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--ink-muted);
+    }
+
+    /* Section common */
+    .hub-section {
+      padding: 3.5rem 0;
+    }
+
+    .hub-section__head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .hub-section__title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .hub-section__title::after {
+      content: "";
+      display: block;
+      width: 48px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--hub-gold), transparent);
+      margin-top: 0.5rem;
+      border-radius: 2px;
+    }
+
+    .hub-section__more {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ink-muted);
+    }
+
+    .hub-section__more:hover { color: var(--brand); }
+
+    /* Editorial intro */
+    .hub-intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .hub-intro__text p {
+      font-size: 1.02rem;
+      line-height: 2;
+      color: var(--ink-soft);
+      margin-bottom: 1.25rem;
+      text-align: justify;
+      text-align-last: right;
+    }
+
+    .hub-intro__quote {
+      margin-top: 1.5rem;
+      padding: 1.25rem 1.5rem;
+      border-inline-start: 3px solid var(--hub-gold);
+      background: var(--hub-gold-soft);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-style: italic;
+      color: var(--ink);
+      line-height: 1.75;
+    }
+
+    .hub-intro__media {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      aspect-ratio: 4/5;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .hub-intro__media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hub-intro__caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1.25rem 1.5rem;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.75));
+      color: #fff;
+      font-size: 0.8rem;
+    }
+
+    /* Quick nav cards */
+    .hub-nav-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    .hub-nav-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.25rem;
+      text-align: center;
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+    }
+
+    .hub-nav-card:hover {
+      border-color: var(--hub-gold);
+      box-shadow: var(--shadow);
+      transform: translateY(-4px);
+    }
+
+    .hub-nav-card__icon {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto 1rem;
+      border-radius: 50%;
+      background: var(--hub-gold-soft);
+      display: grid;
+      place-items: center;
+      color: var(--hub-gold);
+    }
+
+    .hub-nav-card__icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .hub-nav-card strong {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .hub-nav-card span {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      margin-top: 0.35rem;
+    }
+
+    /* Highlights */
+    .hub-highlights {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    .hub-highlight {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      border: 1px solid var(--line-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hub-highlight::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--hub-gold);
+    }
+
+    .hub-highlight__num {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--hub-gold);
+      line-height: 1;
+      opacity: 0.35;
+    }
+
+    .hub-highlight h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 0.5rem 0 0.65rem;
+    }
+
+    .hub-highlight p {
+      font-size: 0.88rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+    }
+
+    /* Gallery strip */
+    .hub-gallery {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-rows: 200px 200px;
+      gap: 0.75rem;
+    }
+
+    .hub-gallery__item {
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      position: relative;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      background: #ddd;
+    }
+
+    .hub-gallery__item:first-child {
+      grid-row: 1 / -1;
+    }
+
+    .hub-gallery__item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .hub-gallery__item:hover img {
+      transform: scale(1.06);
+    }
+
+    .hub-gallery__item span {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0);
+      transition: background var(--transition);
+      display: flex;
+      align-items: flex-end;
+      padding: 0.75rem;
+      font-size: 0.75rem;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .hub-gallery__item:hover span {
+      background: linear-gradient(transparent 40%, rgba(0, 0, 0, 0.6));
+    }
+
+    /* 3D CTA banner */
+    .hub-cta-3d {
+      margin: 2rem 0 0;
+      padding: 3rem 2.5rem;
+      border-radius: var(--radius);
+      background:
+        radial-gradient(ellipse 80% 120% at 100% 0%, rgba(220, 0, 0, 0.2), transparent 50%),
+        linear-gradient(135deg, var(--hub-charcoal) 0%, var(--hub-black) 100%);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+      border: 1px solid rgba(201, 162, 39, 0.2);
+    }
+
+    .hub-cta-3d h2 {
+      font-size: clamp(1.35rem, 3vw, 1.85rem);
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .hub-cta-3d p {
+      margin-top: 0.65rem;
+      font-size: 0.92rem;
+      color: rgba(255, 255, 255, 0.65);
+      max-width: 480px;
+      line-height: 1.75;
+    }
+
+    /* Siblings */
+    .hub-siblings {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    .hub-sibling {
+      background: #fff;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--line);
+      transition: box-shadow var(--transition), transform var(--transition);
+    }
+
+    .hub-sibling:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-4px);
+    }
+
+    .hub-sibling__media {
+      aspect-ratio: 16/10;
+      overflow: hidden;
+      background: var(--hub-charcoal);
+    }
+
+    .hub-sibling__media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s;
+    }
+
+    .hub-sibling:hover .hub-sibling__media img {
+      transform: scale(1.05);
+    }
+
+    .hub-sibling__body {
+      padding: 1.1rem 1.25rem;
+    }
+
+    .hub-sibling__brand {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      color: var(--hub-gold);
+      text-transform: uppercase;
+    }
+
+    .hub-sibling__title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-top: 0.25rem;
+    }
+
+    .hub-sibling__meta {
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      margin-top: 0.35rem;
+    }
+
+    /* Footer note */
+    .hub-footer-note {
+      text-align: center;
+      padding: 2rem 0 3rem;
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+    }
+
+    .hub-footer-note a {
+      color: var(--brand);
+      font-weight: 600;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .hub-hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+      .hub-hero__visual {
+        min-height: 280px;
+        order: -1;
+      }
+      .hub-hero__visual::after {
+        background: linear-gradient(0deg, var(--hub-black) 0%, transparent 40%);
+      }
+      .hub-hero__content {
+        padding: 2rem 1.5rem 2.5rem;
+      }
+      .hub-stats {
+        margin: -1.5rem 1rem 0;
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .hub-stat:nth-child(4),
+      .hub-stat:nth-child(5) {
+        grid-column: span 1;
+      }
+      .hub-intro { grid-template-columns: 1fr; }
+      .hub-intro__media { aspect-ratio: 16/10; max-height: 360px; }
+      .hub-nav-cards { grid-template-columns: repeat(2, 1fr); }
+      .hub-highlights { grid-template-columns: 1fr; }
+      .hub-gallery {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+      }
+      .hub-gallery__item:first-child { grid-row: auto; grid-column: 1 / -1; aspect-ratio: 16/9; }
+      .hub-gallery__item { aspect-ratio: 16/10; }
+      .hub-siblings { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .hub-stats {
+        grid-template-columns: repeat(2, 1fr);
+        margin-inline: 0;
+      }
+      .hub-stat { border-inline-start: none; border-bottom: 1px solid var(--line-soft); }
+      .hub-cta-3d { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+      .hub-nav-cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="car-hub-page">
+
+  <div class="proto-badge">پروتوتایپ — car-hub-ferrari.html · صفحه قبل از 3D2</div>
+
+  <header class="site-header">
+    <div class="container">
+      <div class="site-header__brand">
+        <a href="../index.html" class="logo" aria-label="صفحه اصلی عصر خودرو">
+          <div class="logo__mark" aria-hidden="true">AK</div>
+          <div class="logo__text">
+            <strong>عصر خودرو</strong>
+            <span>Asre Khodro · مرجع تخصصی صنعت خودرو</span>
+          </div>
+        </a>
+      </div>
+      <nav class="main-nav" aria-label="منوی اصلی">
+        <ul class="main-nav__list">
+          <li><a href="../index.html">صفحه اصلی</a></li>
+          <li><a href="#" class="is-active">دانشنامه خودرو</a></li>
+          <li><a href="#">اخبار خودرو</a></li>
+          <li><a href="#">تست و بررسی</a></li>
+          <li><a href="#">ویدئو</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <nav class="hub-breadcrumb" aria-label="مسیر">
+      <ol>
+        <li><a href="../index.html">عصر خودرو</a></li>
+        <li><a href="car-directory.html">دانشنامه خودرو</a></li>
+        <li><a href="car-directory.html">برندها</a></li>
+        <li><a href="car-directory.html">فراری</a></li>
+        <li aria-current="page">۲۹۶ GTB</li>
+      </ol>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hub-hero" aria-labelledby="hub-title">
+      <div class="hub-hero__content">
+        <div class="hub-hero__inner">
+          <div class="hub-brand">
+            <div class="hub-brand__crest" aria-hidden="true">F</div>
+            <span class="hub-brand__name">Ferrari</span>
+          </div>
+          <p class="hub-hero__eyebrow">سوپراسپرت هیبریدی · ۲۰۲۲ — اکنون</p>
+          <h1 id="hub-title" class="hub-hero__title">
+            فراری ۲۹۶ GTB
+            <span>The Defining Sportscar</span>
+          </h1>
+          <p class="hub-hero__lead">
+            اولین مدل V6 هیبریدی فراری با قلب تپنده در مرکز. ترکیبی از میراث مسابقه‌ای و فناوری روز —
+            دروازه ورود به تجربه immersive سه‌بعدی عصر خودرو.
+          </p>
+          <div class="hub-hero__actions">
+            <a href="car-intro-chile20-03.html" class="hub-btn hub-btn--primary">
+              <svg class="hub-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3 4 9v12h16V9l-8-6z"/><path d="M9 21v-8h6v8"/></svg>
+              ورود به نمایش سه‌بعدی
+            </a>
+            <a href="#specs" class="hub-btn hub-btn--ghost">مشاهده مشخصات</a>
+          </div>
+        </div>
+      </div>
+      <div class="hub-hero__visual">
+        <img
+          src="https://images.unsplash.com/photo-1583121274602-3e2820c59d9f?w=1400&q=85&auto=format&fit=crop"
+          alt="فراری ۲۹۶ GTB — نمای سه‌ربع جلو"
+          width="1400" height="900" loading="eager"
+        />
+        <span class="hub-hero__shine">ASRE KHODRO · CAR ENCYCLOPEDIA</span>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <div class="hub-stats" role="list" aria-label="مشخصات کلیدی">
+      <div class="hub-stat" role="listitem">
+        <div class="hub-stat__label">قدرت</div>
+        <div class="hub-stat__value">۸۳۰ <small>اسب</small></div>
+      </div>
+      <div class="hub-stat" role="listitem">
+        <div class="hub-stat__label">۰ تا ۱۰۰</div>
+        <div class="hub-stat__value">۲.۹ <small>ثانیه</small></div>
+      </div>
+      <div class="hub-stat" role="listitem">
+        <div class="hub-stat__label">حداکثر سرعت</div>
+        <div class="hub-stat__value">۳۳۰ <small>km/h</small></div>
+      </div>
+      <div class="hub-stat" role="listitem">
+        <div class="hub-stat__label">موتور</div>
+        <div class="hub-stat__value">V6 <small>هیبرید</small></div>
+      </div>
+      <div class="hub-stat" role="listitem">
+        <div class="hub-stat__label">امتیاز عصر خودرو</div>
+        <div class="hub-stat__value" style="color: var(--hub-gold);">۹.۴</div>
+      </div>
+    </div>
+
+    <!-- Intro -->
+    <section class="hub-section" aria-labelledby="intro-heading">
+      <div class="hub-intro">
+        <div class="hub-intro__text">
+          <div class="hub-section__head" style="margin-bottom: 1.25rem;">
+            <h2 id="intro-heading" class="hub-section__title">نگاهی مجلسی</h2>
+          </div>
+          <p>
+            فراری ۲۹۶ GTB نسل تازه‌ای از سوپراسپرت‌های مارانلو است؛ جایی که موتور V6 توربو با سیستم
+            هیبریدی MGU-K و MGU-H ترکیب شده تا پاسخ آنی و مصرف بهینه‌تر را همزمان ارائه دهد. طراحی بدنه
+            تحت تأثیر مستقیم اصول آیرودینامیک فرمول یک قرار دارد.
+          </p>
+          <p>
+            در عصر خودرو، این صفحه «هاب معرفی» خودروست — پیش از ورود به تجربه سه‌بعدی immersive.
+            کاربر ابتدا هویت برند و مدل را می‌شناسد، سپس با یک کلیک وارد دنیای سه‌بعدی می‌شود.
+          </p>
+          <blockquote class="hub-intro__quote">
+            «۲۹۶ GTB ثابت می‌کند فراری می‌تواند بدون V12 هم هیجان اصیل فراری بسازد.»
+            — تحریریه عصر خودرو
+          </blockquote>
+        </div>
+        <figure class="hub-intro__media">
+          <img
+            src="https://images.unsplash.com/photo-1611651338412-8403fa6e3599?w=800&q=80&auto=format&fit=crop"
+            alt="کابین فراری ۲۹۶ GTB"
+            width="800" height="1000" loading="lazy"
+          />
+          <figcaption class="hub-intro__caption">طراحی کابین راننده‌محور · فراری ۲۹۶ GTB</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- Quick nav -->
+    <section class="hub-section" style="padding-top: 0;" aria-labelledby="nav-heading">
+      <div class="hub-section__head">
+        <h2 id="nav-heading" class="hub-section__title">کاوش در ۲۹۶ GTB</h2>
+      </div>
+      <div class="hub-nav-cards">
+        <a href="#specs" class="hub-nav-card">
+          <div class="hub-nav-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          </div>
+          <strong>مشخصات فنی</strong>
+          <span>موتور، ابعاد، مصرف</span>
+        </a>
+        <a href="#gallery" class="hub-nav-card">
+          <div class="hub-nav-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="2"/><circle cx="8" cy="8" r="2"/><path d="m22 16-6-6-4 4-2-2-6 6"/></svg>
+          </div>
+          <strong>گالری تصاویر</strong>
+          <span>نمای بیرونی و داخلی</span>
+        </a>
+        <a href="#" class="hub-nav-card">
+          <div class="hub-nav-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+          <strong>ویدیوها</strong>
+          <span>تست رانندگی و بررسی</span>
+        </a>
+        <a href="#" class="hub-nav-card">
+          <div class="hub-nav-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 3h5v5M8 21H3v-5M21 3l-7 7M3 21l7-7"/></svg>
+          </div>
+          <strong>مقایسه</strong>
+          <span>با رقبای هم‌رده</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Highlights -->
+    <section class="hub-section" style="padding-top: 0;" aria-labelledby="highlights-heading">
+      <div class="hub-section__head">
+        <h2 id="highlights-heading" class="hub-section__title">نکات برجسته</h2>
+      </div>
+      <div class="hub-highlights">
+        <article class="hub-highlight">
+          <div class="hub-highlight__num">01</div>
+          <h3>هیبرید فرمول یک</h3>
+          <p>سیستم هیبریدی مشتق‌شده از F1 با بازیابی انرژی ترمز و تقویت شتاب در خروج از پیچ.</p>
+        </article>
+        <article class="hub-highlight">
+          <div class="hub-highlight__num">02</div>
+          <h3>طراحی آیرودینامیک فعال</h3>
+          <p>بال عقب فعال و دیفیوزر S-Duct برای پایداری در سرعت‌های بالا بدون افزایش پساورد اضافی.</p>
+        </article>
+        <article class="hub-highlight">
+          <div class="hub-highlight__num">03</div>
+          <h3>تجربه رانندگی دوگانه</h3>
+          <p>حالت‌های رانندگی از آرام شهری تا پیست — با پاسخ پدال و صدای اگزوز قابل تنظیم.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Gallery -->
+    <section class="hub-section" id="gallery" aria-labelledby="gallery-heading">
+      <div class="hub-section__head">
+        <h2 id="gallery-heading" class="hub-section__title">گالری</h2>
+        <a href="#" class="hub-section__more">مشاهده همه ←</a>
+      </div>
+      <div class="hub-gallery">
+        <button type="button" class="hub-gallery__item">
+          <img src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=900&q=80&auto=format&fit=crop" alt="" loading="lazy" />
+          <span>نمای جلو</span>
+        </button>
+        <button type="button" class="hub-gallery__item">
+          <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500&q=80&auto=format&fit=crop" alt="" loading="lazy" />
+          <span>پشت</span>
+        </button>
+        <button type="button" class="hub-gallery__item">
+          <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=500&q=80&auto=format&fit=crop" alt="" loading="lazy" />
+          <span>جانب</span>
+        </button>
+        <button type="button" class="hub-gallery__item">
+          <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=500&q=80&auto=format&fit=crop" alt="" loading="lazy" />
+          <span>جزئیات</span>
+        </button>
+        <button type="button" class="hub-gallery__item">
+          <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=500&q=80&auto=format&fit=crop" alt="" loading="lazy" />
+          <span>چرخ</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Specs teaser -->
+    <section class="hub-section" id="specs" style="padding-top: 0;" aria-labelledby="specs-heading">
+      <div class="hub-section__head">
+        <h2 id="specs-heading" class="hub-section__title">مشخصات فنی (خلاصه)</h2>
+        <a href="#" class="hub-section__more">جدول کامل ←</a>
+      </div>
+      <div class="hub-stats" style="margin: 0;">
+        <div class="hub-stat"><div class="hub-stat__label">حجم موتور</div><div class="hub-stat__value">۲,۹۹۲ <small>cc</small></div></div>
+        <div class="hub-stat"><div class="hub-stat__label">گشتاور</div><div class="hub-stat__value">۷۴۰ <small>Nm</small></div></div>
+        <div class="hub-stat"><div class="hub-stat__label">وزن</div><div class="hub-stat__value">۱,۴۷۰ <small>kg</small></div></div>
+        <div class="hub-stat"><div class="hub-stat__label">گیربکس</div><div class="hub-stat__value">۸DCT</div></div>
+        <div class="hub-stat"><div class="hub-stat__label">محور محرک</div><div class="hub-stat__value">RWD</div></div>
+      </div>
+    </section>
+
+    <!-- 3D CTA -->
+    <section class="hub-cta-3d" aria-labelledby="cta-3d-heading">
+      <div>
+        <h2 id="cta-3d-heading">آماده تجربه immersive هستید؟</h2>
+        <p>
+          وارد محیط سه‌بعدی شوید — خودرو را از هر زاویه ببینید، بچرخانید و در استودیو اختصاصی
+          عصر خودرو کاوش کنید. این همان صفحه‌ای است که با تمپلیت Car Info 3D2 نمایش داده می‌شود.
+        </p>
+      </div>
+      <a href="car-intro-chile20-03.html" class="hub-btn hub-btn--primary">
+        <svg class="hub-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12"/></svg>
+        شروع نمایش سه‌بعدی
+      </a>
+    </section>
+
+    <!-- Siblings -->
+    <section class="hub-section" aria-labelledby="siblings-heading">
+      <div class="hub-section__head">
+        <h2 id="siblings-heading" class="hub-section__title">سایر مدل‌های فراری</h2>
+        <a href="#">همه مدل‌های فراری ←</a>
+      </div>
+      <div class="hub-siblings">
+        <a href="#" class="hub-sibling">
+          <div class="hub-sibling__media">
+            <img src="https://images.unsplash.com/photo-1617788138017-80ad40651399?w=600&q=80&auto=format&fit=crop" alt="" loading="lazy" />
+          </div>
+          <div class="hub-sibling__body">
+            <div class="hub-sibling__brand">Ferrari</div>
+            <div class="hub-sibling__title">SF90 Stradale</div>
+            <div class="hub-sibling__meta">۱,۰۰۰ اسب · هیبرید پلاگین</div>
+          </div>
+        </a>
+        <a href="#" class="hub-sibling">
+          <div class="hub-sibling__media">
+            <img src="https://images.pexels.com/photos/919073/pexels-photo-919073.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" loading="lazy" />
+          </div>
+          <div class="hub-sibling__body">
+            <div class="hub-sibling__brand">Ferrari</div>
+            <div class="hub-sibling__title">Roma</div>
+            <div class="hub-sibling__meta">۶۲۰ اسب · GT مدرن</div>
+          </div>
+        </a>
+        <a href="#" class="hub-sibling">
+          <div class="hub-sibling__media">
+            <img src="https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" loading="lazy" />
+          </div>
+          <div class="hub-sibling__body">
+            <div class="hub-sibling__brand">Ferrari</div>
+            <div class="hub-sibling__title">Purosangue</div>
+            <div class="hub-sibling__meta">۷۲۹ اسب · SUV چهارچرخ متحرک</div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <p class="hub-footer-note">
+      پروتوتایپ صفحه هاب خودرو — مسیر: برندها → مدل‌ها → <strong>این صفحه</strong> →
+      <a href="car-intro-chile20-03.html">نمایش ۳D2</a>
+    </p>
+  </div>
+
+</body>
+</html>
