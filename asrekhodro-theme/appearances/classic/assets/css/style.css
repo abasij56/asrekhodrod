@@ -4579,8 +4579,27 @@ address {
     --magazines-visible: 2;
   }
   .footer-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem 1.25rem;
   }
+
+  .footer-brand,
+  .footer-col--contact {
+    grid-column: 1 / -1;
+  }
+
+  .footer-brand p {
+    max-width: none;
+    text-align: justify;
+    text-align-last: right;
+  }
+
+  .footer-col--contact address,
+  .footer-col--contact address li {
+    text-align: justify;
+    text-align-last: right;
+  }
+
   .footer-bottom {
     flex-direction: column;
     text-align: center;
