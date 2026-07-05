@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { MOUSE, TOUCH } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -11,6 +12,41 @@ const INTRO_AZIMUTH_DEG = 38;
 const INTRO_STAGE_ROTATION_DEFAULT_DEG = 32;
 const INTRO_MODEL_TARGET_SIZE = 4.2;
 const INTRO_CAMERA_FOV = 40;
+
+function getIntroCameraDistance() {
+  return INTRO_CAMERA_DISTANCE * getResponsiveSceneFactors().cameraDistanceMul;
+}
+
+function bindCanvasZoomControls(controls, domElement) {
+  controls.enableZoom = true;
+  controls.enablePan = false;
+  controls.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.ROTATE, RIGHT: MOUSE.ROTATE };
+  // Two-finger pinch zoom on touch devices (pan disabled → dolly only).
+  controls.touches = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN };
+
+  const applyZoomLimits = () => {
+    const baseDistance = getIntroCameraDistance();
+    controls.minDistance = baseDistance * 0.45;
+    controls.maxDistance = baseDistance * 1.9;
+  };
+
+  applyZoomLimits();
+
+  // Desktop: allow OrbitControls wheel zoom only with Ctrl/Cmd held.
+  domElement.addEventListener(
+    'wheel',
+    (event) => {
+      if (event.ctrlKey || event.metaKey) {
+        return;
+      }
+
+      event.stopImmediatePropagation();
+    },
+    { capture: true }
+  );
+
+  return applyZoomLimits;
+}
 
 function getResponsiveSceneFactors() {
   const width = window.innerWidth;
@@ -893,6 +929,10 @@ function getBaseWorldForSection(section) {
 }
 
 function initImmersiveSlides() {
+  if (isCarInfo3d2Page()) {
+    return;
+  }
+
   const sections = getImmersiveSections();
 
   if (!sections.length) {
@@ -1042,8 +1082,8 @@ function initScene(container) {
   controls.target.set(...heroWorld.target);
   controls.enableDamping = true;
   controls.dampingFactor = 0.05;
-  controls.enableZoom = false;
   controls.enablePan = false;
+  const applyZoomLimits = bindCanvasZoomControls(controls, renderer.domElement);
   controls.minPolarAngle = Math.PI / 5;
   controls.maxPolarAngle = Math.PI / 2.1;
   controls.autoRotate = true;
@@ -1156,6 +1196,10 @@ function initScene(container) {
   scene.add(rimLight);
 
   window.addEventListener('carinfo3d:worldchange', (event) => {
+    if (isCarInfo3d2Page() && event.detail?.key !== 'intro') {
+      return;
+    }
+
     const section = event.detail?.section;
     const world = section
       ? getWorldForSection(section)
@@ -1225,6 +1269,7 @@ function initScene(container) {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
     setChromeHeight();
+    applyZoomLimits();
     applyResponsiveModelScale();
 
     if (!userOrbiting && isIntroViewport()) {
