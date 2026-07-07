@@ -29,7 +29,7 @@
                     >
                       <img
                         src="{{ image.thumb_url }}"
-                        alt=""
+                        alt="{{ image.alt|e('html_attr') }}"
                         width="{{ image.width }}"
                         height="{{ image.height }}"
                         loading="lazy"

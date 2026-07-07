@@ -4,7 +4,7 @@
     <div class="picture-frame__backdrops" aria-hidden="true">
       {% for item in picture_frame_items %}
         <div class="picture-frame__backdrop{{ loop.last ? ' is-active' : '' }}" data-pf-backdrop>
-          <img src="{{ item.image }}" alt="" width="1920" height="1080" loading="{{ loop.last ? 'eager' : 'lazy' }}" decoding="async" />
+          <img src="{{ item.image }}" alt="{{ item.image_alt|default('')|e('html_attr') }}" width="1920" height="1080" loading="{{ loop.last ? 'eager' : 'lazy' }}" decoding="async" />
         </div>
       {% endfor %}
     </div>
@@ -82,7 +82,7 @@
                 aria-label="اسلاید {{ item.rank|persian_digits }}: {{ item.title }}"
               >
                 <span class="picture-frame__thumb-frame">
-                  <img src="{{ item.thumb }}" alt="" width="120" height="80" loading="lazy" decoding="async" />
+                  <img src="{{ item.thumb }}" alt="{{ item.image_alt|default('')|e('html_attr') }}" width="120" height="80" loading="lazy" decoding="async" />
                 </span>
                 <span class="picture-frame__thumb-label">{{ item.rank|persian_digits }}</span>
               </button>

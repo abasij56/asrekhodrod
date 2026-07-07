@@ -10,6 +10,7 @@ use ABI\Translator\Compat\AsreKhodro\Bootstrap as AsreKhodroCompat;
 use ABI\Translator\Core\Admin\SettingsPage;
 use ABI\Translator\Core\Filters\ListTitleWarmer;
 use ABI\Translator\Core\Filters\PostFilters;
+use ABI\Translator\Core\Filters\TermFilters;
 use ABI\Translator\Core\Frontend\LanguageSwitcher;
 use ABI\Translator\Core\Language\LanguageRouter;
 use ABI\Translator\Core\SEO\Canonical;
@@ -65,7 +66,7 @@ final class Plugin {
 
 			( new PostFilters( $service ) )->register();
 
-			// Phase 2 + 3 front-end features.
+			// Phase 2 + 3 + 4 front-end features.
 			if ( ! is_admin() ) {
 				// Phase 2: SEO + language switcher.
 				( new Hreflang() )->register();
@@ -75,6 +76,9 @@ final class Plugin {
 				// Phase 3: batch-warm list titles + site-specific Compat bridges.
 				( new ListTitleWarmer( $service ) )->register();
 				( new AsreKhodroCompat( $service ) )->register();
+
+				// Phase 4: taxonomy term translation (category names, etc.).
+				( new TermFilters( $service ) )->register();
 			}
 		} catch ( \Throwable $e ) {
 			Logger::error( 'Boot failed', array( 'reason' => $e->getMessage() ) );

@@ -16,7 +16,7 @@
             <img
               class="video-cinema-stage__poster-image"
               src="{{ video_poster_url }}"
-              alt=""
+              alt="{{ video_poster_alt|default('')|e('html_attr') }}"
               width="1280"
               height="720"
               loading="eager"

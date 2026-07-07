@@ -7,7 +7,7 @@
       rel="{{ ad.link_rel|default('noopener noreferrer') }}"
     >
       {% if ad.image %}
-        <img src="{{ ad.image }}" alt="" width="300" height="75" loading="lazy" decoding="async" />
+        <img src="{{ ad.image }}" alt="{{ ad.image_alt|default('')|e('html_attr') }}" width="300" height="75" loading="lazy" decoding="async" />
       {% endif %}
     </a>
   {% else %}

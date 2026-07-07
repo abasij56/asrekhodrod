@@ -2,21 +2,21 @@
   class="single-gallery single-gallery--inline"
 >
   <div
-    class="single-gallery__grid single-gallery__grid--count-{{ images|length > 4 ? 'many' : images|length }}"
+    class="single-gallery__grid single-gallery__grid--count-{{ image_items|length > 4 ? 'many' : image_items|length }}"
     data-news-gallery-group
-    data-gallery-images="{{ images|json_encode(constant('JSON_UNESCAPED_UNICODE'))|e('html_attr') }}"
+    data-gallery-images="{{ image_items|json_encode(constant('JSON_UNESCAPED_UNICODE'))|e('html_attr') }}"
   >
-    {% for image in images %}
+    {% for image in image_items %}
       <button
         type="button"
-        class="single-gallery__tile{% if loop.first and images|length > 2 %} single-gallery__tile--lead{% endif %}"
+        class="single-gallery__tile{% if loop.first and image_items|length > 2 %} single-gallery__tile--lead{% endif %}"
         data-news-gallery-open
         data-gallery-index="{{ loop.index0 }}"
-        aria-label="نمایش تصویر {{ loop.index }} از {{ images|length }}"
+        aria-label="نمایش تصویر {{ loop.index }} از {{ image_items|length }}"
       >
         <img
-          src="{{ image }}"
-          alt=""
+          src="{{ image.url }}"
+          alt="{{ image.alt|e('html_attr') }}"
           width="640"
           height="427"
           loading="lazy"

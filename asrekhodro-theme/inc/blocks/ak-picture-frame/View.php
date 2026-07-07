@@ -3,6 +3,7 @@
 namespace AsreKhodro\Theme\Blocks\AkPictureFrame;
 
 use AsreKhodro\Theme\ImporterBridge;
+use AsreKhodro\Theme\MediaAlt;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -56,12 +57,18 @@ final class View {
 				continue;
 			}
 
+			$image_alt = MediaAlt::from_post_thumbnail( (int) $post->ID );
+			if ( $image_alt === '' ) {
+				$image_alt = MediaAlt::from_url( $image );
+			}
+
 			$items[] = array(
-				'title'   => $title,
-				'image'   => $image,
-				'thumb'   => $thumb !== '' ? $thumb : $image,
-				'link'    => (string) $post->link(),
-				'caption' => ImporterBridge::get_list_excerpt( $post, 160 ),
+				'title'     => $title,
+				'image'     => $image,
+				'thumb'     => $thumb !== '' ? $thumb : $image,
+				'image_alt' => $image_alt,
+				'link'      => (string) $post->link(),
+				'caption'   => ImporterBridge::get_list_excerpt( $post, 160 ),
 			);
 		}
 

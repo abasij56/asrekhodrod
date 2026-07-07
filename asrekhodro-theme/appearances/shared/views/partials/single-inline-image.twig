@@ -1,7 +1,8 @@
+{% set image = image_items[0] %}
 <figure
   class="single-inline-media single-inline-media--solo"
   data-news-gallery-group
-  data-gallery-images="{{ images|json_encode(constant('JSON_UNESCAPED_UNICODE'))|e('html_attr') }}"
+  data-gallery-images="{{ image_items|json_encode(constant('JSON_UNESCAPED_UNICODE'))|e('html_attr') }}"
 >
   <button
     type="button"
@@ -11,8 +12,8 @@
     aria-label="بزرگنمایی تصویر"
   >
     <img
-      src="{{ images[0] }}"
-      alt=""
+      src="{{ image.url }}"
+      alt="{{ image.alt|e('html_attr') }}"
       width="720"
       height="480"
       loading="lazy"

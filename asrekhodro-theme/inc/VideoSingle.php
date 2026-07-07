@@ -43,6 +43,7 @@ final class VideoSingle {
 		$context['related_videos']     = \Timber\Timber::get_posts( $related_args );
 		$context['video_url']          = self::get_video_url( $post );
 		$context['video_poster_url']   = self::get_poster_url( $post );
+		$context['video_poster_alt']   = self::get_poster_alt( $post );
 		$context['video_player_html']  = $split['player'];
 		$context['video_body_html']    = $split['body'];
 
@@ -63,6 +64,24 @@ final class VideoSingle {
 		}
 
 		return '';
+	}
+
+	public static function get_poster_alt( \Timber\Post $post ): string {
+		$alt = MediaAlt::from_post_thumbnail( (int) $post->ID );
+		if ( $alt !== '' ) {
+			return $alt;
+		}
+
+		if ( $post->thumbnail ) {
+			$thumb_alt = trim( (string) $post->thumbnail->alt() );
+			if ( $thumb_alt !== '' ) {
+				return $thumb_alt;
+			}
+		}
+
+		$poster_url = self::get_poster_url( $post );
+
+		return $poster_url !== '' ? MediaAlt::from_url( $poster_url ) : '';
 	}
 
 	public static function get_video_url( \Timber\Post $post ): string {

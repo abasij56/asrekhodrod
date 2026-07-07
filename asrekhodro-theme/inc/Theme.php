@@ -13,6 +13,7 @@ final class Theme {
 
 		require_once ASREKHODRO_THEME_DIR . '/inc/Setup.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/PostTypes.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/MediaAlt.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/ImporterBridge.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/PersianDate.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/PersianDigits.php';

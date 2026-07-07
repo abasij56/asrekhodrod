@@ -36,16 +36,22 @@ final class ListTitleWarmer {
 			return $posts;
 		}
 
-		$id_to_text = array();
+		/** @var array<string, array<int, string>> $by_type */
+		$by_type = array();
+
 		foreach ( $posts as $post ) {
-			if ( $post instanceof \WP_Post && $post->post_type === 'post' ) {
-				ListContext::add( (int) $post->ID );
-				$id_to_text[ (int) $post->ID ] = (string) $post->post_title;
+			if ( ! $post instanceof \WP_Post || ! TranslatablePostTypes::is_translatable( $post->post_type ) ) {
+				continue;
 			}
+
+			$id = (int) $post->ID;
+			ListContext::add( $id );
+			$by_type[ $post->post_type ][ $id ] = (string) $post->post_title;
 		}
 
-		if ( $id_to_text !== array() ) {
-			$this->service->warm( 'post', $id_to_text, 'title', LanguageDetector::current() );
+		$lang = LanguageDetector::current();
+		foreach ( $by_type as $object_type => $id_to_text ) {
+			$this->service->warm( $object_type, $id_to_text, 'title', $lang );
 		}
 
 		return $posts;

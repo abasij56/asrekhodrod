@@ -350,15 +350,22 @@ final class ImporterBridge {
 	}
 
 	public static function extract_image_from_html( string $html ): string {
-		$images = self::extract_images_from_html( $html );
+		$items = self::extract_image_items_from_html( $html );
 
-		return $images[0] ?? '';
+		return $items[0]['url'] ?? '';
 	}
 
 	/**
 	 * @return array<int, string>
 	 */
 	public static function extract_images_from_html( string $html ): array {
+		return array_column( self::extract_image_items_from_html( $html ), 'url' );
+	}
+
+	/**
+	 * @return list<array{url: string, alt: string}>
+	 */
+	public static function extract_image_items_from_html( string $html ): array {
 		if ( $html === '' ) {
 			return array();
 		}
@@ -366,14 +373,30 @@ final class ImporterBridge {
 		$html = html_entity_decode( $html, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 		$html = self::rewrite_content_media_urls( $html );
 
+		$items = array();
+		$seen  = array();
+
+		if ( preg_match_all( '/<img\b[^>]*>/i', $html, $img_tags ) ) {
+			foreach ( $img_tags[0] as $tag ) {
+				$item = self::image_item_from_img_tag( (string) $tag );
+				if ( $item === null ) {
+					continue;
+				}
+
+				$key = self::normalize_image_url_key( $item['url'] );
+				if ( isset( $seen[ $key ] ) ) {
+					continue;
+				}
+
+				$seen[ $key ]  = true;
+				$items[]         = $item;
+			}
+		}
+
 		$patterns = array(
-			'/<img[^>]+(?:src|data-src|data-lazy-src)\s*=\s*["\']([^"\']+)["\']/i',
 			'#(?:src|href|data-src)\s*=\s*["\']([^"\']*/Uploaded/Image/[^"\']+\.(?:jpe?g|png|gif|webp))["\']#i',
 			'#(https?://media\.asrekhodro\.com/[^\s"\'<>&]+\.(?:jpe?g|png|gif|webp))#i',
 		);
-
-		$urls  = array();
-		$found = array();
 
 		foreach ( $patterns as $pattern ) {
 			if ( ! preg_match_all( $pattern, $html, $matches ) ) {
@@ -381,35 +404,104 @@ final class ImporterBridge {
 			}
 
 			foreach ( $matches[1] as $url ) {
-				$url = html_entity_decode( (string) $url, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
-				if ( $url === '' || isset( $found[ $url ] ) ) {
+				$item = self::image_item_from_raw_url( (string) $url );
+				if ( $item === null ) {
 					continue;
 				}
 
-				$found[ $url ] = true;
-				$urls[]        = $url;
+				$key = self::normalize_image_url_key( $item['url'] );
+				if ( isset( $seen[ $key ] ) ) {
+					continue;
+				}
+
+				$seen[ $key ] = true;
+				$items[]        = $item;
 			}
 		}
 
-		$resolved = array();
-		$seen     = array();
+		return $items;
+	}
 
-		foreach ( $urls as $url ) {
-			$full = self::resolve_any_image_url( $url );
-			if ( $full === '' ) {
-				continue;
-			}
-
-			$key = self::normalize_image_url_key( $full );
-			if ( isset( $seen[ $key ] ) ) {
-				continue;
-			}
-
-			$seen[ $key ] = true;
-			$resolved[]   = $full;
+	/**
+	 * @return array{url: string, alt: string}|null
+	 */
+	private static function image_item_from_img_tag( string $tag ): ?array {
+		if ( ! preg_match( '/(?:src|data-src|data-lazy-src)\s*=\s*["\']([^"\']+)["\']/i', $tag, $src_match ) ) {
+			return null;
 		}
 
-		return $resolved;
+		$url = html_entity_decode( (string) $src_match[1], ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+		$full = self::resolve_any_image_url( $url );
+		if ( $full === '' ) {
+			return null;
+		}
+
+		$alt = '';
+		if ( preg_match( '/\balt\s*=\s*["\']([^"\']*)["\']/i', $tag, $alt_match ) ) {
+			$alt = trim( html_entity_decode( (string) $alt_match[1], ENT_QUOTES | ENT_HTML5, 'UTF-8' ) );
+		}
+
+		if ( $alt === '' ) {
+			$alt = MediaAlt::from_url( $full );
+		}
+
+		return array(
+			'url' => $full,
+			'alt' => $alt,
+		);
+	}
+
+	/**
+	 * @return array{url: string, alt: string}|null
+	 */
+	private static function image_item_from_raw_url( string $url ): ?array {
+		$url = html_entity_decode( $url, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+		if ( $url === '' ) {
+			return null;
+		}
+
+		$full = self::resolve_any_image_url( $url );
+		if ( $full === '' ) {
+			return null;
+		}
+
+		return array(
+			'url' => $full,
+			'alt' => MediaAlt::from_url( $full ),
+		);
+	}
+
+	/**
+	 * @param array<int, string|array{url?: string, alt?: string}> $images
+	 * @return list<array{url: string, alt: string}>
+	 */
+	private static function normalize_image_items( array $images ): array {
+		$items = array();
+
+		foreach ( $images as $image ) {
+			if ( is_array( $image ) ) {
+				$url = trim( (string) ( $image['url'] ?? '' ) );
+				$alt = trim( (string) ( $image['alt'] ?? '' ) );
+			} else {
+				$url = trim( (string) $image );
+				$alt = '';
+			}
+
+			if ( $url === '' ) {
+				continue;
+			}
+
+			if ( $alt === '' ) {
+				$alt = MediaAlt::from_url( $url );
+			}
+
+			$items[] = array(
+				'url' => $url,
+				'alt' => $alt,
+			);
+		}
+
+		return $items;
 	}
 
 	/**
@@ -524,7 +616,7 @@ final class ImporterBridge {
 		while ( $index < $total ) {
 			if ( self::segment_is_image_only( $segments[ $index ] ) ) {
 				$group   = self::collect_consecutive_image_segments( $segments, $index );
-				$images  = self::extract_images_from_html( implode( '', $group['segments'] ) );
+				$images  = self::extract_image_items_from_html( implode( '', $group['segments'] ) );
 				$output .= self::render_inline_image_group( $images );
 				$index   = $group['next_index'];
 				continue;
@@ -622,21 +714,22 @@ final class ImporterBridge {
 	}
 
 	/**
-	 * @param array<int, string> $images
+	 * @param array<int, string|array{url?: string, alt?: string}> $images
 	 */
 	private static function render_inline_image_group( array $images ): string {
-		if ( $images === array() ) {
+		$image_items = self::normalize_image_items( $images );
+		if ( $image_items === array() ) {
 			return '';
 		}
 
-		$template = count( $images ) === 1
+		$template = count( $image_items ) === 1
 			? 'partials/single-inline-image.twig'
 			: 'partials/single-gallery-inline.twig';
 
 		return \Timber\Timber::compile(
 			Appearance::resolve_template( $template ),
 			array(
-				'images' => $images,
+				'image_items' => $image_items,
 			)
 		);
 	}
@@ -813,11 +906,22 @@ final class ImporterBridge {
 		$image = function_exists( 'get_field' ) ? get_field( 'ad_image', $post_id ) : null;
 		$link  = function_exists( 'get_field' ) ? (string) get_field( 'ad_link', $post_id ) : '#';
 		$label = get_the_title( $post_id );
+		$image_url = is_array( $image ) ? (string) ( $image['url'] ?? '' ) : ( is_string( $image ) ? $image : '' );
+		$image_alt = MediaAlt::from_acf_image( $image );
+
+		if ( $image_alt === '' ) {
+			$image_alt = MediaAlt::from_post_thumbnail( $post_id );
+		}
+
+		if ( $image_url === '' && has_post_thumbnail( $post_id ) ) {
+			$image_url = self::get_featured_image_url( $post_id, 'medium' );
+		}
 
 		return array(
 			'title'       => $label,
 			'link'        => $link ?: '#',
-			'image'       => is_array( $image ) ? ( $image['url'] ?? '' ) : ( is_string( $image ) ? $image : '' ),
+			'image'       => $image_url,
+			'image_alt'   => $image_alt,
 			'label'       => function_exists( 'get_field' ) ? (string) get_field( 'ad_label', $post_id ) : $label,
 			'link_target' => '_blank',
 			'link_rel'    => 'noopener noreferrer',

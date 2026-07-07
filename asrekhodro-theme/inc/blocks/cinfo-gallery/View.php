@@ -2,6 +2,8 @@
 
 namespace AsreKhodro\Theme\AcfBlocks\CinfoGallery;
 
+use AsreKhodro\Theme\MediaAlt;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -73,6 +75,10 @@ final class View {
 			$sizes     = is_array( $image['sizes'] ?? null ) ? $image['sizes'] : array();
 			$thumb_url = (string) ( $sizes['medium'] ?? $sizes['medium_large'] ?? $sizes['thumbnail'] ?? $full_url );
 			$alt       = trim( (string) ( $image['alt'] ?? '' ) );
+
+			if ( $alt === '' && ! empty( $image['ID'] ) ) {
+				$alt = MediaAlt::from_attachment_id( (int) $image['ID'] );
+			}
 
 			if ( $alt === '' ) {
 				$alt = $group_title !== '' ? $group_title : $fallback_alt;

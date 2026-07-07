@@ -154,7 +154,7 @@ final class SidebarWidgets {
 				'title' => (string) ( $ad['label'] ?? $ad['title'] ?? '' ),
 				'link'  => (string) ( $ad['link'] ?? '#' ),
 				'image' => (string) $ad['image'],
-				'alt'   => (string) ( $ad['label'] ?? $ad['title'] ?? 'مجله' ),
+				'alt'   => (string) ( $ad['image_alt'] ?? '' ),
 			);
 		}
 

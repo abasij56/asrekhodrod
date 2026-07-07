@@ -42,5 +42,7 @@ final class Bootstrap {
 		$labels->register();
 
 		( new TimberBridge( $this->service, $labels ) )->register();
+		( new PermalinkBridge() )->register();
+		( new PermalinkBridge() )->register();
 	}
 }

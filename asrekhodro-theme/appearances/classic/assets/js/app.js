@@ -1121,11 +1121,21 @@
       if (currentEl) currentEl.textContent = toPersianDigits(String(index + 1));
     }
 
+    function galleryImageUrl(item) {
+      if (typeof item === "string") return item;
+      return item && item.url ? String(item.url) : "";
+    }
+
+    function galleryImageAlt(item) {
+      if (!item || typeof item === "string") return "";
+      return item.alt ? String(item.alt) : "";
+    }
+
     function showImage(i) {
       if (!images.length) return;
       index = (i + images.length) % images.length;
-      imageEl.src = images[index];
-      imageEl.alt = "";
+      imageEl.src = galleryImageUrl(images[index]);
+      imageEl.alt = galleryImageAlt(images[index]);
       updateNav();
     }
 

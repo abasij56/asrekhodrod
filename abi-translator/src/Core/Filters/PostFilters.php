@@ -9,12 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 use ABI\Translator\Core\Language\LanguageDetector;
 use ABI\Translator\Core\Translation\TranslationService;
 
-// ListContext lives in this same namespace (ABI\Translator\Core\Filters).
-
 /**
- * Translate the main title + content of a single `post` (phase 1) and the
- * excerpt of posts in archive/list contexts (phase 2), when a secondary
- * language is active. The homepage blocks are handled by Compat in phase 3.
+ * Translate title, content (single only), and excerpt (lists) for all configured
+ * post types when a secondary language is active. Homepage blocks are warmed via
+ * ListTitleWarmer; UI labels are handled by Compat/AsreKhodro.
  */
 final class PostFilters {
 
@@ -39,23 +37,24 @@ final class PostFilters {
 		}
 
 		$post_id = (int) $post_id;
-		if ( ! $this->is_translatable_title( $post_id ) ) {
+		$post    = $post_id > 0 ? get_post( $post_id ) : null;
+		if ( ! $post instanceof \WP_Post || ! $this->is_translatable_title( $post_id, $post ) ) {
 			return $title;
 		}
 
 		/** @param bool $should */
-		$should = apply_filters( 'abi_translator_should_translate_post', true, get_post( $post_id ), LanguageDetector::current() );
+		$should = apply_filters( 'abi_translator_should_translate_post', true, $post, LanguageDetector::current() );
 		if ( ! $should ) {
 			return $title;
 		}
 
 		return $this->service->translate_field(
-			'post',
+			$post->post_type,
 			$post_id,
 			'title',
 			$title,
 			LanguageDetector::current(),
-			array( 'field' => 'title' )
+			array( 'field' => 'title', 'post_type' => $post->post_type )
 		);
 	}
 
@@ -66,7 +65,12 @@ final class PostFilters {
 
 		// Timber applies the_content without setting the loop, so we key off the
 		// main queried single post instead of in_the_loop()/get_the_ID().
-		if ( is_admin() || ! is_singular( 'post' ) || ! is_main_query() ) {
+		if ( is_admin() || ! is_singular() || ! is_main_query() ) {
+			return $content;
+		}
+
+		$queried = get_queried_object();
+		if ( ! $queried instanceof \WP_Post || ! TranslatablePostTypes::is_translatable( $queried->post_type ) ) {
 			return $content;
 		}
 
@@ -76,18 +80,18 @@ final class PostFilters {
 		}
 
 		/** @param bool $should */
-		$should = apply_filters( 'abi_translator_should_translate_post', true, get_post( $post_id ), LanguageDetector::current() );
+		$should = apply_filters( 'abi_translator_should_translate_post', true, $queried, LanguageDetector::current() );
 		if ( ! $should ) {
 			return $content;
 		}
 
 		return $this->service->translate_field(
-			'post',
+			$queried->post_type,
 			$post_id,
 			'content',
 			$content,
 			LanguageDetector::current(),
-			array( 'field' => 'content' )
+			array( 'field' => 'content', 'post_type' => $queried->post_type )
 		);
 	}
 
@@ -103,7 +107,7 @@ final class PostFilters {
 		}
 
 		$post = $post instanceof \WP_Post ? $post : get_post( $post );
-		if ( ! $post instanceof \WP_Post || $post->post_type !== 'post' ) {
+		if ( ! $post instanceof \WP_Post || ! TranslatablePostTypes::is_translatable( $post->post_type ) ) {
 			return $excerpt;
 		}
 
@@ -114,12 +118,12 @@ final class PostFilters {
 		}
 
 		return $this->service->translate_field(
-			'post',
+			$post->post_type,
 			(int) $post->ID,
 			'excerpt',
 			$excerpt,
 			LanguageDetector::current(),
-			array( 'field' => 'excerpt' )
+			array( 'field' => 'excerpt', 'post_type' => $post->post_type )
 		);
 	}
 
@@ -127,8 +131,8 @@ final class PostFilters {
 	 * Translate the title when it is either the main single post, or a post that
 	 * appears in a warmed listing context (homepage blocks, archives, related).
 	 */
-	private function is_translatable_title( int $post_id ): bool {
-		if ( is_admin() || $post_id <= 0 ) {
+	private function is_translatable_title( int $post_id, \WP_Post $post ): bool {
+		if ( is_admin() || $post_id <= 0 || ! TranslatablePostTypes::is_translatable( $post->post_type ) ) {
 			return false;
 		}
 
@@ -136,7 +140,12 @@ final class PostFilters {
 			return true;
 		}
 
-		if ( ! is_singular( 'post' ) || ! is_main_query() ) {
+		if ( ! is_singular() || ! is_main_query() ) {
+			return false;
+		}
+
+		$queried = get_queried_object();
+		if ( ! $queried instanceof \WP_Post || ! TranslatablePostTypes::is_translatable( $queried->post_type ) ) {
 			return false;
 		}
 
