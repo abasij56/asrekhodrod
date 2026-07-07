@@ -1,0 +1,27 @@
+.abi-lang-switcher {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 13px;
+	line-height: 1;
+}
+
+.abi-lang-switcher__item {
+	display: inline-block;
+	padding: 4px 8px;
+	border-radius: 4px;
+	text-decoration: none;
+	color: inherit;
+	opacity: 0.75;
+	transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.abi-lang-switcher__item:hover {
+	opacity: 1;
+	background-color: rgba(0, 0, 0, 0.06);
+}
+
+.abi-lang-switcher__item.is-active {
+	opacity: 1;
+	font-weight: 700;
+}
