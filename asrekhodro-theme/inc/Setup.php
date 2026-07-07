@@ -24,10 +24,10 @@ final class Setup {
 
 	public static function ensure_ad_positions(): void {
 		$positions = array(
-			'menu_strip'   => 'Menu strip (below nav)',
-			'sidebar_left' => 'Sidebar left',
-			'content_row'  => 'Content row banner',
-			'kiosk'        => 'Kiosk / magazine carousel',
+			'menu_strip'   => 'نوار منو (زیر ناوبری)',
+			'sidebar_left' => 'سایدبار چپ',
+			'content_row'  => 'بنر میان محتوا',
+			'kiosk'        => 'کیوسک / اسلایدر مجله',
 		);
 
 		foreach ( $positions as $slug => $name ) {

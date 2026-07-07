@@ -15,8 +15,8 @@ final class AcfFields {
 
 		acf_add_options_page(
 			array(
-				'page_title' => __( 'Asre Khodro Settings', 'asrekhodro' ),
-				'menu_title' => __( 'Theme Settings', 'asrekhodro' ),
+				'page_title' => 'تنظیمات عصر خودرو',
+				'menu_title' => 'تنظیمات تم',
 				'menu_slug'  => 'asrekhodro-settings',
 				'capability' => 'edit_theme_options',
 				'redirect'   => false,
@@ -75,7 +75,7 @@ final class AcfFields {
 		acf_add_local_field_group(
 			array(
 				'key'    => 'group_ak_theme_options',
-				'title'  => 'Theme Options',
+				'title'  => 'تنظیمات تم',
 				'fields' => array_merge(
 					self::general_option_fields(),
 					self::homepage_option_fields(),
@@ -116,30 +116,30 @@ final class AcfFields {
 		acf_add_local_field_group(
 			array(
 				'key'    => 'group_ak_ad_slot',
-				'title'  => 'Ad fields',
+				'title'  => 'فیلدهای تبلیغ',
 				'fields' => array(
 					array(
 						'key'   => 'field_ak_ad_label',
-						'label' => 'Display label',
+						'label' => 'برچسب نمایش',
 						'name'  => 'ad_label',
 						'type'  => 'text',
 					),
 					array(
 						'key'   => 'field_ak_ad_link',
-						'label' => 'Link URL',
+						'label' => 'نشانی لینک',
 						'name'  => 'ad_link',
 						'type'  => 'url',
 					),
 					array(
 						'key'   => 'field_ak_ad_image',
-						'label' => 'Image (optional)',
+						'label' => 'تصویر (اختیاری)',
 						'name'  => 'ad_image',
 						'type'  => 'image',
 						'return_format' => 'array',
 					),
 					array(
 						'key'           => 'field_ak_ad_active',
-						'label'         => 'Active',
+						'label'         => 'فعال',
 						'name'          => 'ad_active',
 						'type'          => 'true_false',
 						'default_value' => 1,
@@ -161,14 +161,14 @@ final class AcfFields {
 		acf_add_local_field_group(
 			array(
 				'key'    => 'group_ak_video_fields',
-				'title'  => 'Video',
+				'title'  => 'ویدیو',
 				'fields' => array(
 					array(
 						'key'          => 'field_ak_video_url',
-						'label'        => 'Video URL',
+						'label'        => 'نشانی ویدیو',
 						'name'         => 'video_url',
 						'type'         => 'url',
-						'instructions' => 'Direct MP4/FLV URL on media.asrekhodro.com (imported from legacy CMS).',
+						'instructions' => 'نشانی مستقیم MP4/FLV روی media.asrekhodro.com (واردشده از CMS قدیمی).',
 					),
 				),
 				'location' => array(
@@ -186,14 +186,14 @@ final class AcfFields {
 		acf_add_local_field_group(
 			array(
 				'key'    => 'group_ak_magazine_fields',
-				'title'  => 'Magazine cover',
+				'title'  => 'کاور مجله',
 				'fields' => array(
 					array(
 						'key'           => 'field_ak_magazine_cover',
-						'label'         => 'Cover image URL',
+						'label'         => 'نشانی تصویر کاور',
 						'name'          => 'magazine_cover',
 						'type'          => 'url',
-						'instructions'  => 'Optional external cover URL (media.asrekhodro.com). Featured image is preferred.',
+						'instructions'  => 'نشانی خارجی اختیاری برای کاور (media.asrekhodro.com). تصویر شاخص اولویت دارد.',
 					),
 				),
 				'location' => array(
@@ -211,23 +211,17 @@ final class AcfFields {
 		acf_add_local_field_group(
 			array(
 				'key'    => 'group_ak_post_legacy',
-				'title'  => 'AsreKhodro legacy',
+				'title'  => 'فیلدهای قدیمی عصر خودرو',
 				'fields' => array(
 					array(
-						'key'   => 'field_ak_over_title',
-						'label' => 'Over title',
-						'name'  => 'over_title',
-						'type'  => 'text',
-					),
-					array(
 						'key'   => 'field_ak_under_title',
-						'label' => 'Under title',
+						'label' => 'تیتر دوم',
 						'name'  => 'under_title',
 						'type'  => 'text',
 					),
 					array(
 						'key'           => 'field_ak_related_posts',
-						'label'         => 'Related posts',
+						'label'         => 'اخبار مرتبط',
 						'name'          => 'related_posts',
 						'type'          => 'relationship',
 						'post_type'     => array( 'post' ),
@@ -264,7 +258,7 @@ final class AcfFields {
 			),
 			array(
 				'key'           => 'field_ak_active_appearance',
-				'label'         => 'Theme appearance',
+				'label'         => 'ظاهر تم',
 				'name'          => 'active_appearance',
 				'type'          => 'select',
 				'choices'       => self::appearance_choices(),
@@ -274,7 +268,7 @@ final class AcfFields {
 			),
 			array(
 				'key'           => 'field_ak_site_logo',
-				'label'         => 'Site logo (header)',
+				'label'         => 'لوگوی سایت (هدر)',
 				'name'          => 'site_logo',
 				'type'          => 'image',
 				'return_format' => 'array',
@@ -283,7 +277,7 @@ final class AcfFields {
 			),
 			array(
 				'key'           => 'field_ak_site_favicon',
-				'label'         => 'Favicon (32×32)',
+				'label'         => 'فاویکون (۳۲×۳۲)',
 				'name'          => 'site_favicon',
 				'type'          => 'image',
 				'return_format' => 'array',
@@ -292,7 +286,7 @@ final class AcfFields {
 			),
 			array(
 				'key'           => 'field_ak_site_favicon_16',
-				'label'         => 'Favicon (16×16)',
+				'label'         => 'فاویکون (۱۶×۱۶)',
 				'name'          => 'site_favicon_16',
 				'type'          => 'image',
 				'return_format' => 'array',
@@ -301,7 +295,7 @@ final class AcfFields {
 			),
 			array(
 				'key'           => 'field_ak_site_apple_touch_icon',
-				'label'         => 'Apple Touch Icon',
+				'label'         => 'آیکون Apple Touch',
 				'name'          => 'site_apple_touch_icon',
 				'type'          => 'image',
 				'return_format' => 'array',
@@ -310,7 +304,7 @@ final class AcfFields {
 			),
 			array(
 				'key'           => 'field_ak_site_icon_192',
-				'label'         => 'Android / PWA icon (192×192)',
+				'label'         => 'آیکون اندروید / PWA (۱۹۲×۱۹۲)',
 				'name'          => 'site_icon_192',
 				'type'          => 'image',
 				'return_format' => 'array',
@@ -318,7 +312,7 @@ final class AcfFields {
 			),
 			array(
 				'key'           => 'field_ak_site_icon_512',
-				'label'         => 'PWA icon (512×512)',
+				'label'         => 'آیکون PWA (۵۱۲×۵۱۲)',
 				'name'          => 'site_icon_512',
 				'type'          => 'image',
 				'return_format' => 'array',
@@ -326,7 +320,7 @@ final class AcfFields {
 			),
 			array(
 				'key'           => 'field_ak_site_ms_tile_image',
-				'label'         => 'Windows tile image',
+				'label'         => 'تصویر کاشی ویندوز',
 				'name'          => 'site_ms_tile_image',
 				'type'          => 'image',
 				'return_format' => 'array',
@@ -335,14 +329,14 @@ final class AcfFields {
 			),
 			array(
 				'key'           => 'field_ak_site_ms_tile_color',
-				'label'         => 'Windows tile color',
+				'label'         => 'رنگ کاشی ویندوز',
 				'name'          => 'site_ms_tile_color',
 				'type'          => 'color_picker',
 				'default_value' => '#e10600',
 			),
 			array(
 				'key'           => 'field_ak_site_theme_color',
-				'label'         => 'Browser theme color',
+				'label'         => 'رنگ نوار مرورگر',
 				'name'          => 'site_theme_color',
 				'type'          => 'color_picker',
 				'default_value' => '#e10600',
@@ -364,7 +358,7 @@ final class AcfFields {
 			),
 			array(
 				'key'           => 'field_ak_login_hero_image',
-				'label'         => 'Login hero image',
+				'label'         => 'تصویر پس‌زمینه صفحه ورود',
 				'name'          => 'login_hero_image',
 				'type'          => 'image',
 				'return_format' => 'array',
@@ -373,7 +367,7 @@ final class AcfFields {
 			),
 			array(
 				'key'           => 'field_ak_login_hero_title',
-				'label'         => 'Login hero title',
+				'label'         => 'عنوان صفحه ورود',
 				'name'          => 'login_hero_title',
 				'type'          => 'text',
 				'default_value' => 'مرجع تخصصی اخبار خودرو',
@@ -381,7 +375,7 @@ final class AcfFields {
 			),
 			array(
 				'key'           => 'field_ak_login_hero_subtitle',
-				'label'         => 'Login hero subtitle',
+				'label'         => 'زیرعنوان صفحه ورود',
 				'name'          => 'login_hero_subtitle',
 				'type'          => 'textarea',
 				'rows'          => 2,
@@ -405,19 +399,19 @@ final class AcfFields {
 			),
 			array(
 				'key'   => 'field_ak_share_instagram',
-				'label' => 'Share box Instagram (خودرو امروز)',
+				'label' => 'باکس اشتراک اینستاگرام (خودرو امروز)',
 				'name'  => 'share_instagram',
 				'type'  => 'url',
 			),
 			array(
 				'key'   => 'field_ak_share_telegram',
-				'label' => 'Share box Telegram channel',
+				'label' => 'باکس اشتراک کانال تلگرام',
 				'name'  => 'share_telegram',
 				'type'  => 'url',
 			),
 			array(
 				'key'   => 'field_ak_share_telegram_dl',
-				'label' => 'Share box Telegram download',
+				'label' => 'باکس اشتراک دانلود تلگرام',
 				'name'  => 'share_telegram_download',
 				'type'  => 'url',
 			),
@@ -1618,7 +1612,7 @@ final class AcfFields {
 			return $choices;
 		}
 
-		return array( Appearance::DEFAULT_ID => 'Classic' );
+		return array( Appearance::DEFAULT_ID => 'کلاسیک' );
 	}
 
 	private static function appearance_default(): string {

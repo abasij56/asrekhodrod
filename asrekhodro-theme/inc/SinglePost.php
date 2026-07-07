@@ -12,6 +12,59 @@ final class SinglePost {
 		add_filter( 'body_class', array( self::class, 'filter_body_class' ) );
 		add_filter( 'timber/context', array( self::class, 'filter_timber_context' ) );
 		add_filter( 'timber/twig/functions', array( self::class, 'register_twig_functions' ) );
+		add_filter( 'the_content', array( self::class, 'strip_duplicate_over_title' ), 5 );
+	}
+
+	/**
+	 * Imported posts often repeat the rotiter as the first line of the body.
+	 * The rotiter is already rendered above the title in the single hero, so
+	 * drop the duplicated first line/paragraph from the content.
+	 */
+	public static function strip_duplicate_over_title( string $content ): string {
+		if ( ! is_singular( 'post' ) ) {
+			return $content;
+		}
+
+		$over_title = trim( (string) get_post_meta( (int) get_queried_object_id(), PostOverTitleMeta::META_KEY, true ) );
+		if ( $over_title === '' || trim( $content ) === '' ) {
+			return $content;
+		}
+
+		$normalized_over = self::normalize_text( $over_title );
+		if ( $normalized_over === '' ) {
+			return $content;
+		}
+
+		$trimmed = ltrim( $content );
+
+		// First paragraph as an HTML block (<p>…</p>).
+		if ( preg_match( '#^<p\b[^>]*>(.*?)</p>#is', $trimmed, $matches ) ) {
+			if ( self::normalize_text( $matches[1] ) === $normalized_over ) {
+				return ltrim( substr( $trimmed, strlen( $matches[0] ) ) );
+			}
+
+			return $content;
+		}
+
+		// Plain-text content (before wpautop): first line up to the newline.
+		$newline_pos = strpos( $trimmed, "\n" );
+		$first_line  = $newline_pos === false ? $trimmed : substr( $trimmed, 0, $newline_pos );
+
+		if ( self::normalize_text( $first_line ) === $normalized_over ) {
+			return $newline_pos === false ? '' : ltrim( substr( $trimmed, $newline_pos + 1 ) );
+		}
+
+		return $content;
+	}
+
+	private static function normalize_text( string $text ): string {
+		$text = wp_strip_all_tags( $text );
+		$text = html_entity_decode( $text, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+		// Unify invisible characters common in imported Persian text.
+		$text = str_replace( array( "\xC2\xA0", "\xE2\x80\x8C", "\xE2\x80\x8F", "\xE2\x80\x8E" ), ' ', $text );
+		$text = (string) preg_replace( '/\s+/u', ' ', $text );
+
+		return trim( $text );
 	}
 
 	/**

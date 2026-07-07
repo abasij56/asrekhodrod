@@ -22,8 +22,8 @@ final class LayoutBuilderAdmin {
 	public static function register_menu(): void {
 		add_submenu_page(
 			'asrekhodro-settings',
-			__( 'چیدمان صفحات', 'asrekhodro' ),
-			__( 'چیدمان صفحات', 'asrekhodro' ),
+			'چیدمان صفحات',
+			'چیدمان صفحات',
 			'edit_theme_options',
 			'asrekhodro-layout-builder',
 			array( self::class, 'render_page' )

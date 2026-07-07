@@ -31,6 +31,7 @@ final class Theme {
 		require_once ASREKHODRO_THEME_DIR . '/inc/ThemeCategories.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/RfPage.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/SinglePost.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/PostOverTitleMeta.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/VideoSingle.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/PostViews.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/SidebarWidgets.php';
@@ -48,6 +49,7 @@ final class Theme {
 		require_once ASREKHODRO_THEME_DIR . '/inc/ThemeModels.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/CinfoToc.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/AdminPostList.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/AdminNewsDateFilter.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/AdminAds.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/AdminCategoryParent.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/CarBrandAssets.php';
@@ -80,12 +82,14 @@ final class Theme {
 		PostViews::init();
 		AjaxSearch::init();
 		AdminPostList::init();
+		AdminNewsDateFilter::init();
 		AdminAds::init();
 		AdminCategoryParent::init();
 		AdminCategoryBrandLogo::init();
 		ContactForm::init();
 		Comments::init();
 		SinglePost::init();
+		PostOverTitleMeta::init();
 		AboutPage::init();
 		LoginPage::init();
 

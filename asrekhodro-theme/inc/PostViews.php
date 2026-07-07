@@ -91,6 +91,14 @@ final class PostViews {
 		return $sum;
 	}
 
+	public static function get_total( int $post_id ): int {
+		return max( 0, (int) get_post_meta( $post_id, self::META_TOTAL, true ) );
+	}
+
+	public static function total_meta_key(): string {
+		return self::META_TOTAL;
+	}
+
 	public static function bust_popular_cache(): void {
 		foreach ( array( '2days', 'week' ) as $period ) {
 			delete_transient( 'ak_popular_' . $period );

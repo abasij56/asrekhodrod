@@ -13,15 +13,33 @@ final class AsreKhodro_Importer_Post_Types {
 		add_action( 'init', array( self::class, 'register' ), 5 );
 	}
 
+	/**
+	 * @return array<string, string>
+	 */
+	private static function admin_labels( string $name, string $singular_name ): array {
+		return array(
+			'name'               => $name,
+			'singular_name'      => $singular_name,
+			'menu_name'          => $name,
+			'name_admin_bar'     => $singular_name,
+			'add_new'            => 'افزودن',
+			'add_new_item'       => 'افزودن ' . $singular_name . ' جدید',
+			'edit_item'          => 'ویرایش ' . $singular_name,
+			'new_item'           => $singular_name . ' جدید',
+			'view_item'          => 'مشاهده ' . $singular_name,
+			'search_items'       => 'جستجوی ' . $name,
+			'not_found'          => $name . ' یافت نشد.',
+			'not_found_in_trash' => $name . ' در زباله‌دان یافت نشد.',
+			'all_items'          => 'همه ' . $name,
+		);
+	}
+
 	public static function register(): void {
 		if ( ! post_type_exists( 'ad_slot' ) ) {
 			register_post_type(
 				'ad_slot',
 				array(
-					'labels'       => array(
-						'name'          => __( 'Ads', 'asrekhodro' ),
-						'singular_name' => __( 'Ad', 'asrekhodro' ),
-					),
+					'labels'       => self::admin_labels( 'تبلیغات', 'تبلیغ' ),
 					'public'       => false,
 					'show_ui'      => true,
 					'show_in_menu' => true,
@@ -37,7 +55,9 @@ final class AsreKhodro_Importer_Post_Types {
 				'ad_slot',
 				array(
 					'labels'       => array(
-						'name' => __( 'Ad positions', 'asrekhodro' ),
+						'name'          => 'موقعیت‌های تبلیغ',
+						'singular_name' => 'موقعیت تبلیغ',
+						'menu_name'     => 'موقعیت‌های تبلیغ',
 					),
 					'public'       => false,
 					'show_ui'      => true,
@@ -50,6 +70,7 @@ final class AsreKhodro_Importer_Post_Types {
 			register_post_type(
 				'ak_video',
 				array(
+					'labels'       => self::admin_labels( 'ویدیوها', 'ویدیو' ),
 					'public'       => true,
 					'has_archive'  => true,
 					'rewrite'      => array( 'slug' => 'video' ),
@@ -64,6 +85,10 @@ final class AsreKhodro_Importer_Post_Types {
 				'video_category',
 				'ak_video',
 				array(
+					'labels'       => array(
+						'name'          => 'دسته‌بندی ویدیو',
+						'singular_name' => 'دسته ویدیو',
+					),
 					'public'       => true,
 					'hierarchical' => true,
 					'rewrite'      => array( 'slug' => 'video-category' ),
@@ -76,6 +101,7 @@ final class AsreKhodro_Importer_Post_Types {
 			register_post_type(
 				'ak_magazine',
 				array(
+					'labels'       => self::admin_labels( 'مجله‌ها', 'مجله' ),
 					'public'       => true,
 					'has_archive'  => 'Home/Kiosk',
 					'rewrite'      => array(
@@ -92,6 +118,7 @@ final class AsreKhodro_Importer_Post_Types {
 			register_post_type(
 				'ak_review',
 				array(
+					'labels'       => self::admin_labels( 'بررسی‌ها', 'بررسی' ),
 					'public'       => true,
 					'has_archive'  => true,
 					'rewrite'      => array( 'slug' => 'review' ),

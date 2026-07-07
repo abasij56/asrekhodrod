@@ -70,7 +70,39 @@ final class NewsArchive {
 			return;
 		}
 
-		$filter = self::get_active_date_filter();
+		self::apply_jalali_date_query( $query, self::active_jalali_filter_from_request() );
+	}
+
+	/**
+	 * @return array{year: int, month: int, day: int}|null
+	 */
+	public static function active_jalali_filter_from_request(
+		string $year_key = 'jyear',
+		string $month_key = 'jmonth',
+		string $day_key = 'jday'
+	): ?array {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$year = isset( $_GET[ $year_key ] ) ? (int) wp_unslash( $_GET[ $year_key ] ) : 0;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$month = isset( $_GET[ $month_key ] ) ? (int) wp_unslash( $_GET[ $month_key ] ) : 0;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$day = isset( $_GET[ $day_key ] ) ? (int) wp_unslash( $_GET[ $day_key ] ) : 0;
+
+		if ( $year <= 0 ) {
+			return null;
+		}
+
+		return array(
+			'year'  => $year,
+			'month' => max( 0, $month ),
+			'day'   => max( 0, $day ),
+		);
+	}
+
+	/**
+	 * @param array{year: int, month: int, day: int}|null $filter
+	 */
+	public static function apply_jalali_date_query( \WP_Query $query, ?array $filter ): void {
 		if ( $filter === null ) {
 			return;
 		}
@@ -97,32 +129,25 @@ final class NewsArchive {
 		);
 	}
 
-	public static function preserve_date_filter_in_pagination( string $link ): string {
-		if ( ! self::is_archive_request() ) {
-			return $link;
-		}
-
-		$args = self::get_active_date_filter_query_args();
-		if ( $args === array() ) {
-			return $link;
-		}
-
-		return add_query_arg( $args, $link );
-	}
-
 	/**
-	 * @return array<string, mixed>
+	 * Jalali year/month/day options for filter forms.
+	 *
+	 * @param array{year?: int, month?: int, day?: int}|null $active
+	 * @return array{years: list<array{value: int, label: string, selected: bool}>, months: list<array{value: int, label: string, selected: bool}>, days: list<array{value: int, label: string, selected: bool}>, month_lengths_json: string, year: int, month: int, day: int}
 	 */
-	private static function build_date_filter_context( string $action_url ): array {
-		$now         = PersianDate::now_jalali_parts();
-		$active      = self::get_active_date_filter();
-		$year        = $active['year'] ?? 0;
-		$month       = $active['month'] ?? 0;
-		$day         = $active['day'] ?? 0;
+	public static function jalali_filter_form_fields( ?array $active = null ): array {
+		$now    = PersianDate::now_jalali_parts();
+		$active = $active ?? array(
+			'year'  => 0,
+			'month' => 0,
+			'day'   => 0,
+		);
+		$year        = (int) ( $active['year'] ?? 0 );
+		$month       = (int) ( $active['month'] ?? 0 );
+		$day         = (int) ( $active['day'] ?? 0 );
 		$year_start  = max( 1380, $now['year'] - 15 );
 		$year_end    = $now['year'];
 		$years       = array();
-		$day_options = self::day_options_for( $year, $month );
 
 		for ( $candidate = $year_end; $candidate >= $year_start; --$candidate ) {
 			$years[] = array(
@@ -142,23 +167,50 @@ final class NewsArchive {
 		}
 
 		return array(
-			'action_url'         => $action_url,
-			'clear_url'          => remove_query_arg( array_merge( self::DATE_QUERY_KEYS, array( 'paged' ) ), $action_url ),
-			'is_active'          => $active !== null,
 			'year'               => $year,
 			'month'              => $month,
 			'day'                => $day,
 			'years'              => $years,
 			'months'             => $months,
-			'days'               => $day_options,
-			'month_lengths_json' => wp_json_encode( self::month_lengths_map( $year_start, $year_end ) ),
+			'days'               => self::day_options_for_filter( $year, $month, $day ),
+			'month_lengths_json' => wp_json_encode( self::month_lengths_map( $year_start, $year_end ) ) ?: '{}',
+		);
+	}
+
+	public static function preserve_date_filter_in_pagination( string $link ): string {
+		if ( ! self::is_archive_request() ) {
+			return $link;
+		}
+
+		$args = self::get_active_date_filter_query_args();
+		if ( $args === array() ) {
+			return $link;
+		}
+
+		return add_query_arg( $args, $link );
+	}
+
+	/**
+	 * @return array<string, mixed>
+	 */
+	private static function build_date_filter_context( string $action_url ): array {
+		$active = self::get_active_date_filter();
+		$fields = self::jalali_filter_form_fields( $active ?? array() );
+
+		return array_merge(
+			$fields,
+			array(
+				'action_url' => $action_url,
+				'clear_url'  => remove_query_arg( array_merge( self::DATE_QUERY_KEYS, array( 'paged' ) ), $action_url ),
+				'is_active'  => $active !== null,
+			)
 		);
 	}
 
 	/**
 	 * @return list<array{value: int, label: string, selected: bool}>
 	 */
-	private static function day_options_for( int $year, int $month ): array {
+	private static function day_options_for_filter( int $year, int $month, int $selected_day ): array {
 		$days = array(
 			array(
 				'value'    => 0,
@@ -174,8 +226,6 @@ final class NewsArchive {
 		}
 
 		$max_day = PersianDate::jalali_month_length( $year, $month );
-		$active  = self::get_active_date_filter();
-		$selected_day = $active['day'] ?? 0;
 
 		$days[0]['selected'] = $selected_day <= 0;
 
@@ -209,22 +259,7 @@ final class NewsArchive {
 	 * @return array{year: int, month: int, day: int}|null
 	 */
 	private static function get_active_date_filter(): ?array {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$year = isset( $_GET['jyear'] ) ? (int) wp_unslash( $_GET['jyear'] ) : 0;
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$month = isset( $_GET['jmonth'] ) ? (int) wp_unslash( $_GET['jmonth'] ) : 0;
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$day = isset( $_GET['jday'] ) ? (int) wp_unslash( $_GET['jday'] ) : 0;
-
-		if ( $year <= 0 ) {
-			return null;
-		}
-
-		return array(
-			'year'  => $year,
-			'month' => max( 0, $month ),
-			'day'   => max( 0, $day ),
-		);
+		return self::active_jalali_filter_from_request();
 	}
 
 	/**
