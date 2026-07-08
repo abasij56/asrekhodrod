@@ -1,6 +1,7 @@
 {#
   Homepage main zone: full-bleed blocks (e.g. magazines) render outside .container.page-shell
   so they can use the same viewport breakout as picture-frame.
+  Mobile sidebar is rendered after all blocks in layout-shell.twig.
 #}
 {% set main_placements = layout_zones.main ?? [] %}
 {% set shell_open = false %}
@@ -13,7 +14,9 @@
       {% if shell_open %}
         </main>
         {% if has_sidebar and not sidebar_rendered %}
-          {% include 'partials/layout-zone.twig' with { zone: 'sidebar' } %}
+          <div class="page-sidebar-inline">
+            {% include 'partials/layout-zone.twig' with { zone: 'sidebar' } %}
+          </div>
           {% set sidebar_rendered = true %}
         {% endif %}
       </div>
@@ -35,7 +38,9 @@
 {% if shell_open %}
     </main>
     {% if has_sidebar and not sidebar_rendered %}
-      {% include 'partials/layout-zone.twig' with { zone: 'sidebar' } %}
+      <div class="page-sidebar-inline">
+        {% include 'partials/layout-zone.twig' with { zone: 'sidebar' } %}
+      </div>
     {% endif %}
   </div>
 {% endif %}

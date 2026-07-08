@@ -50,18 +50,12 @@
           </ul>
         {% endif %}
 
-        {% if options.social_instagram or options.social_telegram or options.social_youtube %}
+        {% if footer_social_links|default([])|length %}
           <h4 class="mb-footer__heading mb-footer__heading--social">ما را دنبال کنید</h4>
           <div class="mb-footer__socials" aria-label="شبکه‌های اجتماعی">
-            {% if options.social_instagram %}
-              <a href="{{ options.social_instagram }}" aria-label="اینستاگرام" rel="noopener noreferrer">IG</a>
-            {% endif %}
-            {% if options.social_telegram %}
-              <a href="{{ options.social_telegram }}" aria-label="تلگرام" rel="noopener noreferrer">TG</a>
-            {% endif %}
-            {% if options.social_youtube %}
-              <a href="{{ options.social_youtube }}" aria-label="یوتیوب" rel="noopener noreferrer">YT</a>
-            {% endif %}
+            {% for item in footer_social_links %}
+              <a href="{{ item.url }}" aria-label="{{ item.label }}" rel="noopener noreferrer">{{ item.label }}</a>
+            {% endfor %}
           </div>
         {% endif %}
       </div>

@@ -1,0 +1,62 @@
+{% set sticky_ads = placement.sticky_bottom_ads is defined ? placement.sticky_bottom_ads : (sticky_bottom_ads|default([])) %}
+{% if sticky_ads|length == 0 %}
+  {% set sticky_ads = [{ label: 'تبلیغات · عصر خودرو', link: '#', title: 'تبلیغ' }] %}
+{% endif %}
+{% set storage_key = 'ak-sticky-ad-v2-' ~ (placement.layout_page|default('page')) %}
+<aside
+  class="ad-sticky-bottom"
+  data-ak-sticky-ad
+  data-ak-sticky-storage="{{ storage_key }}"
+  role="complementary"
+  aria-label="تبلیغ"
+>
+  <div class="ad-sticky-bottom__glass">
+    <button type="button" class="ad-sticky-bottom__close" data-ak-sticky-close aria-label="بستن تبلیغ">
+      <span aria-hidden="true">×</span>
+    </button>
+    <div class="container ad-sticky-bottom__inner">
+      {% for ad in sticky_ads %}
+        <a
+          href="{{ ad.link }}"
+          class="ad-sticky-bottom__slot"
+          target="_blank"
+          rel="noopener noreferrer"
+          {% if ad.title|default('') %}title="{{ ad.title }}"{% endif %}
+        >
+          {% if ad.image %}
+            {% if ad.image_mobile|default('') %}
+            <picture>
+              <source media="(max-width: 767px)" srcset="{{ ad.image_mobile }}">
+              <img
+                class="ad-sticky-bottom__image"
+                src="{{ ad.image }}"
+                alt="{{ ad.image_alt|default(ad.title|default('')) }}"
+                width="728"
+                height="90"
+                loading="eager"
+                fetchpriority="low"
+                decoding="async"
+                sizes="100vw"
+              />
+            </picture>
+            {% else %}
+            <img
+              class="ad-sticky-bottom__image"
+              src="{{ ad.image }}"
+              alt="{{ ad.image_alt|default(ad.title|default('')) }}"
+              width="728"
+              height="90"
+              loading="eager"
+              fetchpriority="low"
+              decoding="async"
+              sizes="100vw"
+            />
+            {% endif %}
+          {% elseif ad.label|default('') or ad.title|default('') %}
+            <span class="ad-sticky-bottom__label">{{ ad.label|default(ad.title) }}</span>
+          {% endif %}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</aside>

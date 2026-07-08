@@ -27,7 +27,8 @@ final class Setup {
 			'menu_strip'   => 'نوار منو (زیر ناوبری)',
 			'sidebar_left' => 'سایدبار چپ',
 			'content_row'  => 'بنر میان محتوا',
-			'kiosk'        => 'کیوسک / اسلایدر مجله',
+			'kiosk'          => 'کیوسک / اسلایدر مجله',
+			'sticky_bottom'  => 'نوار چسبان پایین صفحه',
 		);
 
 		foreach ( $positions as $slug => $name ) {
@@ -173,6 +174,8 @@ final class Setup {
 		add_image_size( 'ak-card', 500, 312, true );
 		add_image_size( 'ak-hero', 1200, 800, true );
 		add_image_size( 'ak-ad-strip', 435, 60, true );
+		add_image_size( 'ak-sticky-bottom-ad', 728, 90, false );
+		add_image_size( 'ak-sticky-bottom-ad-mobile', 360, 56, false );
 	}
 
 	public static function register_menus(): void {

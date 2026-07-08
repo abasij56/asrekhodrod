@@ -11,6 +11,7 @@ use ABI\Translator\Core\AI\ProviderFactory;
 use ABI\Translator\Core\AI\ProviderInterface;
 use ABI\Translator\Core\Settings;
 use ABI\Translator\Core\Support\Logger;
+use ABI\Translator\Core\Support\RateLimiter;
 
 /**
  * Orchestrates on-demand translation with DB caching and fail-safe fallback.
@@ -100,6 +101,12 @@ final class TranslationService {
 		$provider = $this->provider();
 
 		foreach ( array_chunk( $misses, self::BATCH_SIZE, true ) as $group ) {
+			if ( ! RateLimiter::allow() ) {
+				// Rate limited: leave remaining items for on-demand translation later.
+				Logger::warning( 'Batch warm skipped: rate limit reached', array( 'object_type' => $object_type ) );
+				return;
+			}
+
 			try {
 				$translated = $provider->translateBatch( $group, $from, $lang );
 			} catch ( \Throwable $e ) {
@@ -180,6 +187,20 @@ final class TranslationService {
 		 */
 		$should = apply_filters( 'abi_translator_should_translate', true, $object_type, $object_id, $field, $lang );
 		if ( ! $should ) {
+			return $text;
+		}
+
+		if ( ! RateLimiter::allow() ) {
+			// Rate limited: serve the original text; a later request can translate it.
+			Logger::warning(
+				'Translation skipped: rate limit reached',
+				array(
+					'object_type' => $object_type,
+					'object_id'   => $object_id,
+					'field'       => $field,
+				)
+			);
+
 			return $text;
 		}
 

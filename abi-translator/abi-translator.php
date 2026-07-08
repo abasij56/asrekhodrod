@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       ABI Translator
  * Plugin URI:        https://asrekhodro.com/
- * Description:       AI-powered multilingual + SEO translation plugin. Phases 1–4: /en/ routing, CPT translation, SEO, homepage blocks, taxonomy terms.
+ * Description:       AI-powered multilingual + SEO translation plugin. Phases 1–5: /en/ routing, CPT + taxonomy translation, SEO, homepage blocks, cache purge, dashboard, re-translate, rate limiting.
  * Version:           0.1.0
  * Requires at least: 6.0
  * Requires PHP:      8.0

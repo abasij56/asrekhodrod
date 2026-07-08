@@ -66,6 +66,8 @@ final class LayoutResolver {
 	 */
 	private static function resolve_placements( string $page_key, array $page_config, string $appearance_id ): array {
 		$from_storage = self::placements_from_storage( $page_key );
+		$defaults     = is_array( $page_config['defaults'] ?? null ) ? $page_config['defaults'] : array();
+
 		if ( $from_storage !== array() ) {
 			$validated = self::validate_placements(
 				self::expand_legacy_sidebar_rail( $from_storage ),
@@ -77,8 +79,7 @@ final class LayoutResolver {
 			}
 		}
 
-		$defaults = $page_config['defaults'] ?? array();
-		if ( is_array( $defaults ) && $defaults !== array() ) {
+		if ( $defaults !== array() ) {
 			return self::validate_placements(
 				self::expand_legacy_sidebar_rail( $defaults ),
 				$page_config,
@@ -177,6 +178,12 @@ final class LayoutResolver {
 			if ( array_key_exists( 'data_title', $row ) ) {
 				$placement['data_title'] = (string) $row['data_title'];
 			}
+			foreach ( array( 'mobile', 'tablet', 'desktop' ) as $device ) {
+				$key = 'data_visible_' . $device;
+				if ( array_key_exists( $key, $row ) ) {
+					$placement[ $key ] = (int) $row[ $key ];
+				}
+			}
 
 			$placements[] = LayoutSchema::merge_placement_defaults( $block, $placement );
 		}
@@ -225,7 +232,7 @@ final class LayoutResolver {
 				continue;
 			}
 
-			$validated[] = array_merge(
+			$merged = array_merge(
 				array(
 					'zone'       => $zone,
 					'block'      => $block,
@@ -235,6 +242,8 @@ final class LayoutResolver {
 				),
 				LayoutSchema::merge_placement_defaults( $block, $placement )
 			);
+			$merged['visibility_class'] = LayoutSchema::device_visibility_class( $merged );
+			$validated[]                = $merged;
 		}
 
 		return $validated;

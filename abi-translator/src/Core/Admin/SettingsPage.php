@@ -8,6 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use ABI\Translator\Core\AI\ProviderFactory;
 use ABI\Translator\Core\Settings;
+use ABI\Translator\Core\Translation\TranslationRepository;
 
 /**
  * Settings → ABI Translator admin screen (Provider / API Key / Model / ...).
@@ -19,6 +20,12 @@ final class SettingsPage {
 	private const GROUP       = 'abi_translator_group';
 	private const NONCE_TEST  = 'abi_translator_test_connection';
 	private const CAPABILITY  = 'manage_options';
+
+	private ?Dashboard $dashboard;
+
+	public function __construct( ?TranslationRepository $repository = null ) {
+		$this->dashboard = $repository !== null ? new Dashboard( $repository ) : null;
+	}
 
 	public function register(): void {
 		add_action( 'admin_menu', array( $this, 'add_menu' ) );
@@ -103,6 +110,31 @@ final class SettingsPage {
 				array( 'key' => $key )
 			);
 		}
+
+		add_settings_section(
+			'abi_translator_maintenance',
+			__( 'Maintenance', 'abi-translator' ),
+			static function (): void {
+				echo '<p>' . esc_html__( 'Optional safeguards for on-demand translation.', 'abi-translator' ) . '</p>';
+			},
+			self::MENU_SLUG
+		);
+
+		$maintenance_fields = array(
+			'rate_limit_enabled' => __( 'Rate limit', 'abi-translator' ),
+			'rate_limit_max'     => __( 'Max requests / minute', 'abi-translator' ),
+		);
+
+		foreach ( $maintenance_fields as $key => $label ) {
+			add_settings_field(
+				'abi_translator_' . $key,
+				esc_html( $label ),
+				array( $this, 'render_field' ),
+				self::MENU_SLUG,
+				'abi_translator_maintenance',
+				array( 'key' => $key )
+			);
+		}
 	}
 
 	/**
@@ -153,6 +185,10 @@ final class SettingsPage {
 
 		// Active languages: default first, then targets.
 		$clean['languages'] = array_values( array_unique( array_merge( array( $default ), $targets ) ) );
+
+		// Maintenance: rate limiting.
+		$clean['rate_limit_enabled'] = ! empty( $input['rate_limit_enabled'] );
+		$clean['rate_limit_max']     = max( 1, (int) ( $input['rate_limit_max'] ?? 60 ) );
 
 		Settings::flush();
 
@@ -252,6 +288,24 @@ final class SettingsPage {
 				);
 				break;
 
+			case 'rate_limit_enabled':
+				printf(
+					'<label><input type="checkbox" name="%s" value="1"%s /> %s</label>',
+					esc_attr( $name ),
+					checked( Settings::rate_limit_enabled(), true, false ),
+					esc_html__( 'Limit on-demand translation requests per visitor IP.', 'abi-translator' )
+				);
+				break;
+
+			case 'rate_limit_max':
+				printf(
+					'<input type="number" step="1" min="1" name="%s" value="%s" class="small-text" />',
+					esc_attr( $name ),
+					esc_attr( (string) Settings::rate_limit_max() )
+				);
+				echo '<p class="description">' . esc_html__( 'Maximum provider requests per IP per minute (when rate limiting is enabled).', 'abi-translator' ) . '</p>';
+				break;
+
 			default:
 				printf(
 					'<input type="text" name="%s" value="%s" class="regular-text" />',
@@ -284,6 +338,12 @@ final class SettingsPage {
 				</button>
 				<span id="abi-translator-test-result" style="margin-inline-start:8px;"></span>
 			</p>
+
+			<?php
+			if ( $this->dashboard !== null ) {
+				$this->dashboard->render();
+			}
+			?>
 		</div>
 		<?php
 	}

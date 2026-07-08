@@ -1,0 +1,212 @@
+#emwi-in-upload-ui {
+	margin: 1.2em auto;
+	text-align: center;
+}
+
+#emwi-in-upload-ui .row1 {
+	margin-bottom: .5em;
+}
+
+#emwi-media-new-panel {
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 720px;
+	margin: 1em 0;
+	padding: 1.5em;
+	text-align: left;
+	background-color: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+}
+
+/* Overlay variant: only when opened inside the media-modal grid UI. */
+#emwi-in-upload-ui #emwi-media-new-panel {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	max-width: none;
+	height: 100%;
+	margin: 0 auto;
+	z-index: 999;
+	padding: 2em;
+	background-color: rgb(241, 241, 241);
+	border: 0;
+	border-radius: 0;
+	overflow-y: auto;
+}
+
+.media-modal-content #emwi-in-upload-ui #emwi-media-new-panel {
+	background-color: white;
+}
+
+#emwi-urls-label {
+	display: block;
+	margin-bottom: 1em;
+	font-weight: 600;
+}
+
+#emwi-urls {
+	width: 100%;
+	min-height: 160px;
+	resize: vertical;
+}
+
+#emwi-error {
+	color: red;
+}
+
+#emwi-properties {
+	margin-top: 1.5em;
+}
+
+#emwi-properties label {
+	margin-right: 1em;
+}
+
+#emwi-width {
+	margin-right: 2.5em;
+	width: 6em;
+}
+
+#emwi-height {
+	margin-right: 7em;
+	width: 6em;
+}
+
+#emwi-type {
+	width: 17em;
+}
+
+#emwi-buttons-row {
+	margin-top: 1.5em;
+	text-align: right;
+}
+
+#emwi-buttons-row .spinner {
+	margin-top: 4px;
+	margin-right: 2em;
+	float: none;
+	visibility: hidden;
+}
+
+#emwi-clear {
+	margin-right: 2.3em;
+}
+
+#emwi-add {
+	margin-right: 1.5em;
+}
+
+#emwi-in-upload-ui .emwi-upload-actions {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: .8em;
+}
+
+/* --- CDN upload section --- */
+.emwi-cdn-section {
+	margin-top: 1.5em;
+	padding-top: 1.5em;
+	border-top: 1px solid #dcdcde;
+}
+
+.emwi-cdn-section--inline {
+	width: 100%;
+	max-width: 520px;
+	margin: 0 auto;
+	padding: 0;
+	border-top: 0;
+	text-align: left;
+}
+
+.emwi-cdn-section .emwi-cdn-sep {
+	position: relative;
+	text-align: center;
+	margin-bottom: 1.2em;
+}
+
+.emwi-cdn-section .emwi-cdn-sep::before {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	height: 1px;
+	background: #dcdcde;
+}
+
+.emwi-cdn-section .emwi-cdn-sep span {
+	position: relative;
+	display: inline-block;
+	padding: 0 .8em;
+	background: inherit;
+	color: #646970;
+}
+
+.media-modal-content .emwi-cdn-section .emwi-cdn-sep span {
+	background: #fff;
+}
+
+.emwi-cdn-label {
+	display: block;
+	margin-bottom: .8em;
+	font-weight: 600;
+}
+
+.emwi-cdn-row {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: .8em;
+}
+
+.emwi-cdn-row .spinner {
+	float: none;
+	margin: 0;
+	visibility: hidden;
+}
+
+.emwi-cdn-error {
+	color: #d63638;
+	margin-top: .8em;
+	min-height: 1em;
+}
+
+.emwi-cdn-notice {
+	margin: .6em 0 1em;
+	color: #646970;
+}
+
+.emwi-cdn-notice--warn {
+	color: #9a6700;
+}
+
+.emwi-cdn-missing {
+	margin: .5em 0 1em 1.2em;
+	list-style: disc;
+}
+
+.emwi-cdn-section--inactive {
+	margin-top: 1.5em;
+	padding-top: 1.2em;
+	border-top: 1px solid #dcdcde;
+}
+
+.emwi-cdn-debug {
+	margin-top: 1em;
+}
+
+.emwi-cdn-debug__title {
+	margin: 0 0 .5em;
+	font-weight: 600;
+}
+
+.emwi-cdn-debug table {
+	margin-top: .5em;
+}
+
+.emwi-cdn-debug code {
+	word-break: break-all;
+}

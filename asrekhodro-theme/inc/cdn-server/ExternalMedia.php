@@ -7,210 +7,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Add external image URLs to the media library without importing files.
+ * Add external media URLs to the media library without importing files.
  *
  * Ported from External Media without Import (GPLv3) with security hardening.
+ *
+ * Core registration logic only. Admin UI and AJAX live in the CdnServer module
+ * (inc/cdn-server/Admin/*). The class name and namespace are kept unchanged so
+ * existing callers (importer, ImporterBridge, AdminPostList) keep working.
  */
 final class ExternalMedia {
 
 	private const META_FLAG = '_ak_external_media';
-	private const AJAX_ACTION = 'ak_add_external_media';
-	private const NONCE_ACTION = 'ak_external_media';
-	private const DEFAULT_FALLBACK_WIDTH = 1200;
+
+	public const AJAX_ACTION  = 'ak_add_external_media';
+	public const NONCE_ACTION = 'ak_external_media';
+
+	private const DEFAULT_FALLBACK_WIDTH  = 1200;
 	private const DEFAULT_FALLBACK_HEIGHT = 800;
-
-	public static function init(): void {
-		add_action( 'admin_enqueue_scripts', array( self::class, 'enqueue_admin_assets' ) );
-		add_action( 'admin_menu', array( self::class, 'register_submenu' ) );
-		add_action( 'post-plupload-upload-ui', array( self::class, 'render_upload_ui' ) );
-		add_action( 'post-html-upload-ui', array( self::class, 'render_upload_ui' ) );
-		add_action( 'wp_ajax_' . self::AJAX_ACTION, array( self::class, 'handle_ajax' ) );
-		add_action( 'admin_post_' . self::AJAX_ACTION, array( self::class, 'handle_admin_post' ) );
-		add_filter( 'get_attached_file', array( self::class, 'filter_attached_file' ), 10, 2 );
-	}
-
-	public static function enqueue_admin_assets( string $hook_suffix ): void {
-		if ( ! current_user_can( 'upload_files' ) ) {
-			return;
-		}
-
-		$allowed_hooks = array( 'upload.php', 'post.php', 'post-new.php' );
-		$is_media_page = str_starts_with( $hook_suffix, 'media_page_' );
-
-		if ( ! in_array( $hook_suffix, $allowed_hooks, true ) && ! $is_media_page ) {
-			return;
-		}
-
-		wp_enqueue_style(
-			'ak-external-media',
-			Appearance::asset_url( 'admin/css/external-media.css' ),
-			array(),
-			ASREKHODRO_THEME_VERSION
-		);
-
-		wp_enqueue_script(
-			'ak-external-media',
-			Appearance::asset_url( 'admin/js/external-media.js' ),
-			array( 'jquery' ),
-			ASREKHODRO_THEME_VERSION,
-			true
-		);
-
-		wp_localize_script(
-			'ak-external-media',
-			'akExternalMedia',
-			array(
-				'action' => self::AJAX_ACTION,
-				'nonce'  => wp_create_nonce( self::NONCE_ACTION ),
-			)
-		);
-	}
-
-	public static function register_submenu(): void {
-		add_submenu_page(
-			'upload.php',
-			__( 'Add External Media', 'asrekhodro' ),
-			__( 'Add External Media', 'asrekhodro' ),
-			'upload_files',
-			'add-external-media',
-			array( self::class, 'render_submenu_page' )
-		);
-	}
-
-	public static function render_upload_ui(): void {
-		if ( ! current_user_can( 'upload_files' ) ) {
-			return;
-		}
-
-		$media_library_mode = get_user_option( 'media_library_mode', get_current_user_id() );
-		?>
-		<div id="emwi-in-upload-ui">
-			<div class="row1"><?php esc_html_e( 'or', 'asrekhodro' ); ?></div>
-			<div class="row2">
-				<?php if ( 'grid' === $media_library_mode || $media_library_mode === false ) : ?>
-					<button type="button" id="emwi-show" class="button button-large">
-						<?php esc_html_e( 'Add External Media without Import', 'asrekhodro' ); ?>
-					</button>
-					<?php self::render_panel( true ); ?>
-				<?php else : ?>
-					<a class="button button-large" href="<?php echo esc_url( admin_url( 'upload.php?page=add-external-media' ) ); ?>">
-						<?php esc_html_e( 'Add External Media without Import', 'asrekhodro' ); ?>
-					</a>
-				<?php endif; ?>
-			</div>
-		</div>
-		<?php
-	}
-
-	public static function render_submenu_page(): void {
-		if ( ! current_user_can( 'upload_files' ) ) {
-			wp_die( esc_html__( 'You do not have permission to upload files.', 'asrekhodro' ) );
-		}
-		?>
-		<div class="wrap">
-			<h1><?php esc_html_e( 'Add External Media without Import', 'asrekhodro' ); ?></h1>
-			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
-				<?php wp_nonce_field( self::NONCE_ACTION ); ?>
-				<?php self::render_panel( false ); ?>
-			</form>
-		</div>
-		<?php
-	}
-
-	private static function render_panel( bool $in_upload_ui ): void {
-		$urls      = isset( $_GET['urls'] ) ? sanitize_textarea_field( wp_unslash( (string) $_GET['urls'] ) ) : '';
-		$error     = isset( $_GET['error'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['error'] ) ) : '';
-		$width     = isset( $_GET['width'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['width'] ) ) : '';
-		$height    = isset( $_GET['height'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['height'] ) ) : '';
-		$mime_type = isset( $_GET['mime-type'] ) ? sanitize_mime_type( wp_unslash( (string) $_GET['mime-type'] ) ) : '';
-		$show_meta = ! $in_upload_ui && $error !== '';
-		?>
-		<div id="emwi-media-new-panel" <?php echo $in_upload_ui ? 'style="display:none"' : ''; ?>>
-			<label id="emwi-urls-label" for="emwi-urls"><?php esc_html_e( 'Add medias from URLs', 'asrekhodro' ); ?></label>
-			<textarea
-				id="emwi-urls"
-				name="urls"
-				rows="<?php echo $in_upload_ui ? 3 : 10; ?>"
-				required
-				placeholder="<?php echo esc_attr__( "Please fill in the media URLs.\nMultiple URLs are supported with each URL specified in one line.", 'asrekhodro' ); ?>"
-			><?php echo esc_textarea( $urls ); ?></textarea>
-			<div id="emwi-hidden" <?php echo $show_meta ? '' : 'style="display:none"'; ?>>
-				<div>
-					<span id="emwi-error"><?php echo esc_html( $error ); ?></span>
-					<?php esc_html_e( 'Please fill in the following properties manually. If you leave the fields blank (or 0 for width/height), the plugin will try to resolve them automatically.', 'asrekhodro' ); ?>
-				</div>
-				<div id="emwi-properties">
-					<label for="emwi-width"><?php esc_html_e( 'Width', 'asrekhodro' ); ?></label>
-					<input id="emwi-width" name="width" type="number" min="0" value="<?php echo esc_attr( $width ); ?>">
-					<label for="emwi-height"><?php esc_html_e( 'Height', 'asrekhodro' ); ?></label>
-					<input id="emwi-height" name="height" type="number" min="0" value="<?php echo esc_attr( $height ); ?>">
-					<label for="emwi-mime-type"><?php esc_html_e( 'MIME Type', 'asrekhodro' ); ?></label>
-					<input id="emwi-mime-type" name="mime-type" type="text" value="<?php echo esc_attr( $mime_type ); ?>">
-				</div>
-			</div>
-			<div id="emwi-buttons-row">
-				<input type="hidden" name="action" value="<?php echo esc_attr( self::AJAX_ACTION ); ?>">
-				<span class="spinner"></span>
-				<input type="button" id="emwi-clear" class="button" value="<?php esc_attr_e( 'Clear', 'asrekhodro' ); ?>">
-				<input type="submit" id="emwi-add" class="button button-primary" value="<?php esc_attr_e( 'Add', 'asrekhodro' ); ?>">
-				<?php if ( $in_upload_ui ) : ?>
-					<input type="button" id="emwi-cancel" class="button" value="<?php esc_attr_e( 'Cancel', 'asrekhodro' ); ?>">
-				<?php endif; ?>
-			</div>
-		</div>
-		<?php
-	}
-
-	public static function handle_ajax(): void {
-		if ( ! current_user_can( 'upload_files' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'asrekhodro' ) ), 403 );
-		}
-
-		check_ajax_referer( self::NONCE_ACTION, 'nonce' );
-
-		$info = self::process_submission();
-		$attachments = array();
-
-		foreach ( $info['attachment_ids'] as $attachment_id ) {
-			$attachment = wp_prepare_attachment_for_js( $attachment_id );
-			if ( $attachment ) {
-				$attachments[] = $attachment;
-			} elseif ( ! isset( $info['error'] ) ) {
-				$info['error'] = __( 'An attachment was created but could not be loaded for display.', 'asrekhodro' );
-			}
-		}
-
-		$info['attachments'] = $attachments;
-		wp_send_json_success( $info );
-	}
-
-	public static function handle_admin_post(): void {
-		if ( ! current_user_can( 'upload_files' ) ) {
-			wp_die( esc_html__( 'You do not have permission to upload files.', 'asrekhodro' ) );
-		}
-
-		check_admin_referer( self::NONCE_ACTION );
-
-		$info          = self::process_submission();
-		$redirect_url  = 'upload.php?page=add-external-media';
-		$failed_urls   = (string) ( $info['urls'] ?? '' );
-
-		if ( $failed_urls !== '' || ! empty( $info['error'] ) ) {
-			$redirect_url = add_query_arg(
-				array(
-					'urls'      => $failed_urls,
-					'error'     => (string) ( $info['error'] ?? '' ),
-					'width'     => (string) ( $info['width'] ?? '' ),
-					'height'    => (string) ( $info['height'] ?? '' ),
-					'mime-type' => (string) ( $info['mime-type'] ?? '' ),
-				),
-				$redirect_url
-			);
-		}
-
-		wp_safe_redirect( admin_url( $redirect_url ) );
-		exit;
-	}
 
 	/**
 	 * Register a remote image URL as a media-library attachment (no file upload).
@@ -243,9 +56,11 @@ final class ExternalMedia {
 	}
 
 	/**
+	 * Process the multi-URL submission form (used by the AJAX/admin-post handlers).
+	 *
 	 * @return array<string, mixed>
 	 */
-	private static function process_submission(): array {
+	public static function process_submission(): array {
 		$input = self::sanitize_input();
 
 		if ( isset( $input['error'] ) ) {
@@ -526,6 +341,8 @@ final class ExternalMedia {
 			'gif'  => 'image/gif',
 			'webp' => 'image/webp',
 			'svg'  => 'image/svg+xml',
+			'mp4'  => 'video/mp4',
+			'webm' => 'video/webm',
 			default => 'image/jpeg',
 		};
 	}

@@ -17,7 +17,7 @@ final class Theme {
 		require_once ASREKHODRO_THEME_DIR . '/inc/ImporterBridge.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/PersianDate.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/PersianDigits.php';
-		require_once ASREKHODRO_THEME_DIR . '/inc/ExternalMedia.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/cdn-server/load.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/LegacyRedirects.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/Magazines.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/ArchiveHero.php';
@@ -78,7 +78,7 @@ final class Theme {
 		VideosArchive::init();
 		NewsPermalinks::init();
 		VideoPermalinks::init();
-		ExternalMedia::init();
+		\AsreKhodro\Theme\CdnServer\Module::init();
 		LegacyRedirects::init();
 		PostViews::init();
 		AjaxSearch::init();
@@ -93,6 +93,7 @@ final class Theme {
 		PostOverTitleMeta::init();
 		AboutPage::init();
 		LoginPage::init();
+		FooterSocial::init();
 
 		add_action( 'after_setup_theme', array( AcfFields::class, 'init' ) );
 		add_action( 'acf/init', array( CinfoBlocks::class, 'init' ) );

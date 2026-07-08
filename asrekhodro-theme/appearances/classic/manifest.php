@@ -16,6 +16,12 @@ $zone_after_main = array(
 	'multiple' => true,
 );
 
+$zone_fixed_bottom = array(
+	'label'    => 'پایین صفحه (چسبان)',
+	'blocks'   => array( 'ak-sticky-bottom-ad' ),
+	'multiple' => false,
+);
+
 $zone_before_main = array(
 	'label'    => 'بالای صفحه',
 	'blocks'   => array( '*' ),
@@ -34,8 +40,9 @@ $system_page_zones = array(
 		'blocks'   => array( '*' ),
 		'multiple' => true,
 	),
-	'sidebar'     => $zone_sidebar,
-	'after_main'  => $zone_after_main,
+	'sidebar'      => $zone_sidebar,
+	'after_main'   => $zone_after_main,
+	'fixed_bottom' => $zone_fixed_bottom,
 );
 
 $block_page_zones = array(
@@ -45,8 +52,9 @@ $block_page_zones = array(
 		'blocks'   => array( '*' ),
 		'multiple' => true,
 	),
-	'sidebar'     => $zone_sidebar,
-	'after_main'  => $zone_after_main,
+	'sidebar'      => $zone_sidebar,
+	'after_main'   => $zone_after_main,
+	'fixed_bottom' => $zone_fixed_bottom,
 );
 
 $archive_sidebar_defaults = array(
@@ -98,11 +106,12 @@ return array(
 					'multiple' => true,
 				),
 				'sidebar'     => $zone_sidebar,
-				'after_main'  => array(
+				'after_main'   => array(
 					'label'    => 'قبل از فوتر',
 					'blocks'   => array( 'ak-picture-frame' ),
 					'multiple' => false,
 				),
+				'fixed_bottom' => $zone_fixed_bottom,
 			),
 			'defaults'    => array(
 				array( 'zone' => 'before_main', 'block' => 'ak-ad-strip' ),
@@ -116,6 +125,7 @@ return array(
 				array( 'zone' => 'main', 'block' => 'ak-newsletter' ),
 				array( 'zone' => 'sidebar', 'block' => 'ak-sidebar-ads' ),
 				array( 'zone' => 'after_main', 'block' => 'ak-picture-frame' ),
+				array( 'zone' => 'fixed_bottom', 'block' => 'ak-sticky-bottom-ad' ),
 			),
 		),
 		'archive'     => array(
@@ -125,6 +135,7 @@ return array(
 			'defaults'    => array_merge(
 				array(
 					array( 'zone' => 'before_main', 'block' => 'ak-ad-strip' ),
+					array( 'zone' => 'fixed_bottom', 'block' => 'ak-sticky-bottom-ad' ),
 				),
 				$archive_sidebar_defaults
 			),
@@ -136,6 +147,7 @@ return array(
 			'defaults'    => array_merge(
 				array(
 					array( 'zone' => 'before_main', 'block' => 'ak-ad-strip' ),
+					array( 'zone' => 'fixed_bottom', 'block' => 'ak-sticky-bottom-ad' ),
 				),
 				$archive_sidebar_defaults
 			),

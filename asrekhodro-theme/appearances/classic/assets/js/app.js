@@ -1383,6 +1383,7 @@
       ".ad-strip__slot",
       ".ad-banner__slot",
       ".ad-sidebar__slot",
+      ".ad-sticky-bottom__slot",
       ".rf-ad-slot:not(.rf-ad-slot--placeholder)",
       ".cb-ad-row__slot",
     ].join(", ");
@@ -1399,6 +1400,61 @@
 
       link.setAttribute("target", "_blank");
       link.setAttribute("rel", "noopener noreferrer");
+    });
+  }
+
+  function initStickyBottomAd() {
+    function pinStickyToViewport(el) {
+      if (!window.visualViewport) {
+        el.style.bottom = "0px";
+        return;
+      }
+
+      var vv = window.visualViewport;
+      var gap = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      el.style.bottom = gap + "px";
+    }
+
+    document.querySelectorAll("[data-ak-sticky-ad]").forEach(function (el) {
+      var key = el.getAttribute("data-ak-sticky-storage") || "ak-sticky-ad";
+      if (sessionStorage.getItem(key) === "1") {
+        el.classList.add("is-closed");
+        return;
+      }
+
+      el.classList.remove("is-closed");
+      pinStickyToViewport(el);
+
+      if (window.visualViewport) {
+        var onViewportChange = function () {
+          if (!el.classList.contains("is-closed")) {
+            pinStickyToViewport(el);
+          }
+        };
+        window.visualViewport.addEventListener("resize", onViewportChange);
+        window.visualViewport.addEventListener("scroll", onViewportChange);
+      }
+
+      window.addEventListener("orientationchange", function () {
+        window.setTimeout(function () {
+          if (!el.classList.contains("is-closed")) {
+            pinStickyToViewport(el);
+          }
+        }, 120);
+      });
+
+      var closeBtn = el.querySelector("[data-ak-sticky-close]");
+      if (!closeBtn) {
+        return;
+      }
+
+      closeBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        el.classList.add("is-closed");
+        el.style.bottom = "";
+        sessionStorage.setItem(key, "1");
+      });
     });
   }
 
@@ -1580,5 +1636,6 @@
     initVideoCinema();
     initNewsArchiveDateFilter();
     initAdExternalLinks();
+    initStickyBottomAd();
   });
 })();

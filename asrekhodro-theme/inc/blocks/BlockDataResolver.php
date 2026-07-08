@@ -104,6 +104,7 @@ final class BlockDataResolver {
 			'ak-videos-2',
 			'ak-news-list',
 			'ak-ad-strip',
+			'ak-sticky-bottom-ad',
 			'ak-sidebar-ads',
 			'ak-ticker',
 			'ak-picture-frame',
@@ -134,7 +135,7 @@ final class BlockDataResolver {
 			return self::resolve_news_list( $placement, $meta );
 		}
 
-		if ( $block_name === 'ak-ad-strip' ) {
+		if ( $block_name === 'ak-ad-strip' || $block_name === 'ak-sticky-bottom-ad' ) {
 			return self::resolve_ad_strip( $placement, $meta );
 		}
 
@@ -274,7 +275,8 @@ final class BlockDataResolver {
 	private static function resolve_ad_strip( array $placement, array $meta ): array {
 		$defaults       = is_array( $meta['defaults'] ?? null ) ? $meta['defaults'] : array();
 		$post_type      = (string) ( $placement['post_type'] ?? $defaults['post_type'] ?? 'ad_slot' );
-		$count          = self::placement_count( $placement, $defaults, 3 );
+		$default_count  = max( 1, (int) ( $defaults['count'] ?? 3 ) );
+		$count          = self::placement_count( $placement, $defaults, $default_count );
 		$category       = (int) ( $placement['category'] ?? $defaults['category'] ?? 0 );
 		$strategy       = (string) ( $placement['strategy'] ?? $defaults['strategy'] ?? 'latest' );
 		$image_size     = (string) ( $meta['image_size'] ?? 'ak-ad-strip' );
@@ -297,8 +299,20 @@ final class BlockDataResolver {
 			$items = self::ad_strip_items_from_posts( $posts, $image_size );
 		}
 
+		if ( $items === array() ) {
+			$manual = $placement['manual_posts'] ?? array();
+			if ( is_array( $manual ) && $manual !== array() ) {
+				$posts = self::query_by_ids( $manual, $count, $post_type );
+				$items = self::ad_strip_items_from_posts( $posts, $image_size );
+			}
+		}
+
 		if ( $items === array() && $strategy !== 'manual' ) {
 			$items = ImporterBridge::get_ads_by_position( $position_slug, $count );
+		}
+
+		if ( $image_size === 'ak-sticky-bottom-ad' ) {
+			$items = ImporterBridge::enrich_sticky_bottom_ads( $items );
 		}
 
 		return array( $context_key => array_slice( $items, 0, $count ) );
@@ -639,8 +653,9 @@ final class BlockDataResolver {
 			'ak-videos-2'      => 'videos_2',
 			'ak-videos'        => 'videos',
 			'ak-reviews'       => 'reviews',
-			'ak-ad-strip'      => 'menu_strip_ads',
-			'ak-sidebar-ads'   => 'sidebar_ads',
+			'ak-ad-strip'           => 'menu_strip_ads',
+			'ak-sticky-bottom-ad'   => 'sticky_bottom_ads',
+			'ak-sidebar-ads'        => 'sidebar_ads',
 			default            => str_replace( array( 'ak-', '-' ), array( '', '_' ), $block_name ),
 		};
 	}

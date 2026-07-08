@@ -155,12 +155,18 @@ final class SinglePost {
 			return esc_url( $url );
 		}
 
-		if ( $option_key === 'share_instagram' && ! empty( $options['social_instagram'] ) ) {
-			return esc_url( (string) $options['social_instagram'] );
+		if ( $option_key === 'share_instagram' ) {
+			$url = FooterSocial::url_for_label( $options, 'instagram' );
+			if ( $url !== '' ) {
+				return $url;
+			}
 		}
 
-		if ( $option_key === 'share_telegram' && ! empty( $options['social_telegram'] ) ) {
-			return esc_url( (string) $options['social_telegram'] );
+		if ( $option_key === 'share_telegram' ) {
+			$url = FooterSocial::url_for_label( $options, 'telegram' );
+			if ( $url !== '' ) {
+				return $url;
+			}
 		}
 
 		return esc_url( $default );

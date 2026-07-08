@@ -76,13 +76,22 @@ final class AcfFields {
 			array(
 				'key'    => 'group_ak_theme_options',
 				'title'  => 'تنظیمات تم',
-				'fields' => array_merge(
-					self::general_option_fields(),
-					self::homepage_option_fields(),
-					self::archive_option_fields(),
-					self::contact_option_fields(),
-					self::carsinfo_option_fields(),
-					self::footer_option_fields()
+				/**
+				 * Allow modules to append their own tabs/fields to the theme
+				 * options group (keeps them as vertical tabs in one box).
+				 *
+				 * @param array<int, array<string, mixed>> $fields
+				 */
+				'fields' => apply_filters(
+					'ak_theme_options_fields',
+					array_merge(
+						self::general_option_fields(),
+						self::homepage_option_fields(),
+						self::archive_option_fields(),
+						self::contact_option_fields(),
+						self::carsinfo_option_fields(),
+						self::footer_option_fields()
+					)
 				),
 				'location' => array(
 					array(
@@ -1377,62 +1386,7 @@ final class AcfFields {
 				'ui'                => 1,
 				'conditional_logic' => $when_social,
 			),
-			array(
-				'key'               => 'field_ak_social_instagram',
-				'label'             => 'اینستاگرام — نشانی',
-				'name'              => 'social_instagram',
-				'type'              => 'url',
-				'conditional_logic' => $when_social,
-			),
-			self::social_svg_field(
-				'field_ak_social_instagram_svg',
-				'اینستاگرام — آیکن SVG',
-				'social_instagram_svg',
-				'instagram',
-				$when_social
-			),
-			array(
-				'key'               => 'field_ak_social_telegram',
-				'label'             => 'تلگرام — نشانی',
-				'name'              => 'social_telegram',
-				'type'              => 'url',
-				'conditional_logic' => $when_social,
-			),
-			self::social_svg_field(
-				'field_ak_social_telegram_svg',
-				'تلگرام — آیکن SVG',
-				'social_telegram_svg',
-				'telegram',
-				$when_social
-			),
-			array(
-				'key'               => 'field_ak_social_youtube',
-				'label'             => 'یوتیوب — نشانی',
-				'name'              => 'social_youtube',
-				'type'              => 'url',
-				'conditional_logic' => $when_social,
-			),
-			self::social_svg_field(
-				'field_ak_social_youtube_svg',
-				'یوتیوب — آیکن SVG',
-				'social_youtube_svg',
-				'youtube',
-				$when_social
-			),
-			array(
-				'key'               => 'field_ak_social_linkedin',
-				'label'             => 'لینکدین — نشانی',
-				'name'              => 'social_linkedin',
-				'type'              => 'url',
-				'conditional_logic' => $when_social,
-			),
-			self::social_svg_field(
-				'field_ak_social_linkedin_svg',
-				'لینکدین — آیکن SVG',
-				'social_linkedin_svg',
-				'linkedin',
-				$when_social
-			),
+			self::footer_social_repeater( $when_social ),
 			array(
 				'key'               => 'field_ak_footer_copyright_text',
 				'label'             => 'متن کپی‌رایت',
@@ -1446,35 +1400,52 @@ final class AcfFields {
 	}
 
 	/**
-	 * SVG icon editor field for footer social links.
+	 * Repeater for footer social links (title + URL + SVG icon).
 	 *
-	 * @param string                   $key
-	 * @param string                   $label
-	 * @param string                   $name
-	 * @param string                   $network
 	 * @param list<list<array<string, string>>> $when
 	 * @return array<string, mixed>
 	 */
-	private static function social_svg_field(
-		string $key,
-		string $label,
-		string $name,
-		string $network,
-		array $when
-	): array {
+	private static function footer_social_repeater( array $when ): array {
 		return array(
-			'key'               => $key,
-			'label'             => $label,
-			'name'              => $name,
-			'type'              => 'textarea',
-			'rows'              => 6,
-			'new_lines'         => '',
-			'default_value'     => FooterSocial::default_svg( $network ),
-			'instructions'      => 'کد SVG آیکن. از fill="currentColor" برای هماهنگی با رنگ فوتر استفاده کنید.',
-			'wrapper'           => array(
-				'class' => 'ak-social-svg-field',
-			),
+			'key'               => 'field_ak_footer_social_links',
+			'label'             => 'شبکه‌های اجتماعی',
+			'name'              => 'footer_social_links',
+			'type'              => 'repeater',
+			'layout'            => 'block',
+			'button_label'      => 'افزودن شبکه اجتماعی',
+			'min'               => 0,
+			'max'               => 12,
 			'conditional_logic' => $when,
+			'sub_fields'        => array(
+				array(
+					'key'           => 'field_ak_footer_social_title',
+					'label'         => 'عنوان',
+					'name'          => 'social_title',
+					'type'          => 'text',
+					'required'      => 1,
+					'placeholder'   => 'مثلاً اینستاگرام',
+				),
+				array(
+					'key'         => 'field_ak_footer_social_url',
+					'label'       => 'نشانی',
+					'name'        => 'social_url',
+					'type'        => 'url',
+					'required'    => 1,
+					'placeholder' => 'https://',
+				),
+				array(
+					'key'          => 'field_ak_footer_social_svg',
+					'label'        => 'آیکن SVG',
+					'name'         => 'social_svg',
+					'type'         => 'textarea',
+					'rows'         => 6,
+					'new_lines'    => '',
+					'instructions' => 'کد SVG آیکن. از fill="currentColor" برای هماهنگی با رنگ فوتر استفاده کنید.',
+					'wrapper'      => array(
+						'class' => 'ak-social-svg-field',
+					),
+				),
+			),
 		);
 	}
 

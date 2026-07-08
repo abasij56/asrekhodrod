@@ -206,7 +206,8 @@
 }
 
 .ak-lb-zone--before_main,
-.ak-lb-zone--after_main {
+.ak-lb-zone--after_main,
+.ak-lb-zone--fixed_bottom {
 	border-right: 4px solid #72aee6;
 }
 
@@ -497,6 +498,21 @@
 	font-weight: 600;
 	color: #1d2327;
 	margin-bottom: 0.5rem;
+}
+
+.ak-lb-check-group {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	margin-top: 0.35rem;
+}
+
+.ak-lb-check {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	font-weight: 500;
+	cursor: pointer;
 }
 
 .ak-lb-block-readonly {

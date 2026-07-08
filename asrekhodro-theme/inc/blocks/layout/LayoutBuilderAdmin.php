@@ -158,6 +158,10 @@ final class LayoutBuilderAdmin {
 				'blockLabel'     => __( 'بلاک', 'asrekhodro' ),
 				'blockTitle'     => __( 'عنوان بخش', 'asrekhodro' ),
 				'blockTitleHint' => __( 'خالی بگذارید تا عنوان نمایش داده نشود.', 'asrekhodro' ),
+				'visibleOn'      => __( 'نمایش در', 'asrekhodro' ),
+				'visibleMobile'  => __( 'موبایل', 'asrekhodro' ),
+				'visibleTablet'  => __( 'تبلت', 'asrekhodro' ),
+				'visibleDesktop' => __( 'دسکتاپ', 'asrekhodro' ),
 				'nothingToSave'  => __( 'تغییری برای ذخیره نیست.', 'asrekhodro' ),
 				'unsavedChanges' => __( 'تغییرات ذخیره نشده — دکمه ذخیره را بزنید.', 'asrekhodro' ),
 				'systemContent'  => __( 'محتوای سیستمی (ثابت در قالب)', 'asrekhodro' ),
@@ -241,6 +245,10 @@ final class LayoutBuilderAdmin {
 		if ( ! empty( $defaults['category'] ) ) {
 			$fields['data_category'] = (int) $defaults['category'];
 		}
+
+		$fields['data_visible_mobile']  = 1;
+		$fields['data_visible_tablet']  = 1;
+		$fields['data_visible_desktop'] = 1;
 
 		return $fields;
 	}

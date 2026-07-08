@@ -2,18 +2,24 @@
 <html lang="fa" dir="rtl" {{ function('language_attributes') }}>
 <head>
   <meta charset="{{ site.charset }}">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   {{ function('wp_head') }}
 </head>
 <body class="{{ body_class }}">
-  {% block top %}{% endblock %}
-  {% include 'partials/header.twig' %}
-  {% block before_main %}{% endblock %}
-  {% block content %}{% endblock %}
-  {% block footer %}
-    {% include 'partials/footer.twig' %}
-  {% endblock %}
-  {% include 'partials/news-gallery-lightbox.twig' %}
-  {{ function('wp_footer') }}
+  <div class="site-shell">
+    {% block top %}{% endblock %}
+    {% include 'partials/header.twig' %}
+    {% block before_main %}{% endblock %}
+    {% block content %}{% endblock %}
+    {% block footer %}
+      {% include 'partials/footer.twig' %}
+    {% endblock %}
+    {% include 'partials/news-gallery-lightbox.twig' %}
+    {{ function('wp_footer') }}
+  </div>
+  {% set fixed_bottom_placements = layout_zones.fixed_bottom|default([])|filter(p => p.partial) %}
+  {% if fixed_bottom_placements|length > 0 %}
+    {% include 'partials/layout-zone.twig' with { zone: 'fixed_bottom' } %}
+  {% endif %}
 </body>
 </html>

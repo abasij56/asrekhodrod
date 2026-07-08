@@ -31,11 +31,15 @@ final class TermFilters {
 	/**
 	 * @return list<string>
 	 */
-	private function taxonomies(): array {
+	public static function taxonomies(): array {
 		/** @var list<string> $taxonomies */
 		$taxonomies = apply_filters( 'abi_translator_translatable_taxonomies', self::DEFAULT_TAXONOMIES );
 
 		return array_values( array_unique( array_filter( array_map( 'strval', $taxonomies ) ) ) );
+	}
+
+	public static function is_translatable_taxonomy( string $taxonomy ): bool {
+		return in_array( $taxonomy, self::taxonomies(), true );
 	}
 
 	/**
@@ -49,7 +53,7 @@ final class TermFilters {
 		}
 
 		$tax = is_string( $taxonomy ) && $taxonomy !== '' ? $taxonomy : $term->taxonomy;
-		if ( ! in_array( $tax, $this->taxonomies(), true ) ) {
+		if ( ! in_array( $tax, self::taxonomies(), true ) ) {
 			return $term;
 		}
 
@@ -68,7 +72,7 @@ final class TermFilters {
 			return $terms;
 		}
 
-		$allowed = $this->taxonomies();
+		$allowed = self::taxonomies();
 		foreach ( $terms as $index => $term ) {
 			if ( $term instanceof \WP_Term && in_array( $term->taxonomy, $allowed, true ) ) {
 				$terms[ $index ] = $this->translate_term( $term );

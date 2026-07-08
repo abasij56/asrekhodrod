@@ -41,7 +41,8 @@ final class LayoutSchema {
 		'main'        => 'محتوای اصلی',
 		'main_after'  => 'زیر محتوای اصلی',
 		'sidebar'     => 'سایدبار',
-		'after_main'  => 'قبل از فوتر',
+		'after_main'   => 'قبل از فوتر',
+		'fixed_bottom' => 'پایین صفحه (چسبان)',
 	);
 
 	/** @var array<string, string> */
@@ -165,6 +166,29 @@ final class LayoutSchema {
 		}
 
 		return $placement;
+	}
+
+	/**
+	 * CSS classes for per-device visibility (layout builder checkboxes).
+	 *
+	 * @param array<string, mixed> $placement
+	 */
+	public static function device_visibility_class( array $placement ): string {
+		$classes = array( 'ak-placement' );
+		$devices = array(
+			'mobile'  => 'ak-placement--hide-mobile',
+			'tablet'  => 'ak-placement--hide-tablet',
+			'desktop' => 'ak-placement--hide-desktop',
+		);
+
+		foreach ( $devices as $device => $hide_class ) {
+			$key = 'data_visible_' . $device;
+			if ( array_key_exists( $key, $placement ) && ! (int) $placement[ $key ] ) {
+				$classes[] = $hide_class;
+			}
+		}
+
+		return implode( ' ', $classes );
 	}
 
 	/**
@@ -343,7 +367,23 @@ final class LayoutSchema {
 			return array();
 		}
 
-		return self::placeable_block_names( $appearance_id );
+		if ( in_array( '*', $blocks, true ) ) {
+			return self::placeable_block_names( $appearance_id );
+		}
+
+		$allowed = array();
+		foreach ( $blocks as $block_name ) {
+			if ( ! is_string( $block_name ) || $block_name === '' || $block_name === '*' ) {
+				continue;
+			}
+			$allowed[] = $block_name;
+		}
+
+		if ( $allowed === array() ) {
+			return self::placeable_block_names( $appearance_id );
+		}
+
+		return $allowed;
 	}
 
 	/**

@@ -51,7 +51,9 @@
       {% endif %}
     </main>
     {% if has_sidebar %}
-      {% include 'partials/layout-zone.twig' with { zone: 'sidebar' } %}
+      <div class="page-sidebar-inline">
+        {% include 'partials/layout-zone.twig' with { zone: 'sidebar' } %}
+      </div>
     {% endif %}
   {% if use_inner_grid %}
   </div>
@@ -60,4 +62,9 @@
 {% endif %}
 {% if has_after_main %}
   {% include 'partials/layout-zone.twig' with { zone: 'after_main' } %}
+{% endif %}
+{% if has_sidebar %}
+  <div class="container page-sidebar-below page-sidebar-below--mobile-only">
+    {% include 'partials/layout-zone.twig' with { zone: 'sidebar' } %}
+  </div>
 {% endif %}

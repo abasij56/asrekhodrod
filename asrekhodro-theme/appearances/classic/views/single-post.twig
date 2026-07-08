@@ -58,8 +58,6 @@
         <p class="single-under-title">{{ post.meta('_asrekhodro_under_title')|default(post.meta('under_title')) }}</p>
       {% endif %}
 
-      {% include 'partials/single-share.twig' %}
-
       {% if post_tags|length > 0 %}
         <section class="single-tags" aria-labelledby="single-tags-heading">
           <h2 id="single-tags-heading" class="single-section-title">برچسب‌ها</h2>

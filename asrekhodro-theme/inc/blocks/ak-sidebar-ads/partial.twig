@@ -6,7 +6,7 @@
     {% for ad in sidebar_ad_items %}
       <a href="{{ ad.link }}" class="ad-sidebar__slot" role="listitem" target="_blank" rel="noopener noreferrer">
         {% if ad.image %}
-          <img src="{{ ad.image }}" alt="{{ ad.image_alt|default('')|e('html_attr') }}" width="160" height="80" loading="lazy" decoding="async" />
+          <img src="{{ ad.image }}" alt="{{ ad.image_alt|default('')|e('html_attr') }}" loading="lazy" decoding="async" />
         {% endif %}
       </a>
     {% endfor %}

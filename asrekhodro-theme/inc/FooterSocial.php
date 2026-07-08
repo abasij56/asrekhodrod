@@ -11,7 +11,7 @@ final class FooterSocial {
 	/**
 	 * @var array<string, array{url: string, svg: string, label: string}>
 	 */
-	private const NETWORKS = array(
+	private const LEGACY_NETWORKS = array(
 		'instagram' => array(
 			'url'   => 'social_instagram',
 			'svg'   => 'social_instagram_svg',
@@ -34,14 +34,118 @@ final class FooterSocial {
 		),
 	);
 
+	public static function init(): void {
+		add_filter( 'acf/load_value/name=footer_social_links', array( self::class, 'load_repeater_value' ), 10, 3 );
+	}
+
+	/**
+	 * @param mixed                $value
+	 * @param string|int           $post_id
+	 * @param array<string, mixed> $field
+	 * @return mixed
+	 */
+	public static function load_repeater_value( $value, $post_id, array $field ) {
+		if ( $post_id !== 'options' ) {
+			return $value;
+		}
+		if ( is_array( $value ) && $value !== array() ) {
+			return $value;
+		}
+
+		$options = function_exists( 'get_fields' ) ? ( get_fields( 'option' ) ?: array() ) : array();
+		if ( ! is_array( $options ) ) {
+			return $value;
+		}
+
+		$legacy = self::legacy_rows_from_options( $options );
+
+		return $legacy !== array() ? $legacy : $value;
+	}
+
+	/**
+	 * @param array<string, mixed> $options
+	 * @return list<array<string, string>>
+	 */
+	public static function legacy_rows_from_options( array $options ): array {
+		$rows = array();
+
+		foreach ( self::LEGACY_NETWORKS as $id => $network ) {
+			$url = trim( (string) ( $options[ $network['url'] ] ?? '' ) );
+			if ( $url === '' ) {
+				continue;
+			}
+
+			$custom_svg = trim( (string) ( $options[ $network['svg'] ] ?? '' ) );
+			$svg        = $custom_svg !== '' ? $custom_svg : self::default_svg( $id );
+
+			$rows[] = array(
+				'social_title' => $network['label'],
+				'social_url'   => $url,
+				'social_svg'   => $svg,
+			);
+		}
+
+		return $rows;
+	}
+
 	/**
 	 * @param array<string, mixed> $options
 	 * @return list<array{id: string, url: string, label: string, svg: string}>
 	 */
 	public static function links_for_footer( array $options ): array {
+		$rows = $options['footer_social_links'] ?? null;
+		if ( is_array( $rows ) && $rows !== array() ) {
+			return self::links_from_repeater( $rows );
+		}
+
+		return self::links_from_legacy( $options );
+	}
+
+	/**
+	 * @param list<array<string, mixed>> $rows
+	 * @return list<array{id: string, url: string, label: string, svg: string}>
+	 */
+	private static function links_from_repeater( array $rows ): array {
+		$links = array();
+		$index = 0;
+
+		foreach ( $rows as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+
+			$url = trim( (string) ( $row['social_url'] ?? '' ) );
+			if ( $url === '' ) {
+				continue;
+			}
+
+			$title      = trim( (string) ( $row['social_title'] ?? '' ) );
+			$custom_svg = trim( (string) ( $row['social_svg'] ?? '' ) );
+			$svg        = self::sanitize_svg( $custom_svg );
+			if ( $svg === '' ) {
+				continue;
+			}
+
+			$links[] = array(
+				'id'    => 'social-' . $index,
+				'url'   => esc_url( $url ),
+				'label' => $title !== '' ? $title : __( 'شبکه اجتماعی', 'asrekhodro' ),
+				'svg'   => $svg,
+			);
+			++$index;
+		}
+
+		return $links;
+	}
+
+	/**
+	 * @param array<string, mixed> $options
+	 * @return list<array{id: string, url: string, label: string, svg: string}>
+	 */
+	private static function links_from_legacy( array $options ): array {
 		$links = array();
 
-		foreach ( self::NETWORKS as $id => $network ) {
+		foreach ( self::LEGACY_NETWORKS as $id => $network ) {
 			$url = trim( (string) ( $options[ $network['url'] ] ?? '' ) );
 			if ( $url === '' ) {
 				continue;
@@ -55,13 +159,49 @@ final class FooterSocial {
 
 			$links[] = array(
 				'id'    => $id,
-				'url'   => $url,
+				'url'   => esc_url( $url ),
 				'label' => $network['label'],
 				'svg'   => $svg,
 			);
 		}
 
 		return $links;
+	}
+
+	/**
+	 * @param array<string, mixed> $options
+	 */
+	public static function url_for_label( array $options, string $needle ): string {
+		$needle = mb_strtolower( trim( $needle ) );
+		if ( $needle === '' ) {
+			return '';
+		}
+
+		$rows = $options['footer_social_links'] ?? array();
+		if ( is_array( $rows ) ) {
+			foreach ( $rows as $row ) {
+				if ( ! is_array( $row ) ) {
+					continue;
+				}
+				$title = mb_strtolower( trim( (string) ( $row['social_title'] ?? '' ) ) );
+				$url   = trim( (string) ( $row['social_url'] ?? '' ) );
+				if ( $url !== '' && ( $title === $needle || str_contains( $title, $needle ) ) ) {
+					return esc_url( $url );
+				}
+			}
+		}
+
+		foreach ( self::LEGACY_NETWORKS as $id => $network ) {
+			if ( $id !== $needle && ! str_contains( mb_strtolower( $network['label'] ), $needle ) ) {
+				continue;
+			}
+			$url = trim( (string) ( $options[ $network['url'] ] ?? '' ) );
+			if ( $url !== '' ) {
+				return esc_url( $url );
+			}
+		}
+
+		return '';
 	}
 
 	public static function default_svg( string $network ): string {
@@ -84,7 +224,7 @@ final class FooterSocial {
 	 */
 	public static function default_svgs_for_admin(): array {
 		$defaults = array();
-		foreach ( array_keys( self::NETWORKS ) as $network ) {
+		foreach ( array_keys( self::LEGACY_NETWORKS ) as $network ) {
 			$defaults[ $network ] = self::default_svg( $network );
 		}
 

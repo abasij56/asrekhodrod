@@ -194,6 +194,12 @@ final class LayoutStorage {
 		if ( array_key_exists( 'data_title', $row ) ) {
 			$normalized['data_title'] = sanitize_text_field( (string) $row['data_title'] );
 		}
+		foreach ( array( 'mobile', 'tablet', 'desktop' ) as $device ) {
+			$key = 'data_visible_' . $device;
+			if ( array_key_exists( $key, $row ) ) {
+				$normalized[ $key ] = ! empty( $row[ $key ] ) ? 1 : 0;
+			}
+		}
 
 		return $normalized;
 	}

@@ -39,6 +39,8 @@ final class Settings {
 			'timeout'       => 30,
 			'default_lang'  => 'fa',
 			'languages'     => array( 'fa', 'en' ),
+			'rate_limit_enabled' => false,
+			'rate_limit_max'     => 60,
 		);
 	}
 
@@ -140,6 +142,17 @@ final class Settings {
 
 	public static function has_api_key(): bool {
 		return self::api_key() !== '';
+	}
+
+	public static function rate_limit_enabled(): bool {
+		return (bool) self::get( 'rate_limit_enabled', false );
+	}
+
+	/**
+	 * Maximum provider requests allowed per IP per minute (min 1).
+	 */
+	public static function rate_limit_max(): int {
+		return max( 1, (int) self::get( 'rate_limit_max', 60 ) );
 	}
 
 	/**

@@ -6,7 +6,7 @@
 		return;
 	}
 
-	const ZONE_ORDER = ['before_main', 'main', 'main_after', 'sidebar', 'after_main'];
+	const ZONE_ORDER = ['before_main', 'main', 'main_after', 'sidebar', 'after_main', 'fixed_bottom'];
 	const i18n = cfg.i18n || {};
 
 	const state = {
@@ -205,6 +205,45 @@
 
 	function isDataConfigurable(meta) {
 		return meta.dataConfigurable !== false;
+	}
+
+	function isAkBlock(blockName) {
+		return String(blockName || '').indexOf('ak-') === 0;
+	}
+
+	function ensureVisibilityDefaults(draft) {
+		['mobile', 'tablet', 'desktop'].forEach(function (device) {
+			const key = 'data_visible_' + device;
+			if (draft[key] === undefined || draft[key] === null) {
+				draft[key] = 1;
+			}
+		});
+	}
+
+	function renderVisibilityFields(draft) {
+		ensureVisibilityDefaults(draft);
+		const devices = [
+			{ key: 'mobile', label: i18n.visibleMobile || 'موبایل' },
+			{ key: 'tablet', label: i18n.visibleTablet || 'تبلت' },
+			{ key: 'desktop', label: i18n.visibleDesktop || 'دسکتاپ' },
+		];
+		const checks = devices.map(function (device) {
+			const key = 'data_visible_' + device.key;
+			const label = el('label', { className: 'ak-lb-check' });
+			const input = el('input', { type: 'checkbox' });
+			input.checked = draft[key] === 1 || draft[key] === true || draft[key] === '1';
+			input.addEventListener('change', function () {
+				draft[key] = input.checked ? 1 : 0;
+			});
+			label.appendChild(input);
+			label.appendChild(document.createTextNode(' ' + device.label));
+			return label;
+		});
+
+		return el('div', { className: 'ak-lb-field' }, [
+			el('label', { text: i18n.visibleOn || 'نمایش در' }),
+			el('div', { className: 'ak-lb-check-group' }, checks),
+		]);
 	}
 
 	function hasTitleField(meta) {
@@ -583,7 +622,7 @@
 			return z === 'main' || z === 'main_after' || z === 'sidebar';
 		});
 		const after = ordered.filter(function (z) {
-			return z === 'after_main';
+			return z === 'after_main' || z === 'fixed_bottom';
 		});
 
 		before.forEach(function (zoneKey) {
@@ -679,6 +718,10 @@
 			});
 		}
 
+		if (isAkBlock(draft.placement_block)) {
+			fields.push(renderVisibilityFields(draft));
+		}
+
 		return el('div', {
 			className: 'ak-lb-modal-backdrop',
 			onclick: function (e) {
@@ -772,6 +815,7 @@
 		if (!Array.isArray(draft.data_manual_posts)) {
 			draft.data_manual_posts = [];
 		}
+		ensureVisibilityDefaults(draft);
 	}
 
 	function renderDataFields(m, draft, meta) {

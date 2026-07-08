@@ -7,12 +7,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use ABI\Translator\Compat\AsreKhodro\Bootstrap as AsreKhodroCompat;
+use ABI\Translator\Core\Admin\RetranslateMetabox;
 use ABI\Translator\Core\Admin\SettingsPage;
 use ABI\Translator\Core\Filters\ListTitleWarmer;
 use ABI\Translator\Core\Filters\PostFilters;
 use ABI\Translator\Core\Filters\TermFilters;
 use ABI\Translator\Core\Frontend\LanguageSwitcher;
 use ABI\Translator\Core\Language\LanguageRouter;
+use ABI\Translator\Core\Maintenance\PurgeHooks;
 use ABI\Translator\Core\SEO\Canonical;
 use ABI\Translator\Core\SEO\Hreflang;
 use ABI\Translator\Core\Support\Logger;
@@ -54,16 +56,23 @@ final class Plugin {
 			$router->detect_and_strip();
 			$router->register();
 
-			// Admin settings screen.
-			if ( is_admin() ) {
-				( new SettingsPage() )->register();
-			}
-
-			// Front-end translation filters (guarded internally to fa = no-op).
+			// Shared services (repository/cache are cheap; safe on every request).
 			$repository = new TranslationRepository();
 			$cache      = new TranslationCache();
 			$service    = new TranslationService( $repository, $cache );
 
+			// Admin screens.
+			if ( is_admin() ) {
+				( new SettingsPage( $repository ) )->register();
+
+				// Phase 5: manual re-translate metabox.
+				( new RetranslateMetabox( $repository ) )->register();
+			}
+
+			// Phase 5: purge cached translations when the source changes (admin + front).
+			( new PurgeHooks( $repository ) )->register();
+
+			// Front-end translation filters (guarded internally to fa = no-op).
 			( new PostFilters( $service ) )->register();
 
 			// Phase 2 + 3 + 4 front-end features.

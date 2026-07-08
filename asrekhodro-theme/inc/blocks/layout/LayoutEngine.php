@@ -42,7 +42,10 @@ final class LayoutEngine {
 				$zones[ $zone_key ][ $index ] = array_merge(
 					$placement,
 					$block_context,
-					array( '_context_attached' => true )
+					array(
+						'_context_attached' => true,
+						'layout_page'       => $page_key,
+					)
 				);
 				$context                      = array_merge( $context, $block_context );
 			}

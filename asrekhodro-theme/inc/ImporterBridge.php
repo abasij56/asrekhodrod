@@ -88,7 +88,7 @@ final class ImporterBridge {
 			return esc_url( content_url( $url ) );
 		}
 
-		$base = defined( 'ASREKHODRO_MEDIA_BASE_URL' ) ? ASREKHODRO_MEDIA_BASE_URL : '';
+		$base = self::media_base_url();
 		if ( $base === '' ) {
 			return '';
 		}
@@ -105,8 +105,17 @@ final class ImporterBridge {
 		return self::rewrite_content_media_urls( $content );
 	}
 
+	/**
+	 * Media base URL: CDN Server option (via filter) with the legacy constant as fallback.
+	 */
+	public static function media_base_url(): string {
+		$base = defined( 'ASREKHODRO_MEDIA_BASE_URL' ) ? ASREKHODRO_MEDIA_BASE_URL : '';
+
+		return (string) apply_filters( 'ak_media_base_url', $base );
+	}
+
 	public static function rewrite_content_media_urls( string $content ): string {
-		if ( $content === '' || ! defined( 'ASREKHODRO_MEDIA_BASE_URL' ) || ASREKHODRO_MEDIA_BASE_URL === '' ) {
+		if ( $content === '' || self::media_base_url() === '' ) {
 			return $content;
 		}
 
@@ -918,6 +927,7 @@ final class ImporterBridge {
 		}
 
 		return array(
+			'post_id'     => $post_id,
 			'title'       => $label,
 			'link'        => $link ?: '#',
 			'image'       => $image_url,
@@ -926,6 +936,32 @@ final class ImporterBridge {
 			'link_target' => '_blank',
 			'link_rel'    => 'noopener noreferrer',
 		);
+	}
+
+	/**
+	 * Add mobile-sized image URLs for sticky bottom ads.
+	 *
+	 * @param list<array<string, mixed>> $items
+	 * @return list<array<string, mixed>>
+	 */
+	public static function enrich_sticky_bottom_ads( array $items ): array {
+		foreach ( $items as $index => $item ) {
+			if ( ! is_array( $item ) ) {
+				continue;
+			}
+
+			$post_id = (int) ( $item['post_id'] ?? 0 );
+			if ( $post_id <= 0 ) {
+				continue;
+			}
+
+			$mobile_url = self::get_featured_image_url( $post_id, 'ak-sticky-bottom-ad-mobile' );
+			if ( $mobile_url !== '' ) {
+				$items[ $index ]['image_mobile'] = $mobile_url;
+			}
+		}
+
+		return $items;
 	}
 
 	/**
@@ -983,6 +1019,9 @@ final class ImporterBridge {
 				array( 'label' => 'MVM · مدیران خودرو', 'link' => '#' ),
 			),
 			'content_row'  => array(
+				array( 'label' => 'تبلیغات · عصر خودرو', 'link' => '#' ),
+			),
+			'sticky_bottom' => array(
 				array( 'label' => 'تبلیغات · عصر خودرو', 'link' => '#' ),
 			),
 		);

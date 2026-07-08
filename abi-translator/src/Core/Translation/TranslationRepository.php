@@ -146,6 +146,43 @@ final class TranslationRepository {
 	}
 
 	/**
+	 * Aggregate row counts grouped by language and object type, plus a grand total.
+	 *
+	 * @return array{total: int, rows: array<int, array{lang: string, object_type: string, count: int}>}
+	 */
+	public function stats(): array {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery
+		$rows = $wpdb->get_results(
+			"SELECT lang, object_type, COUNT(*) AS cnt
+			 FROM {$this->table}
+			 GROUP BY lang, object_type
+			 ORDER BY lang ASC, object_type ASC",
+			ARRAY_A
+		);
+
+		$out   = array();
+		$total = 0;
+		if ( is_array( $rows ) ) {
+			foreach ( $rows as $row ) {
+				$count  = (int) ( $row['cnt'] ?? 0 );
+				$total += $count;
+				$out[]  = array(
+					'lang'        => (string) ( $row['lang'] ?? '' ),
+					'object_type' => (string) ( $row['object_type'] ?? '' ),
+					'count'       => $count,
+				);
+			}
+		}
+
+		return array(
+			'total' => $total,
+			'rows'  => $out,
+		);
+	}
+
+	/**
 	 * Delete all cached translations for an object (used when the source is updated/purged).
 	 */
 	public function delete_for_object( string $object_type, int $object_id ): void {
