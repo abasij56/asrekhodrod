@@ -18,6 +18,9 @@ require_once $blocks_dir . '/layout/Homepage.php';
 require_once $blocks_dir . '/BlockRenderer.php';
 require_once $blocks_dir . '/Support/RateFormatter.php';
 require_once $blocks_dir . '/Support/EmbedSanitizer.php';
+require_once $blocks_dir . '/Support/LayoutQueryFields.php';
+require_once $blocks_dir . '/Support/LayoutQueryView.php';
+require_once $blocks_dir . '/Support/AkGutenbergBlock.php';
 require_once $blocks_dir . '/CinfoBlocks.php';
 
 \AsreKhodro\Theme\BlockRegistry::boot();

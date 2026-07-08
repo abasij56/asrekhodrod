@@ -35,6 +35,12 @@ final class LayoutSchema {
 		'ak-sidebar-latest-news',
 	);
 
+	/** Ad blocks allowed in every layout zone (layout builder + resolver). */
+	private const UNIVERSAL_AD_BLOCKS = array(
+		'ak-ad-strip',
+		'ak-sidebar-ads',
+	);
+
 	/** @var array<string, string> */
 	public const ZONE_LABELS = array(
 		'before_main' => 'بالای صفحه',
@@ -381,6 +387,30 @@ final class LayoutSchema {
 
 		if ( $allowed === array() ) {
 			return self::placeable_block_names( $appearance_id );
+		}
+
+		return self::merge_universal_ad_blocks( $allowed );
+	}
+
+	/**
+	 * @param list<string> $allowed
+	 * @return list<string>
+	 */
+	private static function merge_universal_ad_blocks( array $allowed ): array {
+		foreach ( self::UNIVERSAL_AD_BLOCKS as $block_name ) {
+			if ( in_array( $block_name, $allowed, true ) ) {
+				continue;
+			}
+
+			$meta = self::block_meta( $block_name );
+			if ( ! self::is_layout_placeable( $block_name, $meta ) ) {
+				continue;
+			}
+			if ( empty( $meta['partial'] ) && empty( $meta['template'] ) ) {
+				continue;
+			}
+
+			$allowed[] = $block_name;
 		}
 
 		return $allowed;

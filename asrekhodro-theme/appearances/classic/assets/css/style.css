@@ -2454,6 +2454,10 @@ address {
   display: block;
 }
 
+.videos-2 .magazine-item__cover {
+  aspect-ratio: 16 / 9;
+}
+
 /* Videos 2 — subtle light ray on cover hover */
 .videos-2 .magazine-item__cover::before {
   content: "";
@@ -3450,6 +3454,7 @@ address {
   border-radius: var(--radius);
   overflow: hidden;
   aspect-ratio: 16 / 9;
+  align-self: start;
   cursor: pointer;
 }
 
@@ -3464,7 +3469,7 @@ address {
 
 .video-card--lead {
   grid-row: 1 / 3;
-  aspect-ratio: auto;
+  aspect-ratio: 16 / 9;
 }
 
 .video-card img {
@@ -5932,13 +5937,13 @@ address {
   position: relative;
   display: block;
   overflow: hidden;
+  aspect-ratio: 16 / 9;
 }
 
 .rail-widget--videos .kiosk-carousel__cover img {
   display: block;
   width: 100%;
-  height: auto;
-  aspect-ratio: 220 / 305;
+  height: 100%;
   object-fit: cover;
 }
 

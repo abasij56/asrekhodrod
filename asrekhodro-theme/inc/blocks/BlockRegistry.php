@@ -33,7 +33,7 @@ final class BlockRegistry {
 				continue;
 			}
 
-			if ( self::is_acf_block( $config ) ) {
+			if ( self::is_acf_block( $config ) || ! empty( $config['gutenberg'] ) ) {
 				self::boot_acf_block( $dir );
 			}
 		}

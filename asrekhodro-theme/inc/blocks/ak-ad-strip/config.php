@@ -18,4 +18,7 @@ return array(
 		'strategy'  => 'latest',
 	),
 	'partial'      => 'ak-ad-strip/partial.twig',
+	'gutenberg'    => true,
+	'icon'         => 'megaphone',
+	'keywords'     => array( 'تبلیغ', 'ad', 'strip', 'نوار' ),
 );

@@ -18,4 +18,7 @@ return array(
 		'strategy'  => 'latest',
 	),
 	'partial'      => 'ak-sidebar-ads/partial.twig',
+	'gutenberg'    => true,
+	'icon'         => 'megaphone',
+	'keywords'     => array( 'تبلیغ', 'ad', 'sidebar', 'سایدبار' ),
 );
