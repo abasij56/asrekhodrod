@@ -1,3 +1,3 @@
-<div class="{{ placement.visibility_class|default('ak-placement') }}">
-  {% include placement.partial with { placement: placement } %}
+<div class="{{ placement.visibility_class|default('ak-placement') }}" data-ak-skip-gallery>
+  {% include placement.partial|default('ak-sidebar-ads/partial.twig') with { placement: placement } %}
 </div>

@@ -1,4 +1,5 @@
-{% set strip_ads = placement.menu_strip_ads is defined ? placement.menu_strip_ads : (menu_strip_ads|default([])) %}
+{% set resolved_strip = placement.menu_strip_ads|default([]) %}
+{% set strip_ads = resolved_strip|length > 0 ? resolved_strip : menu_strip_ads|default([]) %}
 {% if strip_ads|length > 0 %}
 <div class="container ad-strip{% if strip_ads|length == 1 %} ad-strip--single{% endif %}">
   <div

@@ -613,9 +613,12 @@ final class ImporterBridge {
 			return $content;
 		}
 
+		$preserved = self::isolate_gallery_exempt_blocks( $content );
+		$content   = $preserved['content'];
+
 		$segments = self::split_content_into_segments( $content );
 		if ( $segments === array() ) {
-			return $content;
+			return self::restore_gallery_exempt_blocks( $content, $preserved['placeholders'] );
 		}
 
 		$output = '';
@@ -623,7 +626,15 @@ final class ImporterBridge {
 		$total  = count( $segments );
 
 		while ( $index < $total ) {
-			if ( self::segment_is_image_only( $segments[ $index ] ) ) {
+			$segment = $segments[ $index ];
+
+			if ( self::segment_contains_gallery_exempt_markup( $segment ) ) {
+				$output .= $segment;
+				++$index;
+				continue;
+			}
+
+			if ( self::segment_is_image_only( $segment ) ) {
 				$group   = self::collect_consecutive_image_segments( $segments, $index );
 				$images  = self::extract_image_items_from_html( implode( '', $group['segments'] ) );
 				$output .= self::render_inline_image_group( $images );
@@ -635,7 +646,175 @@ final class ImporterBridge {
 			++$index;
 		}
 
-		return $output;
+		return self::restore_gallery_exempt_blocks( $output, $preserved['placeholders'] );
+	}
+
+	/**
+	 * @return list<string>
+	 */
+	private static function gallery_exempt_markers(): array {
+		return array(
+			'data-ak-skip-gallery',
+			'ad-strip__inner',
+			'page-sidebar-ads',
+			'ad-sidebar__slot',
+		);
+	}
+
+	private static function gallery_exempt_placeholder( int $index ): string {
+		return '[[[AKEXEMPT:' . $index . ']]]';
+	}
+
+	private static function segment_contains_gallery_exempt_markup( string $segment ): bool {
+		if ( str_contains( $segment, '[[[AKEXEMPT:' ) ) {
+			return true;
+		}
+
+		foreach ( self::gallery_exempt_markers() as $marker ) {
+			if ( str_contains( $segment, $marker ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @return array{content: string, placeholders: array<string, string>}
+	 */
+	private static function isolate_gallery_exempt_blocks( string $content ): array {
+		$ranges = array();
+		$offset = 0;
+
+		while ( preg_match( '/<div\b[^>]*\bdata-ak-skip-gallery\b[^>]*>/i', $content, $match, PREG_OFFSET_CAPTURE, $offset ) ) {
+			$start     = (int) $match[0][1];
+			$extracted = self::extract_balanced_div( $content, $start );
+			if ( $extracted === null ) {
+				$offset = $start + 1;
+				continue;
+			}
+
+			$ranges[] = $extracted;
+			$offset   = $extracted['end'];
+		}
+
+		$ranges = self::merge_nested_html_ranges( $ranges );
+		if ( $ranges === array() ) {
+			return array(
+				'content'      => $content,
+				'placeholders' => array(),
+			);
+		}
+
+		usort(
+			$ranges,
+			static fn( array $a, array $b ): int => $b['start'] <=> $a['start']
+		);
+
+		$placeholders = array();
+		foreach ( $ranges as $range ) {
+			$key                    = self::gallery_exempt_placeholder( count( $placeholders ) );
+			$placeholders[ $key ]   = $range['html'];
+			$content                = substr( $content, 0, $range['start'] )
+				. $key
+				. substr( $content, $range['end'] );
+		}
+
+		return array(
+			'content'      => $content,
+			'placeholders' => $placeholders,
+		);
+	}
+
+	/**
+	 * @param array<string, string> $placeholders
+	 */
+	private static function restore_gallery_exempt_blocks( string $content, array $placeholders ): string {
+		foreach ( $placeholders as $key => $html ) {
+			$content = str_replace( $key, $html, $content );
+		}
+
+		return $content;
+	}
+
+	/**
+	 * @return array{start: int, end: int, html: string}|null
+	 */
+	private static function extract_balanced_div( string $html, int $start ): ?array {
+		if ( $start < 0 || ! preg_match( '/<div\b/i', $html, $open_match, PREG_OFFSET_CAPTURE, $start ) ) {
+			return null;
+		}
+
+		$open_pos = (int) $open_match[0][1];
+		$depth    = 0;
+		$len      = strlen( $html );
+		$pos      = $open_pos;
+
+		while ( $pos < $len ) {
+			if ( ! preg_match( '/<\/?div\b[^>]*>/i', $html, $tag_match, PREG_OFFSET_CAPTURE, $pos ) ) {
+				return null;
+			}
+
+			$tag      = (string) $tag_match[0][0];
+			$tag_pos  = (int) $tag_match[0][1];
+			$is_close = str_starts_with( strtolower( ltrim( $tag ) ), '</div' );
+
+			if ( ! $is_close ) {
+				++$depth;
+			} else {
+				--$depth;
+				if ( $depth === 0 ) {
+					$end = $tag_pos + strlen( $tag );
+
+					return array(
+						'start' => $open_pos,
+						'end'   => $end,
+						'html'  => substr( $html, $open_pos, $end - $open_pos ),
+					);
+				}
+			}
+
+			$pos = $tag_pos + strlen( $tag );
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param array<int, array{start: int, end: int, html: string}> $ranges
+	 * @return array<int, array{start: int, end: int, html: string}>
+	 */
+	private static function merge_nested_html_ranges( array $ranges ): array {
+		if ( count( $ranges ) <= 1 ) {
+			return $ranges;
+		}
+
+		usort(
+			$ranges,
+			static function ( array $a, array $b ): int {
+				$len_a = $a['end'] - $a['start'];
+				$len_b = $b['end'] - $b['start'];
+
+				return $len_b <=> $len_a;
+			}
+		);
+
+		$kept = array();
+		foreach ( $ranges as $range ) {
+			$contained = false;
+			foreach ( $kept as $outer ) {
+				if ( $range['start'] >= $outer['start'] && $range['end'] <= $outer['end'] ) {
+					$contained = true;
+					break;
+				}
+			}
+
+			if ( ! $contained ) {
+				$kept[] = $range;
+			}
+		}
+
+		return $kept;
 	}
 
 	/**
@@ -676,6 +855,10 @@ final class ImporterBridge {
 	}
 
 	private static function segment_is_image_only( string $segment ): bool {
+		if ( self::segment_contains_gallery_exempt_markup( $segment ) ) {
+			return false;
+		}
+
 		if ( self::extract_images_from_html( $segment ) === array() ) {
 			return false;
 		}
@@ -701,6 +884,10 @@ final class ImporterBridge {
 
 		while ( $index < $total ) {
 			$segment = $segments[ $index ];
+
+			if ( self::segment_contains_gallery_exempt_markup( $segment ) ) {
+				break;
+			}
 
 			if ( self::segment_is_image_only( $segment ) ) {
 				$collected[] = $segment;

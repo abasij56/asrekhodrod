@@ -1,5 +1,6 @@
 {% set ad_limit = placement.data_count|default(placement.count|default(6)) %}
-{% set sidebar_ad_items = placement.sidebar_ads|default([])|slice(0, ad_limit) %}
+{% set resolved_sidebar = placement.sidebar_ads|default([]) %}
+{% set sidebar_ad_items = (resolved_sidebar|length > 0 ? resolved_sidebar : sidebar_ads|default([]))|slice(0, ad_limit) %}
 {% if sidebar_ad_items|length > 0 %}
 <div class="page-sidebar page-sidebar-ads">
   <div class="page-sidebar-ads__grid" role="list">

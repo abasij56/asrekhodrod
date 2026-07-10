@@ -40,9 +40,9 @@ abstract class AkGutenbergBlock {
 	}
 
 	public static function template_file(): string {
-		$template = static::block_dir() . '/template.twig';
-		if ( file_exists( $template ) ) {
-			return $template;
+		$relative = static::name() . '/template.twig';
+		if ( file_exists( static::block_dir() . '/template.twig' ) ) {
+			return $relative;
 		}
 
 		$partial = (string) ( static::config()['partial'] ?? '' );
