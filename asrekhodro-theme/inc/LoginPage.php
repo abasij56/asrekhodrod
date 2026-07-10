@@ -17,6 +17,7 @@ final class LoginPage {
 		add_action( 'login_footer', array( self::class, 'render_shell_close' ), 5 );
 		add_filter( 'login_message', array( self::class, 'login_heading' ) );
 		add_filter( 'gettext', array( self::class, 'translate_login_strings' ), 10, 3 );
+		add_filter( 'login_display_language_dropdown', '__return_false' );
 	}
 
 	public static function enqueue_assets(): void {

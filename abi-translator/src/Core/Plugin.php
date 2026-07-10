@@ -7,6 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use ABI\Translator\Compat\AsreKhodro\Bootstrap as AsreKhodroCompat;
+use ABI\Translator\Core\Admin\NavMenuSwitcher;
 use ABI\Translator\Core\Admin\RetranslateMetabox;
 use ABI\Translator\Core\Admin\SettingsPage;
 use ABI\Translator\Core\Filters\ListTitleWarmer;
@@ -71,6 +72,9 @@ final class Plugin {
 
 			// Phase 5: purge cached translations when the source changes (admin + front).
 			( new PurgeHooks( $repository ) )->register();
+
+			// Appearance > Menus: "Language switcher" meta box + front-end rendering.
+			( new NavMenuSwitcher() )->register();
 
 			// Front-end translation filters (guarded internally to fa = no-op).
 			( new PostFilters( $service ) )->register();
