@@ -8,6 +8,7 @@ public sealed class ExportOptions
     public bool ExportAll { get; init; }
     public bool Resume { get; init; } = true;
     public bool EnrichImagesOnly { get; init; }
+    public bool GalleryOnly { get; init; }
     public bool SkipContentFileImages { get; init; }
     public int Limit { get; init; } = 100;
     public int ReviewLimit { get; init; } = 50;
@@ -48,6 +49,7 @@ public sealed class ExportOptions
             ExportAll = exportAll,
             Resume = !args.Contains("--no-resume"),
             EnrichImagesOnly = args.Contains("--enrich-images-only"),
+            GalleryOnly = args.Contains("--gallery-only"),
             SkipContentFileImages = args.Contains("--skip-content-file-images"),
             Limit = limit,
             ReviewLimit = reviewLimit,

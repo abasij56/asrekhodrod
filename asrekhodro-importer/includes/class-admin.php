@@ -61,6 +61,14 @@ final class AsreKhodro_Importer_Admin {
 						1,
 						AsreKhodro_Import_Session::max_post_batch_size()
 					),
+					'contentStarting' => __( 'Starting content re-import…', 'asrekhodro' ),
+					'contentStarted'  => __( 'Content re-import started.', 'asrekhodro' ),
+					'contentFinished' => __( 'Content re-import finished.', 'asrekhodro' ),
+					'contentError'    => __( 'Content re-import failed.', 'asrekhodro' ),
+					'contentCancel'   => __( 'Cancel Content Re-import', 'asrekhodro' ),
+					'contentCancelling' => __( 'Cancelling content re-import…', 'asrekhodro' ),
+					'contentCancelled'  => __( 'Content re-import cancelled. Posts already updated remain unchanged.', 'asrekhodro' ),
+					'confirmContentCancel' => __( 'Stop content re-import? Posts already updated will stay as they are.', 'asrekhodro' ),
 				),
 			)
 		);
@@ -71,9 +79,10 @@ final class AsreKhodro_Importer_Admin {
 			return;
 		}
 
-		$import_dir = ASREKHODRO_IMPORTER_DEFAULT_IMPORT_DIR;
-		$manifest   = $import_dir . '/manifest.json';
-		$ready      = file_exists( $manifest );
+		$import_dir  = ASREKHODRO_IMPORTER_DEFAULT_IMPORT_DIR;
+		$manifest    = $import_dir . '/manifest.json';
+		$ready       = file_exists( $manifest );
+		$posts_ready = AsreKhodro_Content_Reimport_Session::has_post_export( $import_dir );
 		$totals     = $ready ? AsreKhodro_Importer::get_file_totals( $import_dir ) : array();
 		$saved_batch = (int) get_user_meta( get_current_user_id(), 'asrekhodro_import_post_batch_size', true );
 		$post_batch  = $saved_batch > 0
@@ -149,7 +158,7 @@ final class AsreKhodro_Importer_Admin {
 						<th scope="row"><?php esc_html_e( 'Reset before import', 'asrekhodro' ); ?></th>
 						<td>
 							<p class="description" style="margin-top:0">
-								<?php esc_html_e( 'All types with export data are checked by default. Uncheck any you do not want cleared before import (fast bulk SQL). If you also reset Posts, Comments/Post categories/Tags are skipped automatically.', 'asrekhodro' ); ?>
+								<?php esc_html_e( 'Optional. Check only the types you want cleared before import (fast bulk SQL). Leave all unchecked to update/add without deleting existing WordPress data. If you reset Posts, Comments/Post categories/Tags are skipped automatically.', 'asrekhodro' ); ?>
 							</p>
 							<fieldset class="ak-import-reset-fieldset" <?php disabled( ! $ready ); ?>>
 								<?php foreach ( AsreKhodro_Import_Reset::get_types() as $type_id => $type_info ) : ?>
@@ -164,7 +173,6 @@ final class AsreKhodro_Importer_Admin {
 											id="<?php echo esc_attr( $input_id ); ?>"
 											name="reset[<?php echo esc_attr( $type_id ); ?>]"
 											value="1"
-											<?php checked( $export_count > 0 ); ?>
 											<?php disabled( $export_count <= 0 ); ?>
 											<?php echo $export_count <= 0 ? ' data-export-empty="1"' : ''; ?>
 										/>
@@ -198,6 +206,22 @@ final class AsreKhodro_Importer_Admin {
 				</button>
 			</p>
 
+			<h2 style="margin-top:28px"><?php esc_html_e( 'Re-import post content only', 'asrekhodro' ); ?></h2>
+			<p>
+				<?php esc_html_e( 'Reads posts/posts-*.json and rewrites post_content only for existing posts that have embed markup in JSON (iframe, script, aparat, object/embed). Skips posts without embed tags or not found in WordPress. Preserves ak-gallery blocks. Does not strip iframe/script on save.', 'asrekhodro' ); ?>
+			</p>
+			<p style="margin-top:12px">
+				<button type="button" class="button button-secondary" id="ak-content-reimport-start" <?php disabled( ! $posts_ready ); ?>>
+					<?php esc_html_e( 'Re-import Post Content', 'asrekhodro' ); ?>
+				</button>
+				<button type="button" class="button" id="ak-content-reimport-cancel" style="display:none;margin-left:8px">
+					<?php esc_html_e( 'Cancel Content Re-import', 'asrekhodro' ); ?>
+				</button>
+			</p>
+			<?php if ( ! $posts_ready ) : ?>
+				<p class="description"><?php esc_html_e( 'Upload post JSON chunks to the import folder first (posts/posts-*.json or posts.json).', 'asrekhodro' ); ?></p>
+			<?php endif; ?>
+
 			<div id="ak-import-progress" style="display:none;max-width:900px;margin-top:20px">
 				<h2><?php esc_html_e( 'Import progress', 'asrekhodro' ); ?></h2>
 				<p id="ak-import-status-text"><?php esc_html_e( 'Waiting…', 'asrekhodro' ); ?></p>
@@ -220,6 +244,12 @@ final class AsreKhodro_Importer_Admin {
 
 				<p>
 					<?php esc_html_e( 'Posts imported:', 'asrekhodro' ); ?> <strong id="ak-import-count-posts">0</strong>
+					&nbsp;|&nbsp;
+					<?php esc_html_e( 'Content updated:', 'asrekhodro' ); ?> <strong id="ak-import-count-content-updated">0</strong>
+					&nbsp;|&nbsp;
+					<?php esc_html_e( 'Not found:', 'asrekhodro' ); ?> <strong id="ak-import-count-content-skipped">0</strong>
+					&nbsp;|&nbsp;
+					<?php esc_html_e( 'No embed in JSON:', 'asrekhodro' ); ?> <strong id="ak-import-count-content-no-embed">0</strong>
 					&nbsp;|&nbsp;
 					<?php esc_html_e( 'Ads imported:', 'asrekhodro' ); ?> <strong id="ak-import-count-ads">0</strong>
 					&nbsp;|&nbsp;

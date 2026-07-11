@@ -2,6 +2,8 @@
 	var running = false;
 	var cancelRequested = false;
 	var activeRequest = null;
+	var activeMode = 'full';
+	var contentToken = '';
 
 	function getResetFlags() {
 		var flags = {};
@@ -96,12 +98,21 @@
 		$( '#ak-import-overall-counter' ).text( payload.overall_done + ' / ' + payload.overall_total );
 		$( '#ak-import-overall-bar' ).css( 'width', overallPct + '%' );
 
-		if ( payload.label ) {
+		if ( payload.current_file ) {
+			var fileInfo = payload.current_file;
+			if ( payload.total_chunks > 1 && payload.current_chunk ) {
+				fileInfo += ' (' + payload.current_chunk + '/' + payload.total_chunks + ')';
+			}
+			setStatus( payload.label ? ( payload.label + ' — ' + fileInfo ) : fileInfo );
+		} else if ( payload.label ) {
 			setStatus( payload.label );
 		}
 
 		if ( payload.counts ) {
 			$( '#ak-import-count-posts' ).text( payload.counts.posts || 0 );
+			$( '#ak-import-count-content-updated' ).text( payload.counts.updated || 0 );
+			$( '#ak-import-count-content-skipped' ).text( payload.counts.skipped_not_found || 0 );
+			$( '#ak-import-count-content-no-embed' ).text( payload.counts.skipped_no_embed || 0 );
 			$( '#ak-import-count-ads' ).text( payload.counts.ads || 0 );
 			$( '#ak-import-count-comments' ).text( payload.counts.comments || 0 );
 			$( '#ak-import-count-media' ).text( payload.counts.external_media || 0 );
@@ -112,23 +123,35 @@
 		}
 	}
 
-	function showPanel() {
+	function showPanel( mode ) {
+		activeMode = mode || 'full';
 		$( '#ak-import-progress' ).show();
 		$( '#ak-import-start' ).prop( 'disabled', true );
+		$( '#ak-content-reimport-start' ).prop( 'disabled', true );
 		$( '#ak-import-post-batch' ).prop( 'disabled', true );
 		$( '.ak-import-reset' ).prop( 'disabled', true );
-		$( '#ak-import-cancel' ).show().prop( 'disabled', false );
+		if ( activeMode === 'content' ) {
+			$( '#ak-content-reimport-cancel' ).show().prop( 'disabled', false );
+			$( '#ak-import-cancel' ).hide();
+		} else {
+			$( '#ak-import-cancel' ).show().prop( 'disabled', false );
+			$( '#ak-content-reimport-cancel' ).hide();
+		}
 	}
 
 	function resetImportControls( finished ) {
 		running = false;
 		cancelRequested = false;
 		activeRequest = null;
+		contentToken = '';
+		activeMode = 'full';
 		$( '#ak-import-cancel' ).hide().prop( 'disabled', false );
+		$( '#ak-content-reimport-cancel' ).hide().prop( 'disabled', false );
 		$( '#ak-import-post-batch' ).prop( 'disabled', false );
 		$( '.ak-import-reset' ).prop( 'disabled', false );
 		$( '.ak-import-reset[data-export-empty="1"]' ).prop( 'disabled', true );
 		$( '#ak-import-start' ).prop( 'disabled', false ).text( finished ? 'Run Import Again' : 'Run Import' );
+		$( '#ak-content-reimport-start' ).prop( 'disabled', false );
 	}
 
 	function showResult( result ) {
@@ -261,6 +284,133 @@
 			} );
 	}
 
+	function pollContentReimport( token ) {
+		if ( cancelRequested ) {
+			return $.Deferred().resolve().promise();
+		}
+
+		return post( 'asrekhodro_content_reimport_status', { token: token }, 60000 ).then( function ( response ) {
+			if ( cancelRequested ) {
+				return;
+			}
+
+			if ( ! response || ! response.success ) {
+				throw new Error( ( response && response.data && response.data.message ) || 'Content re-import status failed.' );
+			}
+
+			var payload = response.data;
+			updateBars( payload );
+
+			if ( payload.done ) {
+				resetImportControls( true );
+				setStatus( akImporter.strings.contentFinished );
+				showResult( payload.result );
+				return;
+			}
+
+			return new Promise( function ( resolve ) {
+				window.setTimeout( resolve, 3000 );
+			} ).then( function () {
+				return pollContentReimport( token );
+			} );
+		} ).catch( function ( xhr ) {
+			if ( cancelRequested || ( xhr && xhr.statusText === 'abort' ) ) {
+				return;
+			}
+
+			if ( xhr instanceof Error ) {
+				throw xhr;
+			}
+
+			throw new Error( getErrorMessage( xhr, 'Content re-import status failed.' ) );
+		} );
+	}
+
+	function startContentReimport() {
+		if ( running ) {
+			return;
+		}
+
+		var postBatchSize = getPostBatchSize();
+		var rawBatchSize = parseInt( $( '#ak-import-post-batch' ).val(), 10 );
+		if ( isNaN( rawBatchSize ) || rawBatchSize < akImporter.postBatch.min || rawBatchSize > akImporter.postBatch.max ) {
+			window.alert( akImporter.strings.invalidBatch );
+			return;
+		}
+
+		$( '#ak-import-post-batch' ).val( postBatchSize );
+
+		running = true;
+		cancelRequested = false;
+		showPanel( 'content' );
+		setStatus( akImporter.strings.contentStarting );
+		$( '#ak-import-result' ).hide();
+		$( '#ak-import-log' ).text( '' );
+		$( '#ak-import-count-content-updated' ).text( '0' );
+		$( '#ak-import-count-content-skipped' ).text( '0' );
+		$( '#ak-import-count-content-no-embed' ).text( '0' );
+
+		post( 'asrekhodro_content_reimport_start', { post_batch_size: postBatchSize }, getStepTimeout( postBatchSize ) )
+			.then( function ( response ) {
+				if ( cancelRequested ) {
+					return;
+				}
+
+				if ( ! response || ! response.success ) {
+					throw new Error( ( response && response.data && response.data.message ) || 'Could not start content re-import.' );
+				}
+
+				var data = response.data;
+				contentToken = data.token || '';
+				updateBars( data );
+				setStatus( akImporter.strings.contentStarted );
+
+				return pollContentReimport( contentToken );
+			} )
+			.catch( function ( error ) {
+				if ( cancelRequested || ( error && error.statusText === 'abort' ) ) {
+					return;
+				}
+
+				resetImportControls( false );
+				var message = error && error.message ? error.message : akImporter.strings.contentError;
+				setStatus( message );
+			} );
+	}
+
+	function cancelContentReimport() {
+		if ( ! running || cancelRequested || activeMode !== 'content' ) {
+			return;
+		}
+
+		if ( ! window.confirm( akImporter.strings.confirmContentCancel ) ) {
+			return;
+		}
+
+		cancelRequested = true;
+		$( '#ak-content-reimport-cancel' ).prop( 'disabled', true );
+		setStatus( akImporter.strings.contentCancelling );
+
+		if ( activeRequest ) {
+			activeRequest.abort();
+		}
+
+		post( 'asrekhodro_content_reimport_cancel' )
+			.then( function ( response ) {
+				var message = akImporter.strings.contentCancelled;
+				if ( response && response.success && response.data && response.data.message ) {
+					message = response.data.message;
+				}
+
+				resetImportControls( false );
+				setStatus( message );
+			} )
+			.catch( function () {
+				resetImportControls( false );
+				setStatus( akImporter.strings.contentCancelled );
+			} );
+	}
+
 	function startImport() {
 		if ( running ) {
 			return;
@@ -284,7 +434,7 @@
 
 		running = true;
 		cancelRequested = false;
-		showPanel();
+		showPanel( 'full' );
 		setStatus( akImporter.strings.starting );
 		$( '#ak-import-result' ).hide();
 		$( '#ak-import-log' ).text( '' );
@@ -335,5 +485,15 @@
 	$( '#ak-import-cancel' ).on( 'click', function ( event ) {
 		event.preventDefault();
 		cancelImport();
+	} );
+
+	$( '#ak-content-reimport-start' ).on( 'click', function ( event ) {
+		event.preventDefault();
+		startContentReimport();
+	} );
+
+	$( '#ak-content-reimport-cancel' ).on( 'click', function ( event ) {
+		event.preventDefault();
+		cancelContentReimport();
 	} );
 }( jQuery ) );

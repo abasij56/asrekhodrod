@@ -398,6 +398,69 @@ internal static class WordPressExportQueries
                                                       FOR JSON PATH;
                                                       """;
 
+    /**
+     * One page of published content IDs, ordered by publish date DESC (newest first),
+     * addressed by record offset. Used to paginate the gallery export by post so a
+     * post's images never split across two chunks. Executed against AsreKhodroFront.
+     */
+    public static string GalleryContentIdPageQuery(int offset, int size) => $"""
+                                                                             SET NOCOUNT ON;
+                                                                             SELECT
+                                                                               sc.ContentId AS contentId
+                                                                             FROM dbo.SingleContent sc
+                                                                             ORDER BY sc.PublishTime DESC, sc.ContentId DESC
+                                                                             OFFSET {(offset < 0 ? 0 : offset)} ROWS FETCH NEXT {(size <= 0 ? 1 : size)} ROWS ONLY
+                                                                             FOR JSON PATH;
+                                                                             """;
+
+    /**
+     * Gallery images for a set of content IDs, ordered by their in-content position.
+     * Rules: image files only (FileTypeId = 1), large size only (ImageDimensionId = 3),
+     * excluding the main/featured image (matched by FileId so its large variant is also
+     * excluded). Only contents with more than one distinct FileId are returned — a single
+     * image stored in multiple dimensions (same FileId) is not a gallery. URLs are raw.
+     */
+    public static string GalleryRowsForContentIdsQuery(string idList) => $"""
+                                                                          SET NOCOUNT ON;
+                                                                          SELECT
+                                                                            cf.ContentId AS contentId,
+                                                                            cf.FileId AS fileId,
+                                                                            cf.URL AS url
+                                                                          FROM dbo.ContentFiles cf
+                                                                          INNER JOIN dbo.SingleContent sc ON sc.ContentId = cf.ContentId
+                                                                          WHERE cf.ContentId IN ({idList})
+                                                                            AND cf.FileTypeId = 1
+                                                                            AND cf.ImageDimensionId = 3
+                                                                            AND cf.URL IS NOT NULL
+                                                                            AND LTRIM(RTRIM(cf.URL)) <> ''
+                                                                            AND NOT EXISTS (
+                                                                              SELECT 1
+                                                                              FROM dbo.ContentFiles m
+                                                                              WHERE m.RowId = sc.MainImageId
+                                                                                AND m.FileId = cf.FileId
+                                                                            )
+                                                                            AND cf.ContentId IN (
+                                                                              SELECT g.ContentId
+                                                                              FROM dbo.ContentFiles g
+                                                                              INNER JOIN dbo.SingleContent gs ON gs.ContentId = g.ContentId
+                                                                              WHERE g.ContentId IN ({idList})
+                                                                                AND g.FileTypeId = 1
+                                                                                AND g.ImageDimensionId = 3
+                                                                                AND g.URL IS NOT NULL
+                                                                                AND LTRIM(RTRIM(g.URL)) <> ''
+                                                                                AND NOT EXISTS (
+                                                                                  SELECT 1
+                                                                                  FROM dbo.ContentFiles m
+                                                                                  WHERE m.RowId = gs.MainImageId
+                                                                                    AND m.FileId = g.FileId
+                                                                                )
+                                                                              GROUP BY g.ContentId
+                                                                              HAVING COUNT(DISTINCT g.FileId) > 1
+                                                                            )
+                                                                          ORDER BY cf.ContentId, cf.PeriorityInContent, cf.RowId
+                                                                          FOR JSON PATH;
+                                                                          """;
+
     public static string MagazinesBackBase(int? magazineLimit = null) => $"""
                                                                                     SET NOCOUNT ON;
                                                                                     SELECT {(magazineLimit.HasValue && magazineLimit.Value > 0 ? SqlFragments.SqlTop(magazineLimit.Value) : string.Empty)}

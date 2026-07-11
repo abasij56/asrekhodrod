@@ -50,6 +50,26 @@ final class AsreKhodro_Importer {
 		return $this->import_dir;
 	}
 
+	/**
+	 * Resolve a legacy contentId to a WordPress post ID (uses in-memory cache after prefetch).
+	 */
+	public function get_post_id_for_content_id( int $content_id, string $post_type = 'post' ): int {
+		if ( $post_type !== 'post' ) {
+			return $this->find_post_id_by_content_id( $post_type, $content_id );
+		}
+
+		return $this->lookup_post_id_by_content_id( $content_id );
+	}
+
+	/**
+	 * Warm the post_map cache for a batch of legacy content IDs.
+	 *
+	 * @param array<int, int> $content_ids
+	 */
+	public function prefetch_content_ids( array $content_ids ): void {
+		$this->prefetch_post_map_for_content_ids( $content_ids );
+	}
+
 	public function get_log(): array {
 		return $this->log;
 	}
@@ -498,7 +518,6 @@ final class AsreKhodro_Importer {
 			$post_id = $this->lookup_post_id_by_content_id( $content_id );
 		}
 
-		$body    = $this->build_post_content( $post );
 		$status  = $this->map_post_status( (int) ( $post['statusId'] ?? 3 ) );
 		$publish = $this->normalize_datetime( $post['publishTime'] ?? null, $post['contentTime'] ?? null );
 
@@ -507,13 +526,13 @@ final class AsreKhodro_Importer {
 				array(
 					'ID'             => $post_id,
 					'post_title'     => $title,
-					'post_content'   => $body,
 					'post_excerpt'   => $this->decode_text( $post['excerpt'] ?? '' ),
 					'post_status'    => $status,
 					'post_date'      => $publish,
 					'post_date_gmt'  => get_gmt_from_date( $publish ),
 				)
 			);
+			$this->save_imported_post_content( $post_id, $post, true );
 			$this->save_post_meta( $post_id, $post );
 			update_post_meta( $post_id, '_asrekhodro_content_id', $content_id );
 			$this->sync_news_post_slug( $post_id, $content_id, $title );
@@ -526,7 +545,6 @@ final class AsreKhodro_Importer {
 		$post_id = wp_insert_post(
 			array(
 				'post_title'     => $title,
-				'post_content'   => $body,
 				'post_excerpt'   => $this->decode_text( $post['excerpt'] ?? '' ),
 				'post_status'    => $status,
 				'post_type'      => 'post',
@@ -543,6 +561,7 @@ final class AsreKhodro_Importer {
 			return $title;
 		}
 
+		$this->save_imported_post_content( (int) $post_id, $post, false );
 		update_post_meta( (int) $post_id, '_asrekhodro_content_id', $content_id );
 		$this->save_post_meta( (int) $post_id, $post );
 		$this->sync_news_post_slug( (int) $post_id, $content_id, $title );
@@ -565,6 +584,167 @@ final class AsreKhodro_Importer {
 		}
 
 		return $label;
+	}
+
+	/**
+	 * Rewrite post_content from export JSON for posts that already exist in WordPress.
+	 * Preserves an existing ak-gallery marker block when present.
+	 *
+	 * @param array<int, array<string, mixed>> $posts
+	 * @return array{updated:int,skipped_not_found:int,skipped_no_embed:int,skipped_other:int,errors:int,log:array<int,string>}
+	 */
+	public function reimport_post_content_batch( array $posts ): array {
+		$stats = array(
+			'updated'           => 0,
+			'skipped_not_found' => 0,
+			'skipped_no_embed'  => 0,
+			'skipped_other'     => 0,
+			'errors'            => 0,
+		);
+
+		$this->prefetch_post_map_for_posts( $posts );
+
+		foreach ( $posts as $post ) {
+			$result = $this->reimport_one_post_content( $post );
+			if ( isset( $stats[ $result ] ) ) {
+				++$stats[ $result ];
+			}
+		}
+
+		$stats['log'] = $this->log;
+
+		return $stats;
+	}
+
+	/**
+	 * @param array<string, mixed> $post
+	 * @return 'updated'|'skipped_not_found'|'skipped_no_embed'|'skipped_other'|'errors'
+	 */
+	public function reimport_one_post_content( array $post ): string {
+		$content_id = (int) ( $post['contentId'] ?? 0 );
+		if ( $content_id <= 0 ) {
+			return 'skipped_other';
+		}
+
+		$content_type_id = (int) ( $post['contentTypeId'] ?? 0 );
+		if ( in_array( $content_type_id, array( 8, 16 ), true ) ) {
+			return 'skipped_other';
+		}
+
+		if ( ! $this->export_post_has_embed_markup( $post ) ) {
+			return 'skipped_no_embed';
+		}
+
+		$post_id = $this->get_post_id_for_content_id( $content_id );
+		if ( $post_id <= 0 ) {
+			return 'skipped_not_found';
+		}
+
+		if ( ! $this->save_imported_post_content( $post_id, $post, true ) ) {
+			$this->log[] = sprintf(
+				'Content reimport error contentId %d (post %d)',
+				$content_id,
+				$post_id
+			);
+			return 'errors';
+		}
+
+		$this->log[] = sprintf(
+			'Content reimport contentId %d → post %d (embed restored)',
+			$content_id,
+			$post_id
+		);
+
+		return 'updated';
+	}
+
+	/**
+	 * True when export JSON still contains embed markup that wp_kses typically strips.
+	 *
+	 * @param array<string, mixed> $post
+	 */
+	public function export_post_has_embed_markup( array $post ): bool {
+		$fields = array( 'body', 'footer', 'overTitle' );
+
+		foreach ( $fields as $field ) {
+			if ( empty( $post[ $field ] ) || ! is_string( $post[ $field ] ) ) {
+				continue;
+			}
+
+			$html = $this->decode_text( $post[ $field ] );
+			if ( $html === '' ) {
+				continue;
+			}
+
+			if ( preg_match( '/<iframe\b/i', $html ) ) {
+				return true;
+			}
+
+			if ( preg_match( '/<script\b/i', $html ) ) {
+				return true;
+			}
+
+			if ( preg_match( '/<(?:embed|object)\b/i', $html ) ) {
+				return true;
+			}
+
+			if ( preg_match( '/aparat\.com/i', $html ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param array<string, mixed> $post
+	 */
+	private function build_imported_post_content( array $post, int $post_id, bool $preserve_gallery ): string {
+		$body = AsreKhodro_Gallery_Importer::strip_existing_gallery( $this->build_post_content( $post ) );
+		if ( ! $preserve_gallery || $post_id <= 0 ) {
+			return $body;
+		}
+
+		$gallery = AsreKhodro_Gallery_Importer::extract_existing_gallery(
+			(string) get_post_field( 'post_content', $post_id )
+		);
+		if ( $gallery === '' ) {
+			return $body;
+		}
+
+		return $gallery . "\n\n" . ltrim( $body );
+	}
+
+	/**
+	 * @param array<string, mixed> $post
+	 */
+	private function save_imported_post_content( int $post_id, array $post, bool $preserve_gallery ): bool {
+		$content = $this->build_imported_post_content( $post, $post_id, $preserve_gallery );
+
+		return $this->write_post_content_raw( $post_id, $content );
+	}
+
+	/**
+	 * Write post_content directly, bypassing wp_kses so iframe/script embeds survive.
+	 */
+	private function write_post_content_raw( int $post_id, string $content ): bool {
+		global $wpdb;
+
+		$updated = $wpdb->update(
+			$wpdb->posts,
+			array( 'post_content' => $content ),
+			array( 'ID' => $post_id ),
+			array( '%s' ),
+			array( '%d' )
+		);
+
+		if ( $updated === false ) {
+			return false;
+		}
+
+		clean_post_cache( $post_id );
+
+		return true;
 	}
 
 	/**

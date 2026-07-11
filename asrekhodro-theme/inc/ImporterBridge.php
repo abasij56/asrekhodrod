@@ -17,6 +17,7 @@ final class ImporterBridge {
 		add_filter( 'the_content', array( self::class, 'filter_content_external_links' ), 21 );
 		add_filter( 'the_content', array( self::class, 'strip_lead_image_from_content' ), 22 );
 		add_filter( 'the_content', array( self::class, 'transform_inline_content_galleries' ), 23 );
+		add_filter( 'the_content', array( self::class, 'transform_inline_content_embeds' ), 24 );
 		add_action( 'save_post', array( self::class, 'sync_post_image_meta' ), 20, 2 );
 	}
 
@@ -650,11 +651,126 @@ final class ImporterBridge {
 	}
 
 	/**
+	 * Center embedded iframes / native video / Aparat script blocks in news body markup.
+	 */
+	public static function transform_inline_content_embeds( string $content ): string {
+		if ( ! is_singular( 'post' ) || $content === '' ) {
+			return $content;
+		}
+
+		if ( ! preg_match( '/<iframe\b|<video\b|ak-video-player|aparat\.com/i', $content ) ) {
+			return $content;
+		}
+
+		$preserved = self::isolate_gallery_exempt_blocks( $content );
+		$content   = self::apply_inline_embed_wrappers( $preserved['content'] );
+
+		return self::restore_gallery_exempt_blocks( $content, $preserved['placeholders'] );
+	}
+
+	private static function apply_inline_embed_wrappers( string $content ): string {
+		$placeholders = array();
+
+		$content = preg_replace_callback(
+			'#<figure\b[^>]*\bsingle-inline-embed\b[^>]*>.*?</figure>#is',
+			static function ( array $matches ) use ( &$placeholders ): string {
+				$key                      = '[[[AKINLINEEMBED:' . count( $placeholders ) . ']]]';
+				$placeholders[ $key ] = $matches[0];
+
+				return $key;
+			},
+			$content
+		) ?? $content;
+
+		$content = preg_replace_callback(
+			'#<div class="ak-video-player"[^>]*>.*?</div>#is',
+			static function ( array $matches ) use ( &$placeholders ): string {
+				$key                      = '[[[AKVIDEOPLAYER:' . count( $placeholders ) . ']]]';
+				$placeholders[ $key ] = $matches[0];
+
+				return $key;
+			},
+			$content
+		) ?? $content;
+
+		$content = preg_replace_callback(
+			'#<div[^>]*>\s*<script\b[^>]*\bsrc=["\'][^"\']*aparat\.com[^"\']*["\'][^>]*>\s*</script>\s*</div>#is',
+			static fn( array $matches ): string => self::render_inline_embed_figure( $matches[0], true ),
+			$content
+		) ?? $content;
+
+		$content = preg_replace_callback(
+			'#<script\b[^>]*\bsrc=["\'][^"\']*aparat\.com[^"\']*["\'][^>]*>\s*</script>#is',
+			static fn( array $matches ): string => self::render_inline_embed_figure( $matches[0], true ),
+			$content
+		) ?? $content;
+
+		$content = preg_replace_callback(
+			'#<p[^>]*>\s*(<iframe\b[^>]*>.*?</iframe>)\s*</p>#is',
+			static fn( array $matches ): string => self::render_inline_embed_figure( $matches[1] ),
+			$content
+		) ?? $content;
+
+		$content = preg_replace_callback(
+			'#<iframe\b[^>]*>.*?</iframe>#is',
+			static fn( array $matches ): string => self::render_inline_embed_figure( $matches[0] ),
+			$content
+		) ?? $content;
+
+		$content = preg_replace_callback(
+			'#<p[^>]*>\s*(<video\b[^>]*>.*?</video>)\s*</p>#is',
+			static fn( array $matches ): string => self::render_inline_embed_figure( $matches[1] ),
+			$content
+		) ?? $content;
+
+		$content = preg_replace_callback(
+			'#<video\b[^>]*>.*?</video>#is',
+			static fn( array $matches ): string => self::render_inline_embed_figure( $matches[0] ),
+			$content
+		) ?? $content;
+
+		foreach ( $placeholders as $key => $html ) {
+			if ( str_starts_with( $key, '[[[AKVIDEOPLAYER:' ) ) {
+				$content = str_replace( $key, self::render_inline_embed_figure( $html ), $content );
+				continue;
+			}
+
+			$content = str_replace( $key, $html, $content );
+		}
+
+		return $content;
+	}
+
+	private static function render_inline_embed_figure( string $embed_html, bool $script_embed = false ): string {
+		$embed_html = trim( $embed_html );
+		if ( $embed_html === '' ) {
+			return '';
+		}
+
+		$player_class = 'ak-video-player';
+		if ( $script_embed ) {
+			$player_class .= ' ak-video-player--embed-script';
+		}
+
+		if ( preg_match( '/\bak-video-player\b/i', $embed_html ) ) {
+			$player_html = $embed_html;
+		} else {
+			$player_html = sprintf( '<div class="%s">%s</div>', esc_attr( $player_class ), $embed_html );
+		}
+
+		return sprintf(
+			'<figure class="single-inline-embed" data-ak-skip-gallery><div class="single-inline-embed__frame">%s</div></figure>',
+			$player_html
+		);
+	}
+
+	/**
 	 * @return list<string>
 	 */
 	private static function gallery_exempt_markers(): array {
 		return array(
 			'data-ak-skip-gallery',
+			'single-inline-embed',
 			'ad-strip__inner',
 			'page-sidebar-ads',
 			'ad-sidebar__slot',

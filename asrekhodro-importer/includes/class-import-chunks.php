@@ -51,6 +51,26 @@ final class AsreKhodro_Import_Chunks {
 		return self::list_chunk_files( $import_dir, $collection ) !== array();
 	}
 
+	public static function count_chunk_files( string $import_dir, string $collection ): int {
+		$files = self::list_chunk_files( $import_dir, $collection );
+
+		return $files !== array() ? count( $files ) : ( self::read_legacy( $import_dir, $collection ) !== array() ? 1 : 0 );
+	}
+
+	public static function count_collection_rows( string $import_dir, string $collection ): int {
+		$files = self::list_chunk_files( $import_dir, $collection );
+		if ( $files === array() ) {
+			return count( self::read_legacy( $import_dir, $collection ) );
+		}
+
+		$total = 0;
+		foreach ( $files as $file ) {
+			$total += count( self::decode_json_file( $file ) );
+		}
+
+		return $total;
+	}
+
 	/**
 	 * @return array<int, string> Sorted absolute paths.
 	 */

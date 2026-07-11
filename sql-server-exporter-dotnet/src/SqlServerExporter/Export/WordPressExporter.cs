@@ -21,6 +21,11 @@ internal sealed class WordPressExporter(ExportOptions options, ResolvedConnectio
             var progressService = new ExportProgressService(options.Output);
             var exportProgress = progressService.ClearEmptyBackOnlyProgress(progressService.Load(), sourceMode);
 
+            if (options.GalleryOnly)
+            {
+                return RunGalleryOnly(sql, exportProgress, progressService);
+            }
+
             if (options.EnrichImagesOnly)
             {
                 return RunEnrichImagesOnly(sql, exportProgress, progressService, sourceMode);
@@ -33,6 +38,23 @@ internal sealed class WordPressExporter(ExportOptions options, ResolvedConnectio
             Console.Error.WriteLine(ex.Message);
             return 1;
         }
+    }
+
+    private int RunGalleryOnly(
+        SqlJsonQueryService sql,
+        JsonObject exportProgress,
+        ExportProgressService progressService)
+    {
+        Console.WriteLine(
+            $"Exporting content galleries from AsreKhodroFront.ContentFiles (profile={connection.Name}, server={connection.Profile.Server}, resume={options.Resume}) → {options.Output}");
+        Console.Out.Flush();
+
+        var result = GalleryExporter.Export(sql, options, exportProgress, progressService);
+
+        Console.WriteLine();
+        Console.WriteLine($"Gallery export complete: {result.Rows} posts with a gallery across {result.Files} chunk(s).");
+        Console.WriteLine($"Import folder: {options.Output} (gallery/)");
+        return 0;
     }
 
     private int RunEnrichImagesOnly(
