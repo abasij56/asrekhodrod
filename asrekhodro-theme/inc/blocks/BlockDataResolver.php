@@ -98,6 +98,7 @@ final class BlockDataResolver {
 
 		$custom_query_blocks = array(
 			'ak-asrekhodro-featured',
+			'ak-featured-cars',
 			'ak-featured-grid',
 			'ak-hero',
 			'ak-magazines',
@@ -117,6 +118,10 @@ final class BlockDataResolver {
 					$context_key => self::query_by_ids( $manual, $count, $post_type ),
 				);
 			}
+		}
+
+		if ( $block_name === 'ak-featured-cars' ) {
+			return self::resolve_featured_cars( $placement, $meta );
 		}
 
 		if ( $block_name === 'ak-featured-grid' ) {
@@ -623,6 +628,39 @@ final class BlockDataResolver {
 
 		return array(
 			'sidebar_rail' => SidebarWidgets::get_rail_context( $args ),
+		);
+	}
+
+	/**
+	 * @param array<string, mixed> $placement
+	 * @param array<string, mixed> $meta
+	 * @return array<string, mixed>
+	 */
+	private static function resolve_featured_cars( array $placement, array $meta ): array {
+		$defaults = is_array( $meta['defaults'] ?? null ) ? $meta['defaults'] : array();
+
+		$count    = (int) ( $placement['count'] ?? $defaults['count'] ?? 8 );
+		$count    = max( 1, min( 24, $count ) );
+		$category = (int) ( $placement['category'] ?? 0 );
+		$strategy = (string) ( $placement['strategy'] ?? $defaults['strategy'] ?? 'latest' );
+
+		$manual = $placement['manual_posts'] ?? array();
+		if ( $strategy === 'manual' && is_array( $manual ) && $manual !== array() ) {
+			$cards = CarsInfoDirectory::featured_cards( array_values( array_map( 'intval', $manual ) ) );
+		} else {
+			$cards = CarsInfoDirectory::latest_featured_cards( $count, $category );
+		}
+
+		$title = array_key_exists( 'data_title', $placement )
+			? trim( sanitize_text_field( (string) $placement['data_title'] ) )
+			: trim( (string) ( $meta['default_title'] ?? 'ماشین‌های منتخب' ) );
+
+		return array(
+			'featured_cars_title'      => $title,
+			'featured_cars_link_url'   => trim( (string) ( $placement['view_url'] ?? '' ) ),
+			'featured_cars_link_label' => trim( (string) ( $placement['view_label'] ?? '' ) ) ?: 'همه مدل‌ها ←',
+			'featured_cars'            => $cards,
+			'featured_cars_has_items'  => $cards !== array(),
 		);
 	}
 

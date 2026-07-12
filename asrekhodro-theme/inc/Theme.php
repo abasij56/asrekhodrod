@@ -55,6 +55,8 @@ final class Theme {
 		require_once ASREKHODRO_THEME_DIR . '/inc/AdminCategoryParent.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/CarBrandAssets.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/AdminCategoryBrandLogo.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/CarSpecIcons.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/AdminCarSpecIconSelect.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/Appearances/ClassicAppearance.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/Appearances/ModernAppearance.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/Appearances/ModernBlueAppearance.php';
@@ -87,6 +89,7 @@ final class Theme {
 		AdminAds::init();
 		AdminCategoryParent::init();
 		AdminCategoryBrandLogo::init();
+		AdminCarSpecIconSelect::init();
 		ContactForm::init();
 		Comments::init();
 		SinglePost::init();

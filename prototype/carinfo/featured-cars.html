@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="پروتوتایپ بلاک ماشین‌های منتخب — عصر خودرو" />
+  <title>ماشین‌های منتخب | پروتوتایپ — عصر خودرو</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <style>
+    body.featured-cars-page {
+      background: var(--surface-alt);
+      padding: 2rem 0 3rem;
+    }
+
+    .proto-badge {
+      position: fixed;
+      bottom: 1rem;
+      left: 1rem;
+      z-index: 9999;
+      background: rgba(10, 10, 12, 0.92);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.4rem 0.7rem;
+      border-radius: 6px;
+      pointer-events: none;
+    }
+
+    /* ۴ ستون روی دسکتاپ — override روی .review-grid */
+    .featured-cars .review-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.15rem;
+    }
+
+    /* همان پایه review-card — فقط افزودنی‌های کار اینفو */
+    .review-card--car > a {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      color: inherit;
+    }
+
+    .review-card--car .review-card__media img {
+      transition: transform 0.45s ease;
+    }
+
+    .review-card--car:hover .review-card__media img {
+      transform: scale(1.04);
+    }
+
+    .review-card__brand {
+      position: absolute;
+      top: 0.75rem;
+      left: 0.75rem;
+      z-index: 1;
+      min-width: 2.25rem;
+      height: 2.25rem;
+      padding: 0 0.45rem;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink-soft);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .review-card--car .review-card__body {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding: 1.05rem 1.15rem 1.15rem;
+    }
+
+    /* مثل carspecs__year رقیب: کوچک، بدون پس‌زمینه */
+    .review-card__drive {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--ink-muted);
+      line-height: 1.4;
+      background: none;
+      padding: 0;
+      border: 0;
+    }
+
+    .review-card--car .review-card__body h3 {
+      margin-bottom: 0.75rem;
+      font-size: 0.98rem;
+    }
+
+    .review-card__specs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.4rem;
+      margin-top: auto;
+      padding-top: 0.8rem;
+      border-top: 1px solid var(--line-soft);
+    }
+
+    .review-card__spec {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      min-height: 3.85rem;
+      padding: 0.4rem 0.25rem;
+      border-radius: var(--radius-sm);
+      background: var(--surface-alt);
+      border: 1px solid var(--line-soft);
+      text-align: center;
+      transition:
+        border-color var(--transition),
+        background var(--transition);
+    }
+
+    .review-card--car:hover .review-card__spec {
+      background: #fff;
+      border-color: rgba(225, 6, 0, 0.12);
+    }
+
+    .review-card__spec-icon {
+      display: grid;
+      place-items: center;
+      width: 1.55rem;
+      height: 1.55rem;
+      color: var(--brand);
+    }
+
+    .review-card__spec-icon svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .ak-icon {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .review-card__spec-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--ink-soft);
+    }
+
+    /* فلش سمت چپ کارت و سمت چپ متن */
+    .review-card__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      align-self: flex-end;
+      margin-top: 0.85rem;
+      direction: ltr;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--brand);
+    }
+
+    .review-card__cta svg {
+      width: 15px;
+      height: 15px;
+      order: -1;
+      transition: transform var(--transition);
+    }
+
+    .review-card--car:hover .review-card__cta svg {
+      transform: translateX(-3px);
+    }
+
+    @media (max-width: 1100px) {
+      .featured-cars .review-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .featured-cars .review-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 560px) {
+      .featured-cars .review-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .review-card__specs {
+        gap: 0.35rem;
+      }
+
+      .review-card__spec {
+        min-height: 3.5rem;
+      }
+    }
+
+    /* ── Icon library preview ── */
+    .icon-showcase {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 2px dashed rgba(225, 6, 0, 0.18);
+    }
+
+    .icon-showcase__note {
+      margin: 0 0 1.25rem;
+      font-size: 0.88rem;
+      color: var(--ink-muted);
+      line-height: 1.75;
+    }
+
+    .icon-showcase__grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.85rem;
+    }
+
+    .icon-showcase__item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 1rem 0.65rem;
+      border-radius: var(--radius-sm);
+      background: #fff;
+      border: 1px solid var(--line-soft);
+      text-align: center;
+    }
+
+    .icon-showcase__label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--ink-muted);
+    }
+
+    .icon-showcase__icon {
+      width: 2rem;
+      height: 2rem;
+      color: #94a3b8;
+    }
+
+    .icon-showcase__icon svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .icon-showcase__sample {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--ink-soft);
+      line-height: 1.4;
+    }
+
+    .icon-showcase__sources {
+      margin-top: 1.25rem;
+      padding: 1rem 1.1rem;
+      border-radius: var(--radius-sm);
+      background: #fff;
+      border: 1px solid var(--line-soft);
+      font-size: 0.82rem;
+      color: var(--ink-muted);
+      line-height: 1.75;
+    }
+
+    .icon-showcase__sources a {
+      color: var(--brand);
+      font-weight: 600;
+    }
+
+    @media (min-width: 640px) {
+      .icon-showcase__grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 900px) {
+      .icon-showcase__grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 1100px) {
+      .icon-showcase__grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body class="featured-cars-page">
+
+  <!-- Sprite آیکون‌های مشخصات — فایل مرجع: assets/car-spec-icons.svg -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="ak-cylinder" viewBox="0 0 24 24" fill="currentColor"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-9Zm2.5-.5a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-11ZM8 9h1.2v6H8V9Zm3.4 0H12.6v6h-1.2V9Zm3.4 0H16v6h-1.2V9Z"/></symbol>
+    <symbol id="ak-displacement" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2.5"/><path d="M8 4.5V3M16 4.5V3M8 19.5v1.5M16 19.5v1.5"/></symbol>
+    <symbol id="ak-turbo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="13" r="3.5"/><path d="M18 6c2 2 2.5 4.5 1 7"/><path d="M14 10c3-1 5.5-.5 7 1"/><rect x="17" y="3" width="4" height="7" rx="1"/></symbol>
+    <symbol id="ak-na" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 12c2-4 4-6 8-6s6 2 8 6"/><path d="M6 15h12"/><path d="M9 18h6"/></symbol>
+    <symbol id="ak-hybrid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="7" width="14" height="10" rx="2"/><path d="M17 11h2l2 3v3h-4v-6Z"/><path d="M7 11h4M7 14h3"/></symbol>
+    <symbol id="ak-phev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 4v4M5 6h4"/><rect x="3" y="9" width="12" height="9" rx="2"/><path d="M15 12h2l3 3v3h-5v-6Z"/></symbol>
+    <symbol id="ak-ev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></symbol>
+    <symbol id="ak-transmission" viewBox="0 0 24 24" fill="currentColor"><path d="M22 11.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0ZM8.5 22a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7ZM8.5 8.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7ZM15 12H8.5M8.5 15.5V8.5"/></symbol>
+    <symbol id="ak-body" viewBox="0 0 24 24" fill="currentColor"><path d="M5 11.5 7 8h10l2 3.5v5.5a1 1 0 0 1-1 1h-1.2a1.8 1.8 0 0 0-3.6 0H10.8a1.8 1.8 0 0 0-3.6 0H6a1 1 0 0 1-1-1v-5.5ZM8.5 10.5h7"/></symbol>
+    <symbol id="ak-fuel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 20V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v14"/><path d="M16 10h2l2 4v6h-4v-10Z"/><path d="M8 10h4M8 14h4"/></symbol>
+    <symbol id="ak-power" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 3v3"/><path d="M12 18v3"/><path d="M3 12h3"/><path d="M18 12h3"/><circle cx="12" cy="12" r="5"/><path d="m9.5 12 1.8 1.8L15 10.1"/></symbol>
+    <symbol id="ak-torque" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 6a6 6 0 1 0 6 6"/><path d="M18 4v4h-4"/><path d="M8 12H4M20 12h-4"/></symbol>
+    <symbol id="ak-drivetrain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="17" r="2.5"/><circle cx="17" cy="17" r="2.5"/><path d="M9.5 17h5M12 6v7"/><path d="M10 6h4"/></symbol>
+    <symbol id="ak-speed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 4a8 8 0 1 0 8 8"/><path d="M12 12 16 8"/><path d="M16 4h2v2"/></symbol>
+    <symbol id="ak-wheel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 5v3M12 16v3M5 12h3M16 12h3"/></symbol>
+    <symbol id="ak-suspension" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 18V8l3-3 3 3v10"/><path d="M12 5v13"/><path d="M12 8h6l2 3v7"/></symbol>
+  </svg>
+
+  <div class="proto-badge">پروتوتایپ — featured-cars.html</div>
+
+  <div class="container">
+    <section class="reviews featured-cars" aria-labelledby="featured-cars-heading">
+      <div class="section-head">
+        <h2 id="featured-cars-heading">ماشین‌های منتخب</h2>
+        <a href="car-directory.html">همه مدل‌ها ←</a>
+        <a href="icon-gallery.html">گالری آیکون‌ها</a>
+      </div>
+
+      <div class="review-grid">
+
+        <article class="review-card review-card--car">
+          <a href="carinfo-sample-audi-a3.html">
+            <div class="review-card__media">
+              <img src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&q=80&auto=format&fit=crop" width="600" height="375" alt="بی‌ام‌و X5 xDrive45e" loading="lazy" decoding="async" />
+              <span class="review-card__brand" aria-hidden="true">BMW</span>
+            </div>
+            <div class="review-card__body">
+              <span class="review-card__drive">دیفرانسیل عقب</span>
+              <h3>بی‌ام‌و X5 xDrive45e</h3>
+              <div class="review-card__specs">
+                <div class="review-card__spec">
+                  <span class="review-card__spec-icon" aria-hidden="true">
+                    <svg class="ak-icon" aria-hidden="true"><use href="#ak-cylinder"/></svg>
+                  </span>
+                  <span class="review-card__spec-label">۶ سیلندر</span>
+                </div>
+                <div class="review-card__spec">
+                  <span class="review-card__spec-icon" aria-hidden="true">
+                    <svg class="ak-icon" aria-hidden="true"><use href="#ak-displacement"/></svg>
+                  </span>
+                  <span class="review-card__spec-label">2998 CC</span>
+                </div>
+                <div class="review-card__spec">
+                  <span class="review-card__spec-icon" aria-hidden="true">
+                    <svg class="ak-icon" aria-hidden="true"><use href="#ak-phev"/></svg>
+                </div>
+              </div>
+              <span class="review-card__cta">
+                مشاهده خودرو
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg>
+              </span>
+            </div>
+          </a>
+        </article>
+
+        <article class="review-card review-card--car">
+          <a href="car-hub-ferrari.html">
+            <div class="review-card__media">
+              <img src="https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800&q=80&auto=format&fit=crop" width="600" height="375" alt="مرسدس بنز E200" loading="lazy" decoding="async" />
+              <span class="review-card__brand" aria-hidden="true">MB</span>
+            </div>
+            <div class="review-card__body">
+              <span class="review-card__drive">دیفرانسیل عقب</span>
+              <h3>مرسدس بنز E200</h3>
+              <div class="review-card__specs">
+                <div class="review-card__spec">
+                  <span class="review-card__spec-icon" aria-hidden="true">
+                    <svg class="ak-icon" aria-hidden="true"><use href="#ak-cylinder"/></svg>
+                  </span>
+                  <span class="review-card__spec-label">۴ سیلندر</span>
+                </div>
+                <div class="review-card__spec">
+                  <span class="review-card__spec-icon" aria-hidden="true">
+                    <svg class="ak-icon" aria-hidden="true"><use href="#ak-displacement"/></svg>
+                  </span>
+                  <span class="review-card__spec-label">1991 CC</span>
+                </div>
+                <div class="review-card__spec">
+                  <span class="review-card__spec-icon" aria-hidden="true">
+                    <svg class="ak-icon" aria-hidden="true"><use href="#ak-turbo"/></svg>
+                  </span>
+                  <span class="review-card__spec-label">توربوشارژ</span>
+                </div>
+              </div>
+              <span class="review-card__cta">
+                مشاهده خودرو
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg>
+              </span>
+            </div>
+          </a>
+        </article>
+
+        <article class="review-card review-card--car">
+          <a href="carinfo-sample-audi-a3.html">
+            <div class="review-card__media">
+              <img src="https://images.unsplash.com/photo-1621007947382-bad6a7070a09?w=800&q=80&auto=format&fit=crop" width="600" height="375" alt="تویوتا RAV4 Hybrid" loading="lazy" decoding="async" />
+              <span class="review-card__brand" aria-hidden="true">TYT</span>
+            </div>
+            <div class="review-card__body">
+              <span class="review-card__drive">دیفرانسیل جلو</span>
+              <h3>تویوتا RAV4 Hybrid</h3>
+              <div class="review-card__specs">
+                <div class="review-card__spec">
+                  <span class="review-card__spec-icon" aria-hidden="true">
+                    <svg class="ak-icon" aria-hidden="true"><use href="#ak-cylinder"/></svg>
+                  </span>
+                  <span class="review-card__spec-label">۴ سیلندر</span>
+                </div>
+                <div class="review-card__spec">
+                  <span class="review-card__spec-icon" aria-hidden="true">
+                    <svg class="ak-icon" aria-hidden="true"><use href="#ak-displacement"/></svg>
+                  </span>
+                  <span class="review-card__spec-label">2487 CC</span>
+                </div>
+                <div class="review-card__spec">
+                  <span class="review-card__spec-icon" aria-hidden="true">
+                    <svg class="ak-icon" aria-hidden="true"><use href="#ak-hybrid"/></svg>
+                </div>
+              </div>
+              <span class="review-card__cta">
+                مشاهده خودرو
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg>
+              </span>
+            </div>
+          </a>
+        </article>
+
+        <article class="review-card review-card--car">
+          <a href="car-hub-ferrari.html">
+            <div class="review-card__media">
+              <img src="https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&q=80&auto=format&fit=crop" width="600" height="375" alt="هیوندای توسان" loading="lazy" decoding="async" />
+              <span class="review-card__brand" aria-hidden="true">HYU</span>
+            </div>
+            <div class="review-card__body">
+              <span class="review-card__drive">دیفرانسیل جلو</span>
+              <h3>هیوندای توسان ۲۰۲۴</h3>
+              <div class="review-card__specs">
+                <div class="review-card__spec">
+                  <span class="review-card__spec-icon" aria-hidden="true">
+                    <svg class="ak-icon" aria-hidden="true"><use href="#ak-cylinder"/></svg>
+                  </span>
+                  <span class="review-card__spec-label">۴ سیلندر</span>
+                </div>
+                <div class="review-card__spec">
+                  <span class="review-card__spec-icon" aria-hidden="true">
+                    <svg class="ak-icon" aria-hidden="true"><use href="#ak-displacement"/></svg>
+                  </span>
+                  <span class="review-card__spec-label">1598 CC</span>
+                </div>
+                <div class="review-card__spec">
+                  <span class="review-card__spec-icon" aria-hidden="true">
+                    <svg class="ak-icon" aria-hidden="true"><use href="#ak-turbo"/></svg>
+                  </span>
+                  <span class="review-card__spec-label">توربوشارژ</span>
+                </div>
+              </div>
+              <span class="review-card__cta">
+                مشاهده خودرو
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg>
+              </span>
+            </div>
+          </a>
+        </article>
+
+        <article class="review-card review-card--car">
+          <a href="carinfo-sample-audi-a3.html">
+            <div class="review-card__media">
+              <img src="https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800&q=80&auto=format&fit=crop" width="600" height="375" alt="جی‌ای‌سی M8" loading="lazy" decoding="async" />
+              <span class="review-card__brand" aria-hidden="true">GAC</span>
+            </div>
+            <div class="review-card__body">
+              <span class="review-card__drive">دیفرانسیل جلو</span>
+              <h3>جی‌ای‌سی M8</h3>
+              <div class="review-card__specs">
+                <div class="review-card__spec">
+                  <span class="review-card__spec-icon" aria-hidden="true">
+                    <svg class="ak-icon" aria-hidden="true"><use href="#ak-cylinder"/></svg>
+                  </span>
+                  <span class="review-card__spec-label">۴ سیلندر</span>
+                </div>
+                <div class="review-card__spec">
+                  <span class="review-card__spec-icon" aria-hidden="true">
+                    <svg class="ak-icon" aria-hidden="true"><use href="#ak-displacement"/></svg>
+                  </span>
+                  <span class="review-card__spec-label">1991 CC</span>
+                </div>
+                <div class="review-card__spec">
+                  <span class="review-card__spec-icon" aria-hidden="true">
+                    <svg class="ak-icon" aria-hidden="true"><use href="#ak-turbo"/></svg>
+                  </span>
+                  <span class="review-card__spec-label">توربوشارژ</span>
+                </div>
+              </div>
+              <span class="review-card__cta">
+                مشاهده خودرو
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg>
+              </span>
+            </div>
+          </a>
+        </article>
+
+        <article class="review-card review-card--car">
+          <a href="car-hub-ferrari.html">
+            <div class="review-card__media">
+              <img src="https://images.unsplash.com/photo-1619767886555-ef0697849662?w=800&q=80&auto=format&fit=crop" width="600" height="375" alt="کیا اسپورتیج" loading="lazy" decoding="async" />
+              <span class="review-card__brand" aria-hidden="true">KIA</span>
+            </div>
+            <div class="review-card__body">
+              <span class="review-card__drive">دیفرانسیل جلو</span>
+              <h3>کیا اسپورتیج GT-Line</h3>
+              <div class="review-card__specs">
+                <div class="review-card__spec">
+                  <span class="review-card__spec-icon" aria-hidden="true">
+                    <svg class="ak-icon" aria-hidden="true"><use href="#ak-cylinder"/></svg>
+                  </span>
+                  <span class="review-card__spec-label">۴ سیلندر</span>
+                </div>
+                <div class="review-card__spec">
+                  <span class="review-card__spec-icon" aria-hidden="true">
+                    <svg class="ak-icon" aria-hidden="true"><use href="#ak-displacement"/></svg>
+                  </span>
+                  <span class="review-card__spec-label">1598 CC</span>
+                </div>
+                <div class="review-card__spec">
+                  <span class="review-card__spec-icon" aria-hidden="true">
+                    <svg class="ak-icon" aria-hidden="true"><use href="#ak-turbo"/></svg>
+                  </span>
+                  <span class="review-card__spec-label">توربوشارژ</span>
+                </div>
+              </div>
+              <span class="review-card__cta">
+                مشاهده خودرو
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg>
+              </span>
+            </div>
+          </a>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="icon-showcase" aria-labelledby="icon-showcase-heading">
+      <div class="section-head">
+        <h2 id="icon-showcase-heading">پیشنهاد آیکون‌های مشخصات فنی</h2>
+      </div>
+
+      <p class="icon-showcase__note">
+        برای کارت‌های «ماشین‌های منتخب» فقط <strong>۳ آیکون</strong> لازم است: سیلندر، حجم موتور (CC)، نوع پیشرانه (توربو / هیبرید / …).
+        برای صفحهٔ تک خودرو (مثل رقیب) حدود <strong>۱۵–۲۰ آیکون</strong> کافی است — بقیهٔ فیلدها می‌توانند از همان مجموعه استفاده کنند.
+        مجموعهٔ زیر ۱۶ آیکون است؛ فایل SVG جدا: <code>assets/car-spec-icons.svg</code>
+      </p>
+
+      <div class="icon-showcase__grid">
+        <div class="icon-showcase__item"><span class="icon-showcase__label">تعداد سیلندر</span><span class="icon-showcase__icon"><svg class="ak-icon"><use href="#ak-cylinder"/></svg></span><span class="icon-showcase__sample">۴ سیلندر خطی</span></div>
+        <div class="icon-showcase__item"><span class="icon-showcase__label">حجم موتور</span><span class="icon-showcase__icon"><svg class="ak-icon"><use href="#ak-displacement"/></svg></span><span class="icon-showcase__sample">1991 CC</span></div>
+        <div class="icon-showcase__item"><span class="icon-showcase__label">تنفس موتور</span><span class="icon-showcase__icon"><svg class="ak-icon"><use href="#ak-turbo"/></svg></span><span class="icon-showcase__sample">توربوشارژ</span></div>
+        <div class="icon-showcase__item"><span class="icon-showcase__label">تنفس طبیعی</span><span class="icon-showcase__icon"><svg class="ak-icon"><use href="#ak-na"/></svg></span><span class="icon-showcase__sample">NA</span></div>
+        <div class="icon-showcase__item"><span class="icon-showcase__label">هیبرید</span><span class="icon-showcase__icon"><svg class="ak-icon"><use href="#ak-hybrid"/></svg></span><span class="icon-showcase__sample">HEV</span></div>
+        <div class="icon-showcase__item"><span class="icon-showcase__label">پلاگین هیبرید</span><span class="icon-showcase__icon"><svg class="ak-icon"><use href="#ak-phev"/></svg></span><span class="icon-showcase__sample">PHEV</span></div>
+        <div class="icon-showcase__item"><span class="icon-showcase__label">برقی</span><span class="icon-showcase__icon"><svg class="ak-icon"><use href="#ak-ev"/></svg></span><span class="icon-showcase__sample">EV</span></div>
+        <div class="icon-showcase__item"><span class="icon-showcase__label">جعبه‌دنده</span><span class="icon-showcase__icon"><svg class="ak-icon"><use href="#ak-transmission"/></svg></span><span class="icon-showcase__sample">۶AT</span></div>
+        <div class="icon-showcase__item"><span class="icon-showcase__label">کلاس بدنه</span><span class="icon-showcase__icon"><svg class="ak-icon"><use href="#ak-body"/></svg></span><span class="icon-showcase__sample">SUV</span></div>
+        <div class="icon-showcase__item"><span class="icon-showcase__label">مصرف سوخت</span><span class="icon-showcase__icon"><svg class="ak-icon"><use href="#ak-fuel"/></svg></span><span class="icon-showcase__sample">۵.۸ L/100</span></div>
+        <div class="icon-showcase__item"><span class="icon-showcase__label">حداکثر توان</span><span class="icon-showcase__icon"><svg class="ak-icon"><use href="#ak-power"/></svg></span><span class="icon-showcase__sample">158 hp</span></div>
+        <div class="icon-showcase__item"><span class="icon-showcase__label">گشتاور</span><span class="icon-showcase__icon"><svg class="ak-icon"><use href="#ak-torque"/></svg></span><span class="icon-showcase__sample">202 Nm</span></div>
+        <div class="icon-showcase__item"><span class="icon-showcase__label">محور محرک</span><span class="icon-showcase__icon"><svg class="ak-icon"><use href="#ak-drivetrain"/></svg></span><span class="icon-showcase__sample">FWD</span></div>
+        <div class="icon-showcase__item"><span class="icon-showcase__label">حداکثر سرعت</span><span class="icon-showcase__icon"><svg class="ak-icon"><use href="#ak-speed"/></svg></span><span class="icon-showcase__sample">180 km/h</span></div>
+        <div class="icon-showcase__item"><span class="icon-showcase__label">سایز چرخ</span><span class="icon-showcase__icon"><svg class="ak-icon"><use href="#ak-wheel"/></svg></span><span class="icon-showcase__sample">R18</span></div>
+        <div class="icon-showcase__item"><span class="icon-showcase__label">سیستم تعلیق</span><span class="icon-showcase__icon"><svg class="ak-icon"><use href="#ak-suspension"/></svg></span><span class="icon-showcase__sample">مک‌فرسون</span></div>
+      </div>
+
+      <div class="icon-showcase__sources">
+        <strong>از کجا بیاوریم؟</strong>
+        <ul style="margin:0.5rem 0 0; padding-right:1.1rem;">
+          <li><strong>SVG سفارشی</strong> (مثل رقیب) — بهترین هماهنگی بصری؛ همین فایل sprite قابل گسترش است.</li>
+          <li><a href="https://tabler.io/icons" target="_blank" rel="noopener">Tabler Icons</a> — engine، manual-gears، car، gauge، gas-station، battery (MIT)</li>
+          <li><a href="https://lucide.dev/icons/" target="_blank" rel="noopener">Lucide</a> — fuel، gauge، car، zap، settings-2 (ISC)</li>
+          <li><a href="https://phosphoricons.com/" target="_blank" rel="noopener">Phosphor</a> — tire، engine، steering-wheel (MIT)</li>
+        </ul>
+        نکته: در HTML رقیب، بیشتر فیلدهای «دارد/ندارد» و سنسورها از <em>یک آیکون عمومی</em> تکرار شده — لازم نیست برای هر فیلد آیکون منحصربه‌فرد بسازید.
+      </div>
+    </section>
+  </div>
+
+</body>
+</html>

@@ -33,10 +33,11 @@ final class View {
 			}
 			$item_rate = RateFormatter::normalize( $row['item_rate'] ?? 0 );
 			$items[]   = array(
-				'title'      => $item_title,
-				'rate'       => $item_rate,
-				'rate_label' => RateFormatter::format( $item_rate ),
-				'bar_width'  => RateFormatter::bar_width( $item_rate ),
+				'title'         => $item_title,
+				'rate'          => $item_rate,
+				'rate_label'    => RateFormatter::format( $item_rate ),
+				'bar_width'     => RateFormatter::bar_width( $item_rate ),
+				'show_in_card'  => ! empty( $row['show_in_card'] ),
 			);
 		}
 

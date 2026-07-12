@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="گالری آیکون‌های SVG مشخصات خودرو — عصر خودرو" />
+  <title>گالری آیکون‌های کار اینفو | پروتوتایپ — عصر خودرو</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <style>
+    body.icon-gallery-page {
+      background: var(--surface-alt);
+      padding: 1.5rem 0 3rem;
+    }
+
+    .proto-badge {
+      position: fixed;
+      bottom: 1rem;
+      left: 1rem;
+      z-index: 9999;
+      background: rgba(10, 10, 12, 0.92);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.4rem 0.7rem;
+      border-radius: 6px;
+      pointer-events: none;
+    }
+
+    .gallery-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .gallery-head h1 {
+      margin: 0;
+      font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+      font-weight: 800;
+      color: var(--ink-soft);
+    }
+
+    .gallery-head p {
+      margin: 0.35rem 0 0;
+      font-size: 0.88rem;
+      color: var(--ink-muted);
+      line-height: 1.6;
+    }
+
+    .gallery-head__links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+    }
+
+    .gallery-head__links a {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--brand);
+      text-decoration: none;
+      padding: 0.45rem 0.85rem;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--line-soft);
+      transition: border-color var(--transition), background var(--transition);
+    }
+
+    .gallery-head__links a:hover {
+      border-color: rgba(225, 6, 0, 0.25);
+      background: #fff;
+    }
+
+    .gallery-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      margin-bottom: 1.25rem;
+      padding: 1rem 0;
+      background: linear-gradient(to bottom, var(--surface-alt) 75%, transparent);
+    }
+
+    .gallery-toolbar__inner {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      padding: 0.85rem 1rem;
+      border-radius: var(--radius-sm);
+      background: #fff;
+      border: 1px solid var(--line-soft);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .gallery-search {
+      flex: 1 1 220px;
+      position: relative;
+    }
+
+    .gallery-search svg {
+      position: absolute;
+      top: 50%;
+      right: 0.85rem;
+      transform: translateY(-50%);
+      width: 1.1rem;
+      height: 1.1rem;
+      color: var(--ink-muted);
+      pointer-events: none;
+    }
+
+    .gallery-search input {
+      width: 100%;
+      padding: 0.65rem 2.5rem 0.65rem 0.85rem;
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+      background: var(--surface-alt);
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .gallery-search input:focus {
+      border-color: rgba(225, 6, 0, 0.35);
+      box-shadow: 0 0 0 3px rgba(225, 6, 0, 0.08);
+    }
+
+    .gallery-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .gallery-filters button {
+      border: 1px solid var(--line-soft);
+      background: var(--surface-alt);
+      color: var(--ink-muted);
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.45rem 0.75rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition), border-color var(--transition);
+    }
+
+    .gallery-filters button:hover {
+      color: var(--ink-soft);
+      border-color: rgba(225, 6, 0, 0.2);
+    }
+
+    .gallery-filters button.is-active {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #fff;
+    }
+
+    .gallery-stats {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--ink-muted);
+      white-space: nowrap;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .icon-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 0.65rem 0.85rem;
+      border-radius: var(--radius-sm);
+      background: #fff;
+      border: 1px solid var(--line-soft);
+      text-align: center;
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+    }
+
+    .icon-card:hover {
+      border-color: rgba(225, 6, 0, 0.18);
+      box-shadow: var(--shadow-sm);
+      transform: translateY(-1px);
+    }
+
+    .icon-card.is-hidden { display: none; }
+
+    .icon-card__preview {
+      display: grid;
+      place-items: center;
+      width: 3rem;
+      height: 3rem;
+      color: #94a3b8;
+    }
+
+    .icon-card__preview img,
+    .icon-card__preview svg {
+      display: block;
+      width: 2rem;
+      height: 2rem;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .icon-card__title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      line-height: 1.45;
+      color: var(--ink-soft);
+      min-height: 2.1em;
+    }
+
+    .icon-card__name {
+      font-size: 0.62rem;
+      font-weight: 600;
+      color: var(--ink-muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      direction: ltr;
+      word-break: break-all;
+    }
+
+    .icon-card__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .icon-card__set {
+      font-size: 0.58rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      background: var(--surface-alt);
+      color: var(--ink-muted);
+    }
+
+    .icon-card__set--custom { background: rgba(225, 6, 0, 0.08); color: var(--brand); }
+    .icon-card__set--tabler-filled { background: #eef2ff; color: #4338ca; }
+
+    .icon-card__copy {
+      border: none;
+      background: transparent;
+      color: var(--brand);
+      font: inherit;
+      font-size: 0.62rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+    }
+
+    .icon-card__copy:hover { background: rgba(225, 6, 0, 0.06); }
+
+    .gallery-empty {
+      display: none;
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--ink-muted);
+      font-size: 0.95rem;
+    }
+
+    .gallery-empty.is-visible { display: block; }
+
+    .toast {
+      position: fixed;
+      bottom: 3.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(1rem);
+      opacity: 0;
+      pointer-events: none;
+      background: rgba(10, 10, 12, 0.92);
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.55rem 1rem;
+      border-radius: 999px;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 10000;
+    }
+
+    .toast.is-visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (min-width: 640px) {
+      .gallery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (min-width: 900px) {
+      .gallery-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.85rem; }
+    }
+
+    @media (min-width: 1100px) {
+      .gallery-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    }
+
+    @media (min-width: 1400px) {
+      .gallery-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body class="icon-gallery-page">
+
+  <div class="proto-badge">پروتوتایپ — icon-gallery.html</div>
+
+  <!-- sprite اختصاصی برای پیش‌نمایش custom -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="ak-cylinder" viewBox="0 0 24 24" fill="currentColor"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-9Zm2.5-.5a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-11ZM8 9h1.2v6H8V9Zm3.4 0H12.6v6h-1.2V9Zm3.4 0H16v6h-1.2V9Z"/></symbol>
+    <symbol id="ak-displacement" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2.5"/><path d="M8 4.5V3M16 4.5V3M8 19.5v1.5M16 19.5v1.5"/></symbol>
+    <symbol id="ak-turbo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="13" r="3.5"/><path d="M18 6c2 2 2.5 4.5 1 7"/><path d="M14 10c3-1 5.5-.5 7 1"/><rect x="17" y="3" width="4" height="7" rx="1"/></symbol>
+    <symbol id="ak-na" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 12c2-4 4-6 8-6s6 2 8 6"/><path d="M6 15h12"/><path d="M9 18h6"/></symbol>
+    <symbol id="ak-hybrid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="7" width="14" height="10" rx="2"/><path d="M17 11h2l2 3v3h-4v-6Z"/><path d="M7 11h4M7 14h3"/></symbol>
+    <symbol id="ak-phev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 4v4M5 6h4"/><rect x="3" y="9" width="12" height="9" rx="2"/><path d="M15 12h2l3 3v3h-5v-6Z"/></symbol>
+    <symbol id="ak-ev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></symbol>
+    <symbol id="ak-transmission" viewBox="0 0 24 24" fill="currentColor"><path d="M22 11.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0ZM8.5 22a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7ZM8.5 8.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7ZM15 12H8.5M8.5 15.5V8.5"/></symbol>
+    <symbol id="ak-body" viewBox="0 0 24 24" fill="currentColor"><path d="M5 11.5 7 8h10l2 3.5v5.5a1 1 0 0 1-1 1h-1.2a1.8 1.8 0 0 0-3.6 0H10.8a1.8 1.8 0 0 0-3.6 0H6a1 1 0 0 1-1-1v-5.5ZM8.5 10.5h7"/></symbol>
+    <symbol id="ak-fuel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 20V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v14"/><path d="M16 10h2l2 4v6h-4v-10Z"/><path d="M8 10h4M8 14h4"/></symbol>
+    <symbol id="ak-power" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 3v3"/><path d="M12 18v3"/><path d="M3 12h3"/><path d="M18 12h3"/><circle cx="12" cy="12" r="5"/><path d="m9.5 12 1.8 1.8L15 10.1"/></symbol>
+    <symbol id="ak-torque" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 6a6 6 0 1 0 6 6"/><path d="M18 4v4h-4"/><path d="M8 12H4M20 12h-4"/></symbol>
+    <symbol id="ak-drivetrain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="17" r="2.5"/><circle cx="17" cy="17" r="2.5"/><path d="M9.5 17h5M12 6v7"/><path d="M10 6h4"/></symbol>
+    <symbol id="ak-speed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 4a8 8 0 1 0 8 8"/><path d="M12 12 16 8"/><path d="M16 4h2v2"/></symbol>
+    <symbol id="ak-wheel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 5v3M12 16v3M5 12h3M16 12h3"/></symbol>
+    <symbol id="ak-suspension" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 18V8l3-3 3 3v10"/><path d="M12 5v13"/><path d="M12 8h6l2 3v7"/></symbol>
+  </svg>
+
+  <div class="container">
+    <header class="gallery-head">
+      <div>
+        <h1>گالری آیکون‌های مشخصات خودرو</h1>
+        <p>۷۷۴ آیکون SVG — Tabler، Lucide و مجموعه اختصاصی. عنوان پیشنهادی برای هر آیکون بر اساس کاربرد در کار اینفو.</p>
+      </div>
+      <div class="gallery-head__links">
+        <a href="featured-cars.html">← ماشین‌های منتخب</a>
+        <a href="icons/README.md">راهنمای آیکون‌ها</a>
+      </div>
+    </header>
+
+    <div class="gallery-toolbar">
+      <div class="gallery-toolbar__inner">
+        <label class="gallery-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></svg>
+          <input id="gallery-search" type="search" placeholder="جستجو: سیلندر، توربو، گیربکس، engine، battery…" autocomplete="off" />
+        </label>
+        <div class="gallery-filters" id="gallery-filters" role="tablist" aria-label="فیلتر مجموعه">
+          <button type="button" class="is-active" data-set="all">همه</button>
+          <button type="button" data-set="custom">Custom</button>
+          <button type="button" data-set="tabler">Tabler</button>
+          <button type="button" data-set="tabler-filled">Filled</button>
+          <button type="button" data-set="lucide">Lucide</button>
+        </div>
+        <span class="gallery-stats" id="gallery-stats" aria-live="polite"></span>
+      </div>
+    </div>
+
+    <div class="gallery-grid" id="gallery-grid"></div>
+    <p class="gallery-empty" id="gallery-empty">نتیجه‌ای پیدا نشد. عبارت دیگری امتحان کنید.</p>
+  </div>
+
+  <div class="toast" id="toast" role="status">مسیر کپی شد</div>
+
+  <script src="icon-gallery-data.js"></script>
+  <script>
+    (function () {
+      var data = window.ICON_GALLERY_DATA || [];
+      var grid = document.getElementById('gallery-grid');
+      var searchInput = document.getElementById('gallery-search');
+      var statsEl = document.getElementById('gallery-stats');
+      var emptyEl = document.getElementById('gallery-empty');
+      var toastEl = document.getElementById('toast');
+      var activeSet = 'all';
+      var toastTimer;
+
+      function normalize(str) {
+        return (str || '').toLowerCase().replace(/[\s_-]+/g, ' ').trim();
+      }
+
+      function buildPreview(item) {
+        var wrap = document.createElement('div');
+        wrap.className = 'icon-card__preview';
+        if (item.set === 'custom') {
+          var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          svg.setAttribute('aria-hidden', 'true');
+          var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+          use.setAttribute('href', '#' + item.name);
+          svg.appendChild(use);
+          wrap.appendChild(svg);
+        } else {
+          var img = document.createElement('img');
+          img.src = item.path;
+          img.alt = '';
+          img.loading = 'lazy';
+          img.decoding = 'async';
+          wrap.appendChild(img);
+        }
+        return wrap;
+      }
+
+      function renderCards() {
+        var q = normalize(searchInput.value);
+        var visible = 0;
+        var cards = grid.querySelectorAll('.icon-card');
+
+        cards.forEach(function (card) {
+          var matchSet = activeSet === 'all' || card.dataset.set === activeSet;
+          var haystack = card.dataset.search || '';
+          var matchQuery = !q || haystack.indexOf(q) !== -1;
+          var show = matchSet && matchQuery;
+          card.classList.toggle('is-hidden', !show);
+          if (show) visible++;
+        });
+
+        statsEl.textContent = visible + ' از ' + data.length + ' آیکون';
+        emptyEl.classList.toggle('is-visible', visible === 0);
+      }
+
+      function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('is-visible');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          toastEl.classList.remove('is-visible');
+        }, 1800);
+      }
+
+      function copyPath(path) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(path).then(function () {
+            showToast('مسیر کپی شد: ' + path);
+          }).catch(function () {
+            showToast(path);
+          });
+        } else {
+          showToast(path);
+        }
+      }
+
+      data.forEach(function (item) {
+        var card = document.createElement('article');
+        card.className = 'icon-card';
+        card.dataset.set = item.set;
+        card.dataset.search = normalize([
+          item.name,
+          item.title,
+          item.set,
+          item.setLabel,
+          item.path
+        ].join(' '));
+
+        var preview = buildPreview(item);
+        var title = document.createElement('div');
+        title.className = 'icon-card__title';
+        title.textContent = item.title;
+
+        var name = document.createElement('div');
+        name.className = 'icon-card__name';
+        name.textContent = item.name;
+
+        var meta = document.createElement('div');
+        meta.className = 'icon-card__meta';
+
+        var setBadge = document.createElement('span');
+        setBadge.className = 'icon-card__set' + (item.set === 'custom' ? ' icon-card__set--custom' : item.set === 'tabler-filled' ? ' icon-card__set--tabler-filled' : '');
+        setBadge.textContent = item.setLabel;
+
+        var copyBtn = document.createElement('button');
+        copyBtn.type = 'button';
+        copyBtn.className = 'icon-card__copy';
+        copyBtn.textContent = 'کپی مسیر';
+        copyBtn.addEventListener('click', function () {
+          copyPath(item.path);
+        });
+
+        meta.appendChild(setBadge);
+        meta.appendChild(copyBtn);
+
+        card.appendChild(preview);
+        card.appendChild(title);
+        card.appendChild(name);
+        card.appendChild(meta);
+        grid.appendChild(card);
+      });
+
+      searchInput.addEventListener('input', renderCards);
+
+      document.getElementById('gallery-filters').addEventListener('click', function (e) {
+        var btn = e.target.closest('button[data-set]');
+        if (!btn) return;
+        activeSet = btn.dataset.set;
+        btn.parentElement.querySelectorAll('button').forEach(function (b) {
+          b.classList.toggle('is-active', b === btn);
+        });
+        renderCards();
+      });
+
+      renderCards();
+    })();
+  </script>
+</body>
+</html>

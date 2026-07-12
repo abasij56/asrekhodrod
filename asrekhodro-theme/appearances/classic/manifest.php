@@ -96,6 +96,7 @@ return array(
 						'ak-hero',
 						'ak-asrekhodro-featured',
 						'ak-featured-grid',
+						'ak-featured-cars',
 						'ak-news-list',
 						'ak-magazines',
 						'ak-videos-2',

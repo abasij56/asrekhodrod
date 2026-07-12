@@ -6,6 +6,13 @@
           {% if item.label %}
             <div class="ci-fact__label">{{ item.label }}</div>
           {% endif %}
+          {% if item.icon_svg %}
+            <span class="ci-fact__icon" aria-hidden="true">{{ item.icon_svg|raw }}</span>
+          {% elseif item.icon_sprite and item.icon_url %}
+            <span class="ci-fact__icon" aria-hidden="true"><svg><use href="{{ item.icon_url }}"></use></svg></span>
+          {% elseif item.icon_url %}
+            <span class="ci-fact__icon" aria-hidden="true"><img src="{{ item.icon_url }}" alt="" loading="lazy" decoding="async" /></span>
+          {% endif %}
           {% if item.value %}
             <div class="ci-fact__value">{{ item.value }}</div>
           {% endif %}

@@ -433,6 +433,13 @@ final class ImporterBridge {
 	}
 
 	/**
+	 * Skip DB alt lookup on single news pages — imported gallery images rarely have alt.
+	 */
+	private static function should_resolve_missing_image_alt(): bool {
+		return ! is_singular( 'post' );
+	}
+
+	/**
 	 * @return array{url: string, alt: string}|null
 	 */
 	private static function image_item_from_img_tag( string $tag ): ?array {
@@ -451,7 +458,7 @@ final class ImporterBridge {
 			$alt = trim( html_entity_decode( (string) $alt_match[1], ENT_QUOTES | ENT_HTML5, 'UTF-8' ) );
 		}
 
-		if ( $alt === '' ) {
+		if ( $alt === '' && self::should_resolve_missing_image_alt() ) {
 			$alt = MediaAlt::from_url( $full );
 		}
 
@@ -477,7 +484,7 @@ final class ImporterBridge {
 
 		return array(
 			'url' => $full,
-			'alt' => MediaAlt::from_url( $full ),
+			'alt' => self::should_resolve_missing_image_alt() ? MediaAlt::from_url( $full ) : '',
 		);
 	}
 
@@ -501,7 +508,7 @@ final class ImporterBridge {
 				continue;
 			}
 
-			if ( $alt === '' ) {
+			if ( $alt === '' && self::should_resolve_missing_image_alt() ) {
 				$alt = MediaAlt::from_url( $url );
 			}
 
@@ -741,26 +748,145 @@ final class ImporterBridge {
 		return $content;
 	}
 
+	private static function is_aparat_embed( string $html ): bool {
+		return (bool) preg_match( '/aparat\.com/i', $html );
+	}
+
 	private static function render_inline_embed_figure( string $embed_html, bool $script_embed = false ): string {
 		$embed_html = trim( $embed_html );
 		if ( $embed_html === '' ) {
 			return '';
 		}
 
+		$is_aparat    = self::is_aparat_embed( $embed_html );
 		$player_class = 'ak-video-player';
-		if ( $script_embed ) {
+		if ( $script_embed || $is_aparat ) {
 			$player_class .= ' ak-video-player--embed-script';
+		}
+		if ( $is_aparat ) {
+			$player_class .= ' ak-video-player--aparat';
 		}
 
 		if ( preg_match( '/\bak-video-player\b/i', $embed_html ) ) {
 			$player_html = $embed_html;
+			if ( $is_aparat ) {
+				$player_html = self::ensure_aparat_player_class( $player_html );
+			}
 		} else {
 			$player_html = sprintf( '<div class="%s">%s</div>', esc_attr( $player_class ), $embed_html );
 		}
 
+		if ( ! $is_aparat ) {
+			$player_html = self::defer_inline_embed_media( $player_html, $script_embed );
+		}
+
+		$lazy_attrs   = $is_aparat ? '' : ' data-ak-lazy-embed';
+		$placeholder  = $is_aparat ? '' : '<span class="single-inline-embed__placeholder" aria-hidden="true"></span>';
+		$figure_class = 'single-inline-embed' . ( $is_aparat ? ' single-inline-embed--aparat' : '' );
+
 		return sprintf(
-			'<figure class="single-inline-embed" data-ak-skip-gallery><div class="single-inline-embed__frame">%s</div></figure>',
+			'<figure class="%s" data-ak-skip-gallery%s><div class="single-inline-embed__frame">%s%s</div></figure>',
+			esc_attr( $figure_class ),
+			$lazy_attrs,
+			$placeholder,
 			$player_html
+		);
+	}
+
+	private static function ensure_aparat_player_class( string $html ): string {
+		if ( preg_match( '/\bak-video-player--aparat\b/i', $html ) ) {
+			return $html;
+		}
+
+		$result = preg_replace(
+			'/(\bak-video-player(?:--embed-script)?)(\s|")/i',
+			'$1 ak-video-player--aparat$2',
+			$html,
+			1
+		);
+
+		return is_string( $result ) ? $result : $html;
+	}
+
+	/**
+	 * Defer iframe/video/script media so article text can paint before heavy embeds load.
+	 */
+	private static function defer_inline_embed_media( string $html, bool $script_embed = false ): string {
+		if ( self::is_aparat_embed( $html ) ) {
+			return $html;
+		}
+
+		if ( $script_embed || preg_match( '/<script\b[^>]*\bsrc=["\'][^"\']*aparat\.com/i', $html ) ) {
+			return self::defer_script_embed_media( $html );
+		}
+
+		$html = preg_replace_callback(
+			'/<iframe\b([^>]*)>/i',
+			static function ( array $matches ): string {
+				$attrs = $matches[1];
+
+				if ( ! preg_match( '/\bsrc\s*=\s*(["\'])(.*?)\1/i', $attrs, $src_match ) ) {
+					return $matches[0];
+				}
+
+				$src   = $src_match[2];
+				$attrs = (string) preg_replace( '/\bsrc\s*=\s*(["\']).*?\1/i', '', $attrs );
+				$attrs = (string) preg_replace( '/\bloading\s*=\s*(["\']).*?\1/i', '', $attrs );
+				$attrs = trim( preg_replace( '/\s+/', ' ', $attrs ) ?? $attrs );
+
+				return sprintf(
+					'<iframe %s data-src="%s" loading="lazy" data-ak-lazy-iframe>',
+					$attrs,
+					esc_attr( $src )
+				);
+			},
+			$html
+		) ?? $html;
+
+		$html = preg_replace_callback(
+			'/<video\b([^>]*)>/i',
+			static function ( array $matches ): string {
+				$attrs = $matches[1];
+				$attrs = (string) preg_replace( '/\bpreload\s*=\s*(["\']).*?\1/i', '', $attrs );
+
+				if ( preg_match( '/\bsrc\s*=\s*(["\'])(.*?)\1/i', $attrs, $src_match ) ) {
+					$src   = $src_match[2];
+					$attrs = (string) preg_replace( '/\bsrc\s*=\s*(["\']).*?\1/i', '', $attrs );
+					$attrs = trim( preg_replace( '/\s+/', ' ', $attrs ) ?? $attrs );
+
+					return sprintf(
+						'<video %s preload="none" data-src="%s" data-ak-lazy-video>',
+						$attrs,
+						esc_attr( $src )
+					);
+				}
+
+				$attrs = trim( preg_replace( '/\s+/', ' ', $attrs ) ?? $attrs );
+
+				return sprintf( '<video %s preload="none" data-ak-lazy-video>', $attrs );
+			},
+			$html
+		) ?? $html;
+
+		return $html;
+	}
+
+	/**
+	 * Keep Aparat (and similar) script embeds inert until JS hydrates them near the viewport.
+	 */
+	private static function defer_script_embed_media( string $html ): string {
+		$inner = $html;
+		if ( preg_match( '/\bak-video-player\b/i', $html ) ) {
+			if ( preg_match( '#<div\b[^>]*\bak-video-player\b[^>]*>(.*)</div>\s*$#is', $html, $match ) ) {
+				$inner = trim( $match[1] );
+			}
+		}
+
+		return sprintf(
+			'<div class="ak-video-player ak-video-player--embed-script ak-video-player--lazy" data-ak-lazy-script>'
+			. '<template>%s</template>'
+			. '</div>',
+			$inner
 		);
 	}
 

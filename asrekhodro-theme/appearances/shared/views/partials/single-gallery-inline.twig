@@ -1,3 +1,7 @@
+{#
+  All gallery tiles use data-src so article text can paint before image bandwidth.
+  Hydrated by initSingleContentLazyMedia() via IntersectionObserver after idle.
+#}
 <div
   class="single-gallery single-gallery--inline"
 >
@@ -9,16 +13,19 @@
     {% for image in image_items %}
       <button
         type="button"
-        class="single-gallery__tile{% if loop.first and image_items|length > 2 %} single-gallery__tile--lead{% endif %}"
+        class="single-gallery__tile"
         data-news-gallery-open
         data-gallery-index="{{ loop.index0 }}"
         aria-label="نمایش تصویر {{ loop.index }} از {{ image_items|length }}"
       >
         <img
-          src="{{ image.url }}"
+          class="is-lazy"
+          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 427'%3E%3C/svg%3E"
+          data-src="{{ image.url }}"
+          data-ak-lazy-img
           alt="{{ image.alt|e('html_attr') }}"
-          width="640"
-          height="427"
+          width="160"
+          height="107"
           loading="lazy"
           decoding="async"
         />

@@ -120,6 +120,191 @@ final class CarsInfoDirectory {
 		return $models;
 	}
 
+	/**
+	 * Featured-car cards (brand logo + up to 3 card specs) for the ماشین‌های منتخب block.
+	 *
+	 * @param list<int> $post_ids
+	 * @return list<array<string, mixed>>
+	 */
+	public static function featured_cards( array $post_ids ): array {
+		if ( $post_ids === array() ) {
+			return array();
+		}
+
+		$country_root = CarsInfo::country_category_id();
+		$cards        = array();
+
+		foreach ( $post_ids as $post_id ) {
+			$post = get_post( (int) $post_id );
+			if ( ! $post instanceof \WP_Post || $post->post_type !== 'carsinfo' || $post->post_status !== 'publish' ) {
+				continue;
+			}
+
+			$cards[] = self::featured_card( $post, $country_root );
+		}
+
+		return $cards;
+	}
+
+	/**
+	 * @return list<array<string, mixed>>
+	 */
+	public static function latest_featured_cards( int $count, int $category = 0 ): array {
+		$count = max( 1, min( 24, $count ) );
+
+		$args = array(
+			'post_type'              => 'carsinfo',
+			'post_status'            => 'publish',
+			'posts_per_page'         => $count,
+			'orderby'                => 'date',
+			'order'                  => 'DESC',
+			'ignore_sticky_posts'    => true,
+			'no_found_rows'          => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => true,
+		);
+
+		if ( $category > 0 ) {
+			$args['cat'] = $category;
+		}
+
+		$posts        = get_posts( $args );
+		$country_root = CarsInfo::country_category_id();
+		$cards        = array();
+
+		foreach ( (array) $posts as $post ) {
+			if ( $post instanceof \WP_Post ) {
+				$cards[] = self::featured_card( $post, $country_root );
+			}
+		}
+
+		return $cards;
+	}
+
+	/**
+	 * @return array<string, mixed>
+	 */
+	private static function featured_card( \WP_Post $post, int $country_root ): array {
+		$model      = self::format_model( $post, $country_root );
+		$brand_root = CarsInfo::brand_category_id();
+		$brand      = $brand_root > 0 ? self::post_brand_term( (int) $post->ID, $brand_root, $country_root ) : null;
+
+		$model['brand'] = $brand instanceof \WP_Term
+			? array(
+				'id'   => (int) $brand->term_id,
+				'name' => (string) $brand->name,
+				'abbr' => self::abbr( (string) $brand->name ),
+				'logo' => ThemeCategories::term_directory_logo( (int) $brand->term_id, (string) $brand->name ),
+			)
+			: array(
+				'id'   => 0,
+				'name' => '',
+				'abbr' => '',
+				'logo' => array( 'url' => '', 'alt' => '', 'width' => 0, 'height' => 0 ),
+			);
+
+		$model['specs'] = self::card_specs( (int) $post->ID, (string) $post->post_content );
+
+		return $model;
+	}
+
+	/**
+	 * Up to 3 card specs pulled from the cinfo-facts block (items flagged «نمایش در کارت»).
+	 *
+	 * @return list<array<string, mixed>>
+	 */
+	private static function card_specs( int $post_id, string $content ): array {
+		$rows = self::fact_rows_from_content( $content );
+		if ( $rows === array() ) {
+			return array();
+		}
+
+		$ctx   = \AsreKhodro\Theme\AcfBlocks\CinfoFacts\View::context( array( 'fact_items' => $rows ) );
+		$items = is_array( $ctx['facts_items'] ?? null ) ? $ctx['facts_items'] : array();
+
+		$specs = array();
+		foreach ( $items as $item ) {
+			if ( empty( $item['show_in_card'] ) ) {
+				continue;
+			}
+
+			$text = trim( (string) ( $item['value'] ?? '' ) );
+			if ( $text === '' ) {
+				$text = trim( (string) ( $item['label'] ?? '' ) );
+			}
+			if ( $text === '' ) {
+				continue;
+			}
+
+			$specs[] = array(
+				'text'        => $text,
+				'label'       => (string) ( $item['label'] ?? '' ),
+				'icon_url'    => (string) ( $item['icon_url'] ?? '' ),
+				'icon_sprite' => ! empty( $item['icon_sprite'] ),
+				'icon_svg'    => (string) ( $item['icon_svg'] ?? '' ),
+			);
+
+			if ( count( $specs ) >= 3 ) {
+				break;
+			}
+		}
+
+		return $specs;
+	}
+
+	/**
+	 * Reconstruct cinfo-facts repeater rows from a post's block content.
+	 *
+	 * @return list<array<string, mixed>>
+	 */
+	private static function fact_rows_from_content( string $content ): array {
+		if ( $content === '' || ! function_exists( 'parse_blocks' ) ) {
+			return array();
+		}
+
+		$rows = array();
+		foreach ( parse_blocks( $content ) as $block ) {
+			if ( is_array( $block ) ) {
+				$rows = array_merge( $rows, self::fact_rows_from_block( $block ) );
+			}
+		}
+
+		return $rows;
+	}
+
+	/**
+	 * @param array<string, mixed> $block
+	 * @return list<array<string, mixed>>
+	 */
+	private static function fact_rows_from_block( array $block ): array {
+		$rows = array();
+
+		if ( ( $block['blockName'] ?? '' ) === 'acf/cinfo-facts' ) {
+			$data = $block['attrs']['data'] ?? array();
+			if ( is_array( $data ) ) {
+				$count = (int) ( $data['fact_items'] ?? 0 );
+				for ( $i = 0; $i < $count; $i++ ) {
+					$p      = 'fact_items_' . $i . '_';
+					$rows[] = array(
+						'item_label'    => (string) ( $data[ $p . 'item_label' ] ?? '' ),
+						'item_value'    => (string) ( $data[ $p . 'item_value' ] ?? '' ),
+						'item_icon'     => (string) ( $data[ $p . 'item_icon' ] ?? '' ),
+						'item_icon_svg' => (string) ( $data[ $p . 'item_icon_svg' ] ?? '' ),
+						'show_in_card'  => ! empty( $data[ $p . 'show_in_card' ] ),
+					);
+				}
+			}
+		}
+
+		foreach ( (array) ( $block['innerBlocks'] ?? array() ) as $inner ) {
+			if ( is_array( $inner ) ) {
+				$rows = array_merge( $rows, self::fact_rows_from_block( $inner ) );
+			}
+		}
+
+		return $rows;
+	}
+
 	private static function empty_hint( int $brand_root, int $country_root ): string {
 		$published = self::published_carsinfo_posts();
 		if ( $published === array() ) {
