@@ -61,6 +61,7 @@ final class LayoutSchema {
 		'page_car'      => 'صفحه خودرو',
 		'page_carsinfo_directory' => 'دانشنامه خودرو',
 		'carsinfo_3d2'  => 'اطلاعات خودرو — 3D2',
+		'carsinfo_2d'   => 'اطلاعات خودرو — 2D',
 		'not_found'     => 'صفحه ۴۰۴',
 	);
 

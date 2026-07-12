@@ -1,0 +1,43 @@
+{% extends 'base.twig' %}
+
+{% set sidebar_placements = layout_zones.sidebar ?? [] %}
+{% set carinfo2d_has_sidebar = sidebar_placements|filter(p => p.partial)|length > 0 %}
+
+{% block before_main %}
+  {% include 'partials/layout-zone.twig' with { zone: 'before_main' } %}
+{% endblock %}
+
+{% block content %}
+<main class="carinfo2d-main" id="carinfo2d-main">
+  {{ carsinfo_content|raw }}
+
+  {% set main_placements = layout_zones.main ?? [] %}
+  {% if main_placements|filter(p => p.partial)|length > 0 %}
+    <div class="carinfo2d-zone carinfo2d-zone--main" data-carinfo2d-zone="main">
+      {% include 'partials/layout-zone.twig' with { zone: 'main' } %}
+    </div>
+  {% endif %}
+
+  {% set main_after_placements = layout_zones.main_after ?? [] %}
+  {% if main_after_placements|filter(p => p.partial)|length > 0 %}
+    <div class="carinfo2d-zone carinfo2d-zone--main-after" data-carinfo2d-zone="main-after">
+      {% include 'partials/layout-zone.twig' with { zone: 'main_after' } %}
+    </div>
+  {% endif %}
+</main>
+
+{% if carinfo2d_has_sidebar %}
+  <template id="carinfo2d-sidebar-template">
+    {% include 'partials/layout-zone.twig' with { zone: 'sidebar' } %}
+  </template>
+{% endif %}
+
+{% set after_main_placements = layout_zones.after_main ?? [] %}
+{% if after_main_placements|filter(p => p.partial)|length > 0 %}
+  <div class="carinfo2d-after-main">
+    {% include 'partials/layout-zone.twig' with { zone: 'after_main' } %}
+  </div>
+{% endif %}
+
+{% include 'partials/cinfo/car-lightbox.twig' %}
+{% endblock %}

@@ -13,7 +13,7 @@
           comments_section_id: (block.anchor|default(comments_default_anchor)) ~ '-panel',
           comments_custom_title: comments_title,
           comments_modifier_class: 'ak-comments--cinfo',
-          comments_show_head: 'carinfo3d2-page' not in body_class|default('')
+          comments_show_head: ('carinfo3d2-page' not in body_class|default('')) and ('carinfo2d-page' not in body_class|default(''))
         } %}
       </div>
     </div>

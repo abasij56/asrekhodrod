@@ -15,6 +15,10 @@ final class CarSpecIcons {
 
 	private const SPRITE_FILE = 'custom/car-spec-icons.svg';
 
+	public const ADMIN_INITIAL_LIMIT = 10;
+
+	public const ADMIN_PAGE_SIZE = 20;
+
 	/** @var list<array{id: string, set: string, name: string, title: string, url: string, sprite: bool}>|null */
 	private static ?array $catalog = null;
 
@@ -26,10 +30,28 @@ final class CarSpecIcons {
 			return self::$catalog;
 		}
 
-		self::$catalog = array();
+		$cache_key = self::catalog_cache_key();
+		$cached    = get_transient( $cache_key );
+		if ( is_array( $cached ) ) {
+			self::$catalog = $cached;
+
+			return self::$catalog;
+		}
+
+		self::$catalog = self::build_catalog();
+		set_transient( $cache_key, self::$catalog, DAY_IN_SECONDS );
+
+		return self::$catalog;
+	}
+
+	/**
+	 * @return list<array{id: string, set: string, name: string, title: string, url: string, sprite: bool}>
+	 */
+	private static function build_catalog(): array {
+		$catalog = array();
 
 		foreach ( self::custom_icons() as $item ) {
-			self::$catalog[] = $item;
+			$catalog[] = $item;
 		}
 
 		foreach ( array( 'tabler', 'lucide', 'tabler-filled' ) as $set ) {
@@ -51,7 +73,7 @@ final class CarSpecIcons {
 					continue;
 				}
 
-				self::$catalog[] = array(
+				$catalog[] = array(
 					'id'     => $set . '/' . $name,
 					'set'    => $set,
 					'name'   => $name,
@@ -62,27 +84,139 @@ final class CarSpecIcons {
 			}
 		}
 
-		return self::$catalog;
+		return $catalog;
+	}
+
+	private static function catalog_cache_key(): string {
+		$parts = array( ASREKHODRO_THEME_VERSION );
+
+		foreach ( array( 'custom', 'tabler', 'lucide', 'tabler-filled' ) as $set ) {
+			$dir = self::DIR . '/' . $set;
+			if ( ! is_dir( $dir ) ) {
+				continue;
+			}
+
+			$parts[] = $set . ':' . (string) filemtime( $dir );
+			$files   = glob( $dir . '/*.svg' ) ?: array();
+			$parts[] = (string) count( $files );
+		}
+
+		return 'ak_car_spec_icons_' . md5( implode( '|', $parts ) );
+	}
+
+	/**
+	 * Fast picker bootstrap — custom icons only (no SVG directory scan).
+	 *
+	 * @return list<array<string, mixed>>
+	 */
+	public static function quick_initial_admin_items( int $limit = self::ADMIN_INITIAL_LIMIT ): array {
+		$items = array();
+
+		foreach ( self::custom_icons() as $item ) {
+			$items[] = self::format_admin_item( $item );
+			if ( count( $items ) >= $limit ) {
+				break;
+			}
+		}
+
+		return $items;
+	}
+	/**
+	 * @return array{items: list<array<string, mixed>>, total: int, has_more: bool, next_offset: int}
+	 */
+	public static function query_admin_items( string $query = '', int $offset = 0, int $limit = self::ADMIN_PAGE_SIZE, string $include_id = '' ): array {
+		$offset = max( 0, $offset );
+		$limit  = max( 1, min( 50, $limit ) );
+		$query  = mb_strtolower( trim( $query ) );
+
+		$matches = array();
+		foreach ( self::catalog() as $item ) {
+			if ( $query === '' || self::item_matches_query( $item, $query ) ) {
+				$matches[] = $item;
+			}
+		}
+
+		$include_item = null;
+		$include_id   = sanitize_text_field( $include_id );
+		if ( $include_id !== '' ) {
+			$include_item = self::item_for_id( $include_id );
+		}
+
+		$total = count( $matches );
+		$slice = array_slice( $matches, $offset, $limit );
+		$items = array();
+
+		if ( $offset === 0 && $include_item !== null ) {
+			$items[] = self::format_admin_item( $include_item );
+		}
+
+		foreach ( $slice as $item ) {
+			if ( $include_item !== null && (string) $item['id'] === (string) $include_item['id'] ) {
+				continue;
+			}
+
+			$items[] = self::format_admin_item( $item );
+		}
+
+		return array(
+			'items'       => $items,
+			'total'       => $total,
+			'has_more'    => ( $offset + $limit ) < $total,
+			'next_offset' => $offset + $limit,
+		);
+	}
+
+	/**
+	 * @param array<string, mixed> $item
+	 */
+	private static function item_matches_query( array $item, string $query ): bool {
+		if ( $query === '' ) {
+			return true;
+		}
+
+		$haystack = array(
+			(string) ( $item['title'] ?? '' ),
+			(string) ( $item['name'] ?? '' ),
+			(string) ( $item['id'] ?? '' ),
+			(string) ( $item['set'] ?? '' ),
+			self::set_label( (string) ( $item['set'] ?? '' ) ),
+		);
+
+		foreach ( $haystack as $part ) {
+			if ( $part !== '' && mb_strpos( mb_strtolower( $part ), $query ) !== false ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param array<string, mixed> $item
+	 * @return array<string, mixed>
+	 */
+	public static function format_admin_item( array $item ): array {
+		$id = (string) ( $item['id'] ?? '' );
+
+		return array(
+			'id'       => $id,
+			'set'      => (string) ( $item['set'] ?? '' ),
+			'name'     => (string) ( $item['name'] ?? '' ),
+			'title'    => (string) ( $item['title'] ?? '' ),
+			'url'      => (string) ( $item['url'] ?? '' ),
+			'sprite'   => ! empty( $item['sprite'] ),
+			'symbol'   => str_starts_with( $id, 'custom/' ) ? substr( $id, 7 ) : '',
+			'setLabel' => self::set_label( (string) ( $item['set'] ?? '' ) ),
+		);
 	}
 
 	/**
 	 * @return array<string, string>
 	 */
 	public static function acf_choices(): array {
-		$choices = array(
+		return array(
 			'' => __( '— بدون آیکون —', 'asrekhodro' ),
 		);
-
-		foreach ( self::catalog() as $item ) {
-			$choices[ (string) $item['id'] ] = sprintf(
-				'%s — %s (%s)',
-				(string) $item['title'],
-				(string) $item['name'],
-				self::set_label( (string) $item['set'] )
-			);
-		}
-
-		return $choices;
 	}
 
 	/**
@@ -134,12 +268,7 @@ final class CarSpecIcons {
 		$items = array();
 
 		foreach ( self::catalog() as $item ) {
-			$row            = $item;
-			$row['symbol']  = str_starts_with( (string) $item['id'], 'custom/' )
-				? substr( (string) $item['id'], 7 )
-				: '';
-			$row['setLabel'] = self::set_label( (string) $item['set'] );
-			$items[]        = $row;
+			$items[] = self::format_admin_item( $item );
 		}
 
 		return $items;

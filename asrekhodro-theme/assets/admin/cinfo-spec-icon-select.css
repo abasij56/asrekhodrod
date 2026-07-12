@@ -169,6 +169,20 @@
   color: #646970;
 }
 
+.ak-cinfo-icon-picker__status,
+.ak-cinfo-icon-picker__more {
+  margin: 0;
+  padding: 0.55rem 0.65rem;
+  color: #646970;
+  font-size: 12px;
+  text-align: center;
+  list-style: none;
+}
+
+.ak-cinfo-icon-picker__more {
+  border-top: 1px solid #f0f0f1;
+}
+
 .acf-field[data-key="field_cinfo_hero_rate_item_show_in_card"] .acf-label label,
 .acf-field[data-key="field_cinfo_facts_item_show_in_card"] .acf-label label {
   font-weight: 600;

@@ -63,6 +63,13 @@ final class EmbedSanitizer {
 				'id'    => true,
 				'style' => true,
 			),
+			'span'   => array(
+				'class' => true,
+				'style' => true,
+			),
+			'style'  => array(
+				'type' => true,
+			),
 			'video'  => array(
 				'src'         => true,
 				'controls'    => true,

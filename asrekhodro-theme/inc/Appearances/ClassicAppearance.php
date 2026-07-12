@@ -134,6 +134,26 @@ class ClassicAppearance {
 					)
 				);
 			}
+
+			if ( CarInfo3d::is_2d_template() ) {
+				wp_enqueue_style(
+					'asrekhodro-carinfo2d',
+					Appearance::asset_url( 'css/carinfo2d.css' ),
+					array( 'asrekhodro-car-page' ),
+					ASREKHODRO_THEME_VERSION
+				);
+
+				wp_enqueue_script(
+					'asrekhodro-carinfo2d',
+					Appearance::asset_url( 'js/carinfo2d.js' ),
+					array(),
+					ASREKHODRO_THEME_VERSION,
+					array(
+						'strategy'  => 'defer',
+						'in_footer' => true,
+					)
+				);
+			}
 		}
 
 		if ( CarInfo3d::is_3d_template() ) {
