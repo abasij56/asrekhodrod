@@ -22,6 +22,17 @@
               {% elseif car.brand.abbr %}
                 <span class="review-card__brand" aria-hidden="true">{{ car.brand.abbr }}</span>
               {% endif %}
+              {% if car.rates|length > 0 %}
+                <div class="review-card__rates" aria-hidden="true">
+                  {% for rate in car.rates %}
+                    <div class="review-card__rate">
+                      <span class="review-card__rate-title">{{ rate.title }}</span>
+                      <span class="review-card__rate-bar"><span style="width:{{ rate.bar_width }}%"></span></span>
+                      <span class="review-card__rate-value">{{ rate.rate_label }}</span>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
             </div>
             <div class="review-card__body">
               <h3>{{ car.title }}</h3>
@@ -37,7 +48,7 @@
                       {% elseif spec.icon_sprite and spec.icon_url %}
                         <span class="review-card__spec-icon" aria-hidden="true"><svg class="ak-icon"><use href="{{ spec.icon_url }}"></use></svg></span>
                       {% elseif spec.icon_url %}
-                        <span class="review-card__spec-icon" aria-hidden="true"><img src="{{ spec.icon_url }}" alt="" loading="lazy" decoding="async" /></span>
+                        <span class="review-card__spec-icon" aria-hidden="true"><span class="review-card__spec-mask" style="--ak-mask:url('{{ spec.icon_url }}')"></span></span>
                       {% endif %}
                       <span class="review-card__spec-label">{{ spec.text }}</span>
                     </div>

@@ -203,7 +203,9 @@ final class CarsInfoDirectory {
 				'logo' => array( 'url' => '', 'alt' => '', 'width' => 0, 'height' => 0 ),
 			);
 
-		$model['specs'] = self::card_specs( (int) $post->ID, (string) $post->post_content );
+		$content        = (string) $post->post_content;
+		$model['specs'] = self::card_specs( $content );
+		$model['rates'] = self::card_rates( $content );
 
 		return $model;
 	}
@@ -213,8 +215,22 @@ final class CarsInfoDirectory {
 	 *
 	 * @return list<array<string, mixed>>
 	 */
-	private static function card_specs( int $post_id, string $content ): array {
-		$rows = self::fact_rows_from_content( $content );
+	private static function card_specs( string $content ): array {
+		$rows = array();
+		foreach ( self::block_data_sets( $content, 'acf/cinfo-facts' ) as $data ) {
+			$count = (int) ( $data['fact_items'] ?? 0 );
+			for ( $i = 0; $i < $count; $i++ ) {
+				$p      = 'fact_items_' . $i . '_';
+				$rows[] = array(
+					'item_label'    => (string) ( $data[ $p . 'item_label' ] ?? '' ),
+					'item_value'    => (string) ( $data[ $p . 'item_value' ] ?? '' ),
+					'item_icon'     => (string) ( $data[ $p . 'item_icon' ] ?? '' ),
+					'item_icon_svg' => (string) ( $data[ $p . 'item_icon_svg' ] ?? '' ),
+					'show_in_card'  => ! empty( $data[ $p . 'show_in_card' ] ),
+				);
+			}
+		}
+
 		if ( $rows === array() ) {
 			return array();
 		}
@@ -253,56 +269,94 @@ final class CarsInfoDirectory {
 	}
 
 	/**
-	 * Reconstruct cinfo-facts repeater rows from a post's block content.
+	 * Up to 4 rate rows pulled from the cinfo-hero block (items flagged «نمایش در کارت»).
 	 *
 	 * @return list<array<string, mixed>>
 	 */
-	private static function fact_rows_from_content( string $content ): array {
+	private static function card_rates( string $content ): array {
+		$rows = array();
+		foreach ( self::block_data_sets( $content, 'acf/cinfo-hero' ) as $data ) {
+			$count = (int) ( $data['rate_items'] ?? 0 );
+			for ( $i = 0; $i < $count; $i++ ) {
+				$p      = 'rate_items_' . $i . '_';
+				$rows[] = array(
+					'item_title'   => (string) ( $data[ $p . 'item_title' ] ?? '' ),
+					'item_rate'    => (string) ( $data[ $p . 'item_rate' ] ?? '' ),
+					'show_in_card' => ! empty( $data[ $p . 'show_in_card' ] ),
+				);
+			}
+		}
+
+		if ( $rows === array() ) {
+			return array();
+		}
+
+		$ctx   = \AsreKhodro\Theme\AcfBlocks\CinfoHero\View::context( array( 'rate_items' => $rows ) );
+		$items = is_array( $ctx['hero_rate_items'] ?? null ) ? $ctx['hero_rate_items'] : array();
+
+		$rates = array();
+		foreach ( $items as $item ) {
+			if ( empty( $item['show_in_card'] ) ) {
+				continue;
+			}
+
+			$title = trim( (string) ( $item['title'] ?? '' ) );
+			if ( $title === '' ) {
+				continue;
+			}
+
+			$rates[] = array(
+				'title'      => $title,
+				'rate_label' => (string) ( $item['rate_label'] ?? '' ),
+				'bar_width'  => (float) ( $item['bar_width'] ?? 0 ),
+			);
+
+			if ( count( $rates ) >= 4 ) {
+				break;
+			}
+		}
+
+		return $rates;
+	}
+
+	/**
+	 * Collect flattened ACF block data arrays for every instance of a block in post content.
+	 *
+	 * @return list<array<string, mixed>>
+	 */
+	private static function block_data_sets( string $content, string $block_name ): array {
 		if ( $content === '' || ! function_exists( 'parse_blocks' ) ) {
 			return array();
 		}
 
-		$rows = array();
-		foreach ( parse_blocks( $content ) as $block ) {
-			if ( is_array( $block ) ) {
-				$rows = array_merge( $rows, self::fact_rows_from_block( $block ) );
-			}
-		}
+		$sets = array();
+		self::collect_block_data( parse_blocks( $content ), $block_name, $sets );
 
-		return $rows;
+		return $sets;
 	}
 
 	/**
-	 * @param array<string, mixed> $block
-	 * @return list<array<string, mixed>>
+	 * @param array<int, mixed>          $blocks
+	 * @param list<array<string, mixed>> $sets
 	 */
-	private static function fact_rows_from_block( array $block ): array {
-		$rows = array();
+	private static function collect_block_data( array $blocks, string $block_name, array &$sets ): void {
+		foreach ( $blocks as $block ) {
+			if ( ! is_array( $block ) ) {
+				continue;
+			}
 
-		if ( ( $block['blockName'] ?? '' ) === 'acf/cinfo-facts' ) {
-			$data = $block['attrs']['data'] ?? array();
-			if ( is_array( $data ) ) {
-				$count = (int) ( $data['fact_items'] ?? 0 );
-				for ( $i = 0; $i < $count; $i++ ) {
-					$p      = 'fact_items_' . $i . '_';
-					$rows[] = array(
-						'item_label'    => (string) ( $data[ $p . 'item_label' ] ?? '' ),
-						'item_value'    => (string) ( $data[ $p . 'item_value' ] ?? '' ),
-						'item_icon'     => (string) ( $data[ $p . 'item_icon' ] ?? '' ),
-						'item_icon_svg' => (string) ( $data[ $p . 'item_icon_svg' ] ?? '' ),
-						'show_in_card'  => ! empty( $data[ $p . 'show_in_card' ] ),
-					);
+			if ( ( $block['blockName'] ?? '' ) === $block_name ) {
+				$data = $block['attrs']['data'] ?? array();
+				if ( is_array( $data ) ) {
+					$sets[] = $data;
 				}
 			}
-		}
 
-		foreach ( (array) ( $block['innerBlocks'] ?? array() ) as $inner ) {
-			if ( is_array( $inner ) ) {
-				$rows = array_merge( $rows, self::fact_rows_from_block( $inner ) );
+			$inner = $block['innerBlocks'] ?? array();
+			if ( is_array( $inner ) && $inner !== array() ) {
+				self::collect_block_data( $inner, $block_name, $sets );
 			}
 		}
-
-		return $rows;
 	}
 
 	private static function empty_hint( int $brand_root, int $country_root ): string {

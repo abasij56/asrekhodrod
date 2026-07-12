@@ -4264,6 +4264,78 @@ address {
   object-fit: contain;
 }
 
+/* Rate items overlay — slides in from the left over the image on hover */
+.review-card__rates {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.9rem 1rem;
+  background: rgba(15, 17, 22, 0.5);
+  backdrop-filter: blur(7px) saturate(120%);
+  -webkit-backdrop-filter: blur(7px) saturate(120%);
+  opacity: 0;
+  transform: translateX(-100%);
+  transition:
+    transform 0.42s cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.review-card--car:hover .review-card__rates,
+.review-card--car:focus-within .review-card__rates {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.review-card__rate {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.review-card__rate-title {
+  white-space: nowrap;
+}
+
+.review-card__rate-bar {
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  overflow: hidden;
+}
+
+.review-card__rate-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--brand), #ff5a4d);
+}
+
+.review-card__rate-value {
+  font-weight: 800;
+}
+
+@media (hover: none) {
+  .review-card__rates {
+    position: static;
+    opacity: 1;
+    transform: none;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    display: none;
+  }
+}
+
 .review-card--car .review-card__body {
   display: flex;
   flex-direction: column;
@@ -4324,15 +4396,26 @@ address {
 
 .review-card__spec-icon svg,
 .review-card__spec-icon img {
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
   object-fit: contain;
+  color: var(--brand);
 }
 
 .review-card__spec-icon .ak-icon {
   display: block;
-  width: 100%;
-  height: 100%;
+  width: 16px;
+  height: 16px;
+}
+
+/* File-based (Tabler/Lucide) icons: recolor + size via mask so all specs match */
+.review-card__spec-mask {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background-color: var(--brand);
+  -webkit-mask: var(--ak-mask) center / contain no-repeat;
+  mask: var(--ak-mask) center / contain no-repeat;
 }
 
 .review-card__spec-label {
