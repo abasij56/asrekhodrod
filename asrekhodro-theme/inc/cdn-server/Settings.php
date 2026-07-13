@@ -80,6 +80,100 @@ final class Settings {
 	private static function fields(): array {
 		$defaults = Config::defaults();
 
+		return array_merge( self::watermark_fields(), self::cdn_fields( $defaults ) );
+	}
+
+	/**
+	 * Watermark tab — placed above CDN Server.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	private static function watermark_fields(): array {
+		$when_enabled = array(
+			array(
+				array(
+					'field'    => 'field_ak_site_watermark_enabled',
+					'operator' => '==',
+					'value'    => '1',
+				),
+			),
+		);
+
+		return array(
+			array(
+				'key'       => 'field_ak_watermark_tab',
+				'label'     => __( 'واترمارک', 'asrekhodro' ),
+				'name'      => '',
+				'type'      => 'tab',
+				'placement' => 'left',
+			),
+			array(
+				'key'           => 'field_ak_site_watermark_enabled',
+				'label'         => __( 'افزودن واترمارک به تصاویر', 'asrekhodro' ),
+				'name'          => 'site_watermark_enabled',
+				'type'          => 'true_false',
+				'ui'            => 1,
+				'ui_on_text'    => __( 'فعال', 'asrekhodro' ),
+				'ui_off_text'   => __( 'غیرفعال', 'asrekhodro' ),
+				'default_value' => 0,
+				'instructions'  => __( 'با فعال شدن، هنگام آپلود تصویر به CDN واترمارک روی عکس ادغام می‌شود.', 'asrekhodro' ),
+			),
+			array(
+				'key'               => 'field_ak_site_watermark',
+				'label'             => __( 'تصویر واترمارک', 'asrekhodro' ),
+				'name'              => 'site_watermark',
+				'type'              => 'image',
+				'return_format'     => 'id',
+				'preview_size'      => 'medium',
+				'mime_types'        => 'png,webp',
+				'instructions'      => __( 'PNG با پس‌زمینه شفاف توصیه می‌شود.', 'asrekhodro' ),
+				'conditional_logic' => $when_enabled,
+			),
+			array(
+				'key'               => 'field_ak_site_watermark_position',
+				'label'             => __( 'موقعیت واترمارک', 'asrekhodro' ),
+				'name'              => 'site_watermark_position',
+				'type'              => 'select',
+				'choices'           => array(
+					'bottom_left'  => __( 'پایین چپ', 'asrekhodro' ),
+					'bottom_right' => __( 'پایین راست', 'asrekhodro' ),
+					'top_left'     => __( 'بالا چپ', 'asrekhodro' ),
+					'top_right'    => __( 'بالا راست', 'asrekhodro' ),
+				),
+				'default_value'     => 'bottom_left',
+				'ui'                => 1,
+				'conditional_logic' => $when_enabled,
+			),
+			array(
+				'key'               => 'field_ak_site_watermark_opacity',
+				'label'             => __( 'شفافیت واترمارک (٪)', 'asrekhodro' ),
+				'name'              => 'site_watermark_opacity',
+				'type'              => 'number',
+				'default_value'     => 70,
+				'min'               => 10,
+				'max'               => 100,
+				'step'              => 5,
+				'conditional_logic' => $when_enabled,
+			),
+			array(
+				'key'               => 'field_ak_site_watermark_margin',
+				'label'             => __( 'فاصله واترمارک از لبه (پیکسل)', 'asrekhodro' ),
+				'name'              => 'site_watermark_margin',
+				'type'              => 'number',
+				'default_value'     => 16,
+				'min'               => 0,
+				'max'               => 120,
+				'step'              => 1,
+				'conditional_logic' => $when_enabled,
+			),
+		);
+	}
+
+	/**
+	 * @param array<string, mixed> $defaults
+	 * @return array<int, array<string, mixed>>
+	 */
+	private static function cdn_fields( array $defaults ): array {
 		return array(
 			array(
 				'key'       => 'field_ak_cdn_tab',

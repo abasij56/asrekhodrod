@@ -112,7 +112,7 @@ final class Theme {
 	 * @return array<string, mixed>
 	 */
 	public static function global_context( array $context ): array {
-		$context['site']            = \Timber\Timber::context()['site'] ?? $context['site'] ?? null;
+		$context['site']            = $context['site'] ?? null;
 		$context['theme_uri']       = ASREKHODRO_THEME_URI;
 		$context['appearance_id']   = Appearance::id();
 		$context['appearance_uri']  = Appearance::uri();

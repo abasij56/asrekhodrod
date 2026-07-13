@@ -45,6 +45,20 @@ final class Uploader {
 		$tmp_path      = (string) $file['tmp_name'];
 		$original_name = (string) $file['name'];
 		$mime_type     = $validated['mime'];
+		$upload_path   = $tmp_path;
+		$temp_wm_path  = '';
+
+		if ( Watermark::should_apply( $mime_type ) ) {
+			$watermarked = Watermark::apply( $tmp_path, $mime_type );
+			if ( is_wp_error( $watermarked ) ) {
+				if ( apply_filters( 'ak_cdn_watermark_fail_upload', false, $watermarked, $file ) ) {
+					return $watermarked;
+				}
+			} elseif ( is_string( $watermarked ) && $watermarked !== '' && $watermarked !== $tmp_path ) {
+				$upload_path  = $watermarked;
+				$temp_wm_path = $watermarked;
+			}
+		}
 
 		$canonical    = PathBuilder::build_canonical_relative_path( $original_name, $mime_type );
 		$ftp_relative = PathBuilder::ftp_relative_from_canonical( $canonical );
@@ -57,15 +71,18 @@ final class Uploader {
 			'logical_absolute'   => $absolute,
 			'public_url'         => $public_url,
 			'configured_base'    => Config::remote_base_path(),
+			'watermark_applied' => $temp_wm_path !== '',
 		);
 
 		$connection = self::make_connection();
 		if ( is_wp_error( $connection ) ) {
+			self::cleanup_watermark_temp( $temp_wm_path );
 			return $connection;
 		}
 
-		$result = $connection->upload( $tmp_path, $absolute );
+		$result = $connection->upload( $upload_path, $absolute );
 		self::merge_connection_debug( $connection );
+		self::cleanup_watermark_temp( $temp_wm_path );
 
 		if ( is_wp_error( $result ) ) {
 			self::merge_error_debug( $result );
@@ -246,6 +263,12 @@ final class Uploader {
 		}
 
 		return $rows;
+	}
+
+	private static function cleanup_watermark_temp( string $path ): void {
+		if ( $path !== '' && is_file( $path ) ) {
+			wp_delete_file( $path );
+		}
 	}
 
 	private static function merge_connection_debug( ConnectionInterface $connection ): void {

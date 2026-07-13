@@ -52,9 +52,14 @@ final class FooterSocial {
 			return $value;
 		}
 
-		$options = function_exists( 'get_fields' ) ? ( get_fields( 'option' ) ?: array() ) : array();
-		if ( ! is_array( $options ) ) {
-			return $value;
+		// Do not call get_fields() here — this runs during get_fields()/get_field()
+		// and would recurse until Apache crashes (stack overflow).
+		$options = array();
+		foreach ( self::LEGACY_NETWORKS as $network ) {
+			$url_key = 'options_' . $network['url'];
+			$svg_key = 'options_' . $network['svg'];
+			$options[ $network['url'] ] = (string) get_option( $url_key, '' );
+			$options[ $network['svg'] ] = (string) get_option( $svg_key, '' );
 		}
 
 		$legacy = self::legacy_rows_from_options( $options );

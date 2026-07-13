@@ -49,6 +49,9 @@ final class Appearance {
 
 	public static function id(): string {
 		if ( self::$active_id === null ) {
+			// Guard first: get_field()/ACF bootstrap can re-enter Appearance::id()
+			// and overflow the stack (Apache exit 3221225725 / ERR_CONNECTION_RESET).
+			self::$active_id = self::DEFAULT_ID;
 			self::$active_id = self::detect_active_id();
 		}
 
@@ -339,11 +342,13 @@ final class Appearance {
 	private static function detect_active_id(): string {
 		$registered = self::registered_ids();
 
-		if ( function_exists( 'get_field' ) ) {
-			$value = get_field( 'active_appearance', 'option' );
-			if ( is_string( $value ) && $value !== '' && in_array( $value, $registered, true ) ) {
-				return $value;
-			}
+		// Use WP options directly — never get_field() here.
+		// Early get_field during theme bootstrap re-enters ACF field registration
+		// which can call Appearance again and crash the Apache PHP worker.
+		$value = get_option( 'options_active_appearance', null );
+
+		if ( is_string( $value ) && $value !== '' && in_array( $value, $registered, true ) ) {
+			return $value;
 		}
 
 		if ( in_array( self::DEFAULT_ID, $registered, true ) ) {

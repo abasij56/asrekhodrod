@@ -36,12 +36,14 @@ final class Config {
 	public static function get( string $key ): mixed {
 		$defaults = self::defaults();
 		$default  = $defaults[ $key ] ?? null;
+		$value    = null;
 
-		if ( ! function_exists( 'get_field' ) ) {
-			return $default;
+		// Avoid get_field() before ACF is ready — it can re-enter theme bootstrap.
+		if ( function_exists( 'get_field' ) && did_action( 'acf/init' ) ) {
+			$value = get_field( self::OPTION_PREFIX . $key, 'option' );
+		} else {
+			$value = get_option( 'options_' . self::OPTION_PREFIX . $key, null );
 		}
-
-		$value = get_field( self::OPTION_PREFIX . $key, 'option' );
 
 		if ( $value === null || $value === '' || $value === false ) {
 			// true_false false is a legit value; only treat as "unset" for non-bool defaults.
