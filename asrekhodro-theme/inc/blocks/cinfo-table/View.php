@@ -32,10 +32,12 @@ final class View {
 				);
 			}
 
+			$is_first_item_in_group = true;
 			foreach ( $group['items'] as $item ) {
-				$row = self::build_item_row( $group['name'], $item, $show_group_headers );
+				$row = self::build_item_row( $group['name'], $item, $show_group_headers, $is_first_item_in_group );
 				if ( $row !== null ) {
 					$table_rows[] = $row;
+					$is_first_item_in_group = false;
 				}
 			}
 		}
@@ -103,9 +105,13 @@ final class View {
 	 * @param array{title: string, value: string, note: string} $item
 	 * @return array{type: string, col1: string, col2: string, col3: string}|null
 	 */
-	private static function build_item_row( string $group_name, array $item, bool $show_group_headers ): ?array {
-		if ( $show_group_headers || $group_name !== '' ) {
-			$col1 = $group_name;
+	private static function build_item_row( string $group_name, array $item, bool $show_group_headers, bool $is_first_in_group ): ?array {
+		if ( $show_group_headers ) {
+			$col1 = '';
+			$col2 = $item['title'];
+			$col3 = $item['value'] !== '' ? $item['value'] : $item['note'];
+		} elseif ( $group_name !== '' ) {
+			$col1 = $is_first_in_group ? $group_name : '';
 			$col2 = $item['title'];
 			$col3 = $item['value'] !== '' ? $item['value'] : $item['note'];
 		} else {
