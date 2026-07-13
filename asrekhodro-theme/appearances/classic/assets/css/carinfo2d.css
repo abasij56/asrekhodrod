@@ -14,7 +14,17 @@ body.carinfo2d-page .carinfo2d-main {
 
 /* First section — directly under site header (no 3D intro viewport) */
 body.carinfo2d-page #carinfo2d-main > .ci-hero-slide,
-body.carinfo2d-page #carinfo2d-main > .ci-hero,
+body.carinfo2d-page #carinfo2d-main > .ci-hero {
+  position: relative;
+  z-index: 1;
+  min-height: auto;
+  height: auto;
+  scroll-snap-align: none;
+  scroll-snap-stop: normal;
+  display: block;
+  padding: 1.5rem 0;
+}
+
 body.carinfo2d-page #carinfo2d-main > .ci-facts-section {
   position: relative;
   z-index: 1;
@@ -49,14 +59,15 @@ body.carinfo2d-page #carinfo2d-main > .ci-hero-slide .ci-hero__grid {
   padding: 0;
 }
 
-body.carinfo2d-page #carinfo2d-main > .ci-hero__title,
+body.carinfo2d-page #carinfo2d-main > .ci-hero .ci-hero__title,
 body.carinfo2d-page #carinfo2d-main > .ci-hero-slide .ci-hero__title {
   color: inherit;
 }
 
-body.carinfo2d-page #carinfo2d-main > .ci-hero__subtitle,
-body.carinfo2d-page #carinfo2d-main > .ci-hero-slide .ci-hero__subtitle {
-  color: rgba(20, 24, 32, 0.7);
+body.carinfo2d-page #carinfo2d-main > .ci-hero .ci-hero__subtitle,
+body.carinfo2d-page #carinfo2d-main > .ci-hero-slide .ci-hero__subtitle,
+body.carinfo2d-page .ci-hero .ci-hero__subtitle {
+  color: rgba(20, 24, 32, 0.88);
 }
 
 body.carinfo2d-page #carinfo2d-main > .ci-hero .ci-score__main,
@@ -232,7 +243,7 @@ body.carinfo2d-page .carinfo2d-scroll-panel .ci-hero__title {
 }
 
 body.carinfo2d-page .carinfo2d-scroll-panel .ci-hero__subtitle {
-  color: rgba(20, 24, 32, 0.7);
+  color: rgba(20, 24, 32, 0.88);
 }
 
 body.carinfo2d-page .carinfo2d-scroll-panel .ci-hero .ci-score__main {

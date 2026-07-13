@@ -1449,6 +1449,9 @@ address {
   padding: 2rem 2rem 1.35rem;
   color: #fff;
   text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 .hero__content .tag {
@@ -1456,10 +1459,10 @@ address {
 }
 
 .hero__content h1 {
-  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-size: clamp(1.3rem, 2.5vw, 1.75rem);
   font-weight: 800;
   line-height: 1.3;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.65rem;
   letter-spacing: -0.02em;
 }
 
@@ -1468,13 +1471,18 @@ address {
   width: 100%;
 }
 
-.hero__content p {
-  font-size: 0.95rem;
-  opacity: 0.9;
-  margin-bottom: 1.25rem;
-  max-width: none;
-  width: 100%;
-  line-height: 1.7;
+.hero__content p,
+.hero__content [data-hero-excerpt] {
+  display: none;
+}
+
+.hero__content .btn--primary,
+.hero__content [data-hero-cta] {
+  align-self: flex-end;
+  padding: 0.38rem 0.95rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.25;
 }
 
 /* ── Classic news list (asrekhodro format) ── */
@@ -1561,7 +1569,8 @@ address {
 .news-list__title {
   font-size: 0.95rem;
   font-weight: 700;
-  line-height: 1.45;
+  line-height: 1.4rem;
+  height: 1.6rem;
   color: var(--ink);
   display: -webkit-box;
   -webkit-line-clamp: 1;
@@ -5007,6 +5016,8 @@ address {
   .news-list__title {
     font-size: 0.88rem;
     -webkit-line-clamp: 2;
+    height: 3.2rem;
+    line-height: 1.4rem;
   }
 
   .news-list__excerpt {
@@ -5267,11 +5278,26 @@ address {
 
 .single-article__content .single-gallery--inline .single-gallery__tile,
 .single-article__content .single-gallery--inline .single-gallery__tile--lead,
-.single-article__content .single-gallery--inline .single-gallery__grid--count-1 .single-gallery__tile,
-.single-article__content .single-gallery--inline .single-gallery__grid--count-2 .single-gallery__tile,
-.single-article__content .single-gallery--inline .single-gallery__grid--count-3 .single-gallery__tile,
-.single-article__content .single-gallery--inline .single-gallery__grid--count-4 .single-gallery__tile,
-.single-article__content .single-gallery--inline .single-gallery__grid--count-many .single-gallery__tile {
+.single-article__content
+  .single-gallery--inline
+  .single-gallery__grid--count-1
+  .single-gallery__tile,
+.single-article__content
+  .single-gallery--inline
+  .single-gallery__grid--count-2
+  .single-gallery__tile,
+.single-article__content
+  .single-gallery--inline
+  .single-gallery__grid--count-3
+  .single-gallery__tile,
+.single-article__content
+  .single-gallery--inline
+  .single-gallery__grid--count-4
+  .single-gallery__tile,
+.single-article__content
+  .single-gallery--inline
+  .single-gallery__grid--count-many
+  .single-gallery__tile {
   grid-column: auto;
   grid-row: auto;
   min-height: 0;
@@ -5921,11 +5947,14 @@ address {
   display: block;
 }
 
-.single-inline-embed[data-ak-lazy-embed]:not(.is-loaded) .single-inline-embed__frame {
+.single-inline-embed[data-ak-lazy-embed]:not(.is-loaded)
+  .single-inline-embed__frame {
   position: relative;
 }
 
-.single-inline-embed[data-ak-lazy-embed].is-loaded > .single-inline-embed__frame > .single-inline-embed__placeholder {
+.single-inline-embed[data-ak-lazy-embed].is-loaded
+  > .single-inline-embed__frame
+  > .single-inline-embed__placeholder {
   display: none;
 }
 
@@ -6042,15 +6071,25 @@ address {
   margin-inline: auto;
 }
 
-.single-inline-embed .ak-video-player--aparat .h_iframe-aparat_embed_frame > span,
-.single-inline-embed .ak-video-player--aparat.h_iframe-aparat_embed_frame > span {
+.single-inline-embed
+  .ak-video-player--aparat
+  .h_iframe-aparat_embed_frame
+  > span,
+.single-inline-embed
+  .ak-video-player--aparat.h_iframe-aparat_embed_frame
+  > span {
   display: block;
   width: 100%;
   height: auto;
 }
 
-.single-inline-embed .ak-video-player--aparat .h_iframe-aparat_embed_frame iframe,
-.single-inline-embed .ak-video-player--aparat.h_iframe-aparat_embed_frame iframe {
+.single-inline-embed
+  .ak-video-player--aparat
+  .h_iframe-aparat_embed_frame
+  iframe,
+.single-inline-embed
+  .ak-video-player--aparat.h_iframe-aparat_embed_frame
+  iframe {
   position: absolute;
   top: 0;
   left: 0;
@@ -6067,13 +6106,21 @@ address {
     max-width: min(100%, 680px);
   }
 
-  .single-inline-embed--aparat .ak-video-player--aparat .h_iframe-aparat_embed_frame,
-  .single-inline-embed--aparat .ak-video-player--aparat.h_iframe-aparat_embed_frame {
+  .single-inline-embed--aparat
+    .ak-video-player--aparat
+    .h_iframe-aparat_embed_frame,
+  .single-inline-embed--aparat
+    .ak-video-player--aparat.h_iframe-aparat_embed_frame {
     aspect-ratio: 16 / 9;
   }
 
-  .single-inline-embed--aparat .ak-video-player--aparat .h_iframe-aparat_embed_frame > span,
-  .single-inline-embed--aparat .ak-video-player--aparat.h_iframe-aparat_embed_frame > span {
+  .single-inline-embed--aparat
+    .ak-video-player--aparat
+    .h_iframe-aparat_embed_frame
+    > span,
+  .single-inline-embed--aparat
+    .ak-video-player--aparat.h_iframe-aparat_embed_frame
+    > span {
     display: none !important;
     height: 0 !important;
     padding: 0 !important;
@@ -6081,7 +6128,8 @@ address {
   }
 }
 
-.single-inline-embed .ak-video-player--embed-script:not(.ak-video-player--aparat) {
+.single-inline-embed
+  .ak-video-player--embed-script:not(.ak-video-player--aparat) {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
@@ -6089,14 +6137,18 @@ address {
   overflow: hidden;
 }
 
-.single-inline-embed .ak-video-player--embed-script:not(.ak-video-player--aparat) > div {
+.single-inline-embed
+  .ak-video-player--embed-script:not(.ak-video-player--aparat)
+  > div {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-.single-inline-embed .ak-video-player--embed-script:not(.ak-video-player--aparat) iframe {
+.single-inline-embed
+  .ak-video-player--embed-script:not(.ak-video-player--aparat)
+  iframe {
   position: absolute;
   inset: 0;
   display: block;
@@ -6134,7 +6186,9 @@ address {
   max-width: 100%;
 }
 .body-text .single-inline-embed:not(.single-inline-embed--aparat) iframe,
-.single-article__content .single-inline-embed:not(.single-inline-embed--aparat) iframe {
+.single-article__content
+  .single-inline-embed:not(.single-inline-embed--aparat)
+  iframe {
   aspect-ratio: 16 / 9;
   height: auto;
 }

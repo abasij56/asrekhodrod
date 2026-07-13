@@ -318,6 +318,7 @@ final class LayoutSchema {
 	public static function post_type_choices(): array {
 		$choices = array(
 			'post'        => __( 'نوشته', 'asrekhodro' ),
+			'carsinfo'    => __( 'اطلاعات خودرو', 'asrekhodro' ),
 			'ak_video'    => __( 'ویدیو', 'asrekhodro' ),
 			'ak_magazine' => __( 'مجله', 'asrekhodro' ),
 			'ak_review'   => __( 'بررسی', 'asrekhodro' ),
