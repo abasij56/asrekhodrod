@@ -1,0 +1,10 @@
+.ak-under-title--empty {
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border: 1px dashed #c3c4c7;
+  border-radius: 6px;
+  color: #646970;
+  font-size: 0.9rem;
+  font-style: italic;
+  background: #f6f7f7;
+}

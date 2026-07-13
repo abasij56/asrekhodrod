@@ -8,11 +8,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class SinglePost {
 
+	private const UNDER_TITLE_BLOCK = 'acf/ak-under-title';
+
 	public static function init(): void {
 		add_filter( 'body_class', array( self::class, 'filter_body_class' ) );
 		add_filter( 'timber/context', array( self::class, 'filter_timber_context' ) );
 		add_filter( 'timber/twig/functions', array( self::class, 'register_twig_functions' ) );
 		add_filter( 'the_content', array( self::class, 'strip_duplicate_over_title' ), 5 );
+		add_filter( 'render_block', array( self::class, 'suppress_under_title_block_render' ), 10, 2 );
 	}
 
 	/**
@@ -132,7 +135,9 @@ final class SinglePost {
 
 		$context['post_lead']         = ImporterBridge::get_list_excerpt( $post, 320 );
 		$context['post_datetime']     = ImporterBridge::format_post_datetime( $post );
-		$context['post_tags']         = self::get_tags_with_counts( $post );
+		$context['post_tags']                  = self::get_tags_with_counts( $post );
+		$context['post_under_title']           = self::get_under_title_from_block( $post );
+		$context['post_has_under_title_block'] = self::has_under_title_block( $post );
 		$context['related_posts']     = self::get_related_posts( $post, 20 );
 		$context['latest_posts']      = ImporterBridge::query_posts(
 			array(
@@ -170,6 +175,69 @@ final class SinglePost {
 		}
 
 		return esc_url( $default );
+	}
+
+	public static function has_under_title_block( \Timber\Post $post ): bool {
+		if ( ! function_exists( 'has_block' ) ) {
+			return false;
+		}
+
+		return has_block( self::UNDER_TITLE_BLOCK, (int) $post->ID );
+	}
+
+	public static function get_under_title_from_block( \Timber\Post $post ): string {
+		$content = (string) $post->post_content;
+		if ( $content === '' || ! function_exists( 'parse_blocks' ) ) {
+			return '';
+		}
+
+		return self::find_under_title_in_blocks( parse_blocks( $content ) );
+	}
+
+	/**
+	 * @param array<int, mixed> $blocks
+	 */
+	private static function find_under_title_in_blocks( array $blocks ): string {
+		foreach ( $blocks as $block ) {
+			if ( ! is_array( $block ) ) {
+				continue;
+			}
+
+			if ( ( $block['blockName'] ?? '' ) === self::UNDER_TITLE_BLOCK ) {
+				$data = $block['attrs']['data'] ?? array();
+				if ( is_array( $data ) ) {
+					$text = trim( (string) ( $data['text'] ?? '' ) );
+					if ( $text !== '' ) {
+						return $text;
+					}
+				}
+			}
+
+			$inner = $block['innerBlocks'] ?? array();
+			if ( is_array( $inner ) && $inner !== array() ) {
+				$text = self::find_under_title_in_blocks( $inner );
+				if ( $text !== '' ) {
+					return $text;
+				}
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * @param array<string, mixed> $block
+	 */
+	public static function suppress_under_title_block_render( string $content, array $block ): string {
+		if ( ! is_singular( 'post' ) ) {
+			return $content;
+		}
+
+		if ( ( $block['blockName'] ?? '' ) === self::UNDER_TITLE_BLOCK ) {
+			return '';
+		}
+
+		return $content;
 	}
 
 	/**

@@ -19,6 +19,9 @@
             <p class="single-hero__over">{{ post.meta('_asrekhodro_over_title') }}</p>
           {% endif %}
           <h1 class="single-hero__title">{{ post.title }}</h1>
+          {% if post_under_title|default('')|trim != '' %}
+            <h2 class="ak-under-title">{{ post_under_title }}</h2>
+          {% endif %}
           {% if post_lead %}
             <p class="single-hero__lead">{{ post_lead }}</p>
           {% endif %}
@@ -54,7 +57,7 @@
         {{ post.content }}
       </div>
 
-      {% if post.meta('_asrekhodro_under_title') or post.meta('under_title') %}
+      {% if (post.meta('_asrekhodro_under_title') or post.meta('under_title')) and not post_has_under_title_block|default(false) %}
         <p class="single-under-title">{{ post.meta('_asrekhodro_under_title')|default(post.meta('under_title')) }}</p>
       {% endif %}
 

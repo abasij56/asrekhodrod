@@ -190,13 +190,18 @@ address {
   letter-spacing: 0.03em;
 }
 
-.tag--breaking {
-  background: var(--brand);
-  color: #fff;
-}
+.news-list__over,
+.tag--breaking,
 .tag--ev {
-  background: #0d9488;
-  color: #fff;
+  background: none;
+  color: var(--logo-asre);
+  font-weight: 500;
+  font-size: 0.65rem;
+  line-height: 1.35;
+  padding: 0;
+  border-radius: 0;
+  text-transform: none;
+  letter-spacing: normal;
 }
 .tag--market {
   background: var(--accent);
@@ -1365,11 +1370,6 @@ address {
   align-self: flex-start;
 }
 
-.hero .tag--breaking {
-  background: var(--logo-asre);
-  color: #fff;
-}
-
 .hero__main img {
   position: absolute;
   inset: 0;
@@ -1456,6 +1456,7 @@ address {
 
 .hero__content .tag {
   margin-bottom: 0.75rem;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .hero__content h1 {
@@ -1551,16 +1552,9 @@ address {
 }
 
 .news-list__over {
-  display: inline-block;
+  display: block;
   align-self: flex-start;
   max-width: 100%;
-  background: var(--logo-asre);
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.72rem;
-  line-height: 1.35;
-  padding: 0.25rem 0.6rem;
-  border-radius: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -5713,6 +5707,14 @@ address {
   margin-bottom: 0.75rem;
 }
 
+.single-hero .ak-under-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin: 0 0 0.75rem;
+}
+
 .single-hero__lead {
   color: var(--ink-soft);
   line-height: 1.85;
@@ -6332,6 +6334,14 @@ address {
   border-top: 1px dashed var(--line);
   color: var(--ink-muted);
   font-style: italic;
+}
+
+.body-text .ak-under-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin: 0 0 1.25rem;
 }
 
 .single-section-title {
