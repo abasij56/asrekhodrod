@@ -15,6 +15,8 @@
           <span class="cb-hero__tag">{{ hero_main.meta('_asrekhodro_over_title') }}</span>
         {% endif %}
         <h1 id="cb-hero-heading" class="cb-hero__title">{{ hero_main.title }}</h1>
+        {% set hero_under_title = ak_post_under_title(hero_main)|default('')|trim %}
+        {% if hero_under_title %}<span class="cb-hero__tag">{{ hero_under_title }}</span>{% endif %}
         <p class="cb-hero__excerpt">{{ ak.list_excerpt(hero_main) }}</p>
         <div class="cb-hero__meta">
           {% if hero_main.meta('_asrekhodro_author') %}

@@ -10,6 +10,8 @@
     <div class="hero__content">
       {% if hero_main.meta('_asrekhodro_over_title') %}<span class="tag tag--ev">{{ hero_main.meta('_asrekhodro_over_title') }}</span>{% endif %}
       <h1 id="hero-heading"><a href="{{ hero_main.link }}">{{ hero_main.title }}</a></h1>
+      {% set hero_under_title = ak_post_under_title(hero_main)|default('')|trim %}
+      {% if hero_under_title %}<span class="tag tag--ev">{{ hero_under_title }}</span>{% endif %}
       <p>{{ hero_main.post_excerpt|default(hero_main.post_content|striptags|slice(0, 200)) }}</p>
       <a href="{{ hero_main.link }}" class="btn btn--primary">ادامه مطلب</a>
     </div>
@@ -20,6 +22,8 @@
         <a href="{{ post.link }}">
           {% if post.meta('_asrekhodro_over_title') %}<span class="tag tag--breaking">{{ post.meta('_asrekhodro_over_title') }}</span>{% endif %}
           <h3>{{ post.title }}</h3>
+          {% set side_under_title = ak_post_under_title(post)|default('')|trim %}
+          {% if side_under_title %}<span class="tag tag--breaking">{{ side_under_title }}</span>{% endif %}
           <time datetime="{{ post.date('Y-m-d') }}">{{ ak_post_date(post) }}</time>
         </a>
       </article>

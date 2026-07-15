@@ -1517,9 +1517,9 @@ address {
 .news-list__link {
   display: flex;
   flex-direction: row;
-  align-items: stretch;
+  align-items: flex-start;
   min-height: 109px;
-  height: 109px;
+  height: auto;
 }
 
 .news-list__media {
@@ -1544,17 +1544,22 @@ address {
 .news-list__body {
   flex: 1;
   min-width: 0;
-  padding: 0.7rem 1rem;
+  padding: 0.65rem 1rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 0.35rem;
+  gap: 0.25rem;
+  min-height: 109px;
+  box-sizing: border-box;
 }
 
 .news-list__over {
   display: block;
   align-self: flex-start;
   max-width: 100%;
+  margin: 0;
+  font-size: 0.7rem;
+  line-height: 1.55;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1563,11 +1568,13 @@ address {
 .news-list__title {
   font-size: 0.95rem;
   font-weight: 700;
-  line-height: 1.4rem;
-  height: 1.6rem;
+  line-height: 1.45;
+  max-height: none;
+  height: auto;
+  margin: 0;
   color: var(--ink);
   display: -webkit-box;
-  -webkit-line-clamp: 1;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   transition: color var(--transition);
@@ -5010,8 +5017,8 @@ address {
   .news-list__title {
     font-size: 0.88rem;
     -webkit-line-clamp: 2;
-    height: 3.2rem;
-    line-height: 1.4rem;
+    height: auto;
+    line-height: 1.45;
   }
 
   .news-list__excerpt {

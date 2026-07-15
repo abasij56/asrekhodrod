@@ -30,6 +30,42 @@ final class CarsInfoDirectory {
 	}
 
 	/**
+	 * Public archive URL for the cars encyclopedia directory page.
+	 */
+	public static function archive_url(): string {
+		$pages = get_posts(
+			array(
+				'post_type'              => 'page',
+				'post_status'            => 'publish',
+				'meta_key'               => '_wp_page_template',
+				'meta_value'             => 'page-carsinfo-directory.php',
+				'posts_per_page'         => 1,
+				'fields'                 => 'ids',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			)
+		);
+
+		if ( $pages !== array() ) {
+			$url = get_permalink( (int) $pages[0] );
+			if ( is_string( $url ) && $url !== '' ) {
+				return esc_url( $url );
+			}
+		}
+
+		$page = get_page_by_path( 'دانشنامه-خودرو' );
+		if ( $page instanceof \WP_Post ) {
+			$url = get_permalink( $page );
+			if ( is_string( $url ) && $url !== '' ) {
+				return esc_url( $url );
+			}
+		}
+
+		return esc_url( home_url( '/دانشنامه-خودرو/' ) );
+	}
+
+	/**
 	 * @param array<string, mixed> $fields
 	 * @return array<string, mixed>
 	 */

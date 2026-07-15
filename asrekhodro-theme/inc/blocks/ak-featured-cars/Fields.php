@@ -31,25 +31,18 @@ final class Fields {
 					),
 					array(
 						'key'           => $prefix . 'link_url',
-						'label'         => 'لینک «مشاهده همه»',
+						'label'         => 'لینک آرشیو دانشنامه',
 						'name'          => 'view_url',
 						'type'          => 'url',
-						'instructions'  => 'اختیاری — آدرس صفحه‌ای که همه مدل‌ها را نشان می‌دهد.',
+						'instructions'  => 'خالی = /دانشنامه-خودرو/ — در غیر این صورت همان آدرس واردشده استفاده می‌شود.',
 					),
 					array(
-						'key'               => $prefix . 'link_label',
-						'label'             => 'متن لینک',
-						'name'              => 'view_label',
-						'type'              => 'text',
-						'default_value'     => 'همه مدل‌ها ←',
-						'conditional_logic' => array(
-							array(
-								array(
-									'field'    => $prefix . 'link_url',
-									'operator' => '!=empty',
-								),
-							),
-						),
+						'key'           => $prefix . 'link_label',
+						'label'         => 'متن لینک',
+						'name'          => 'view_label',
+						'type'          => 'text',
+						'default_value' => 'آرشیو دانشنامه ←',
+						'instructions'  => 'خالی = «آرشیو دانشنامه ←»',
 					),
 					array(
 						'key'           => $mode_field,

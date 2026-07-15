@@ -19,6 +19,9 @@
         </div>
         <div class="card__body">
           <h3>{{ featured_lead.title }}</h3>
+          {% if featured_lead.under_title %}
+            <span class="tag tag--market">{{ featured_lead.under_title }}</span>
+          {% endif %}
           <p class="card__excerpt">{{ featured_lead.excerpt }}</p>
           <div class="card__meta">
             <time datetime="{{ featured_lead.date_iso }}">{{ featured_lead.date }}</time>

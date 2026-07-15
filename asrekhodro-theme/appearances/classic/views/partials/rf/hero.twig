@@ -16,6 +16,8 @@
           <div class="rf-lead-story__category">{{ hero_main.meta('_asrekhodro_over_title') }}</div>
         {% endif %}
         <h1 id="rf-hero-heading" class="rf-lead-story__title">{{ hero_main.title }}</h1>
+        {% set lead_under_title = ak_post_under_title(hero_main)|default('')|trim %}
+        {% if lead_under_title %}<div class="rf-lead-story__category">{{ lead_under_title }}</div>{% endif %}
         <p class="rf-lead-story__excerpt">{{ ak.list_excerpt(hero_main) }}</p>
         <div class="rf-lead-story__meta">
           <span>{{ rf_site_name|default('عصر خودرو') }}</span>
@@ -28,6 +30,8 @@
       {% for post in hero_side_posts %}
         <a href="{{ post.link }}" class="rf-side-headline">
           <h3 class="rf-side-headline__title">{{ post.title }}</h3>
+          {% set side_under_title = ak_post_under_title(post)|default('')|trim %}
+          {% if side_under_title %}<div class="rf-lead-story__category">{{ side_under_title }}</div>{% endif %}
           <time class="rf-side-headline__date" datetime="{{ post.date('Y-m-d') }}">{{ ak_post_date(post) }}</time>
         </a>
       {% endfor %}

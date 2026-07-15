@@ -10,6 +10,9 @@ final class SinglePost {
 
 	private const UNDER_TITLE_BLOCK = 'acf/ak-under-title';
 
+	/** @var array<int, string> */
+	private static array $under_title_cache = array();
+
 	public static function init(): void {
 		add_filter( 'body_class', array( self::class, 'filter_body_class' ) );
 		add_filter( 'timber/context', array( self::class, 'filter_timber_context' ) );
@@ -186,12 +189,21 @@ final class SinglePost {
 	}
 
 	public static function get_under_title_from_block( \Timber\Post $post ): string {
-		$content = (string) $post->post_content;
-		if ( $content === '' || ! function_exists( 'parse_blocks' ) ) {
-			return '';
+		$post_id = (int) $post->ID;
+		if ( array_key_exists( $post_id, self::$under_title_cache ) ) {
+			return self::$under_title_cache[ $post_id ];
 		}
 
-		return self::find_under_title_in_blocks( parse_blocks( $content ) );
+		$content = (string) $post->post_content;
+		if ( $content === '' || ! function_exists( 'parse_blocks' ) ) {
+			self::$under_title_cache[ $post_id ] = '';
+
+			return self::$under_title_cache[ $post_id ];
+		}
+
+		self::$under_title_cache[ $post_id ] = self::find_under_title_in_blocks( parse_blocks( $content ) );
+
+		return self::$under_title_cache[ $post_id ];
 	}
 
 	/**

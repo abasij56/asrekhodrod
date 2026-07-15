@@ -3,6 +3,7 @@
 namespace AsreKhodro\Theme\Blocks\AkHero;
 
 use AsreKhodro\Theme\ImporterBridge;
+use AsreKhodro\Theme\SinglePost;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -112,11 +113,12 @@ final class View {
 	 */
 	private static function map_main( \Timber\Post $main, \Timber\Post $visual ): array {
 		return array(
-			'id'      => (int) $main->ID,
-			'link'    => (string) $main->link(),
-			'title'   => trim( (string) $main->title() ),
-			'excerpt' => ImporterBridge::get_list_excerpt( $main, 220 ),
-			'image'   => ImporterBridge::get_post_image_url( $visual ),
+			'id'          => (int) $main->ID,
+			'link'        => (string) $main->link(),
+			'title'       => trim( (string) $main->title() ),
+			'under_title' => SinglePost::get_under_title_from_block( $main ),
+			'excerpt'     => ImporterBridge::get_list_excerpt( $main, 220 ),
+			'image'       => ImporterBridge::get_post_image_url( $visual ),
 		);
 	}
 
@@ -142,14 +144,15 @@ final class View {
 				: $post;
 
 			$items[] = array(
-				'id'       => (int) $post->ID,
-				'badge'    => trim( (string) $post->meta( '_asrekhodro_over_title' ) ),
-				'title'    => $title,
-				'date'     => ImporterBridge::format_post_date( $post ),
-				'date_iso' => (string) $post->date( 'Y-m-d' ),
-				'link'     => (string) $post->link(),
-				'excerpt'  => ImporterBridge::get_list_excerpt( $post, 220 ),
-				'image'    => ImporterBridge::get_post_image_url( $image_post ),
+				'id'          => (int) $post->ID,
+				'badge'       => trim( (string) $post->meta( '_asrekhodro_over_title' ) ),
+				'title'       => $title,
+				'under_title' => SinglePost::get_under_title_from_block( $post ),
+				'date'        => ImporterBridge::format_post_date( $post ),
+				'date_iso'    => (string) $post->date( 'Y-m-d' ),
+				'link'        => (string) $post->link(),
+				'excerpt'     => ImporterBridge::get_list_excerpt( $post, 220 ),
+				'image'       => ImporterBridge::get_post_image_url( $image_post ),
 			);
 		}
 
@@ -164,11 +167,12 @@ final class View {
 
 		foreach ( $side_items as $item ) {
 			$panels[] = array(
-				'id'      => (int) ( $item['id'] ?? 0 ),
-				'title'   => (string) ( $item['title'] ?? '' ),
-				'excerpt' => (string) ( $item['excerpt'] ?? '' ),
-				'image'   => (string) ( $item['image'] ?? '' ),
-				'link'    => (string) ( $item['link'] ?? '' ),
+				'id'          => (int) ( $item['id'] ?? 0 ),
+				'title'       => (string) ( $item['title'] ?? '' ),
+				'under_title' => (string) ( $item['under_title'] ?? '' ),
+				'excerpt'     => (string) ( $item['excerpt'] ?? '' ),
+				'image'       => (string) ( $item['image'] ?? '' ),
+				'link'        => (string) ( $item['link'] ?? '' ),
 			);
 		}
 

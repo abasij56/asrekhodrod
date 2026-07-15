@@ -1389,6 +1389,7 @@
       var image = main.querySelector("[data-hero-image]");
       var titleLink = main.querySelector("[data-hero-title-link]");
       var title = main.querySelector("[data-hero-title]");
+      var underTitle = main.querySelector("[data-hero-under-title]");
       var excerpt = main.querySelector("[data-hero-excerpt]");
       var cta = main.querySelector("[data-hero-cta]");
       var imageLink = main.querySelector("[data-hero-image-link]");
@@ -1417,6 +1418,10 @@
         }
         if (title) {
           title.textContent = slide.title || "";
+        }
+        if (underTitle) {
+          underTitle.textContent = slide.under_title || "";
+          underTitle.hidden = !slide.under_title;
         }
         if (excerpt) {
           excerpt.textContent = slide.excerpt || "";

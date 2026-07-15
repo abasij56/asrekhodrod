@@ -12,6 +12,10 @@
           <p class="news-list__over">{{ over_title }}</p>
         {% endif %}
         <h2 class="news-list__title">{{ post.title }}</h2>
+        {% set under_title = ak_post_under_title(post)|default('')|trim %}
+        {% if under_title %}
+          <p class="news-list__over">{{ under_title }}</p>
+        {% endif %}
         {% if show_excerpt is not defined or show_excerpt %}
           <p class="news-list__excerpt"><strong>عصر خودرو-</strong> {{ ak.list_excerpt(post) }}</p>
         {% endif %}

@@ -655,10 +655,12 @@ final class BlockDataResolver {
 			? trim( sanitize_text_field( (string) $placement['data_title'] ) )
 			: trim( (string) ( $meta['default_title'] ?? 'ماشین‌های منتخب' ) );
 
+		$view_url = trim( (string) ( $placement['view_url'] ?? '' ) );
+
 		return array(
 			'featured_cars_title'      => $title,
-			'featured_cars_link_url'   => trim( (string) ( $placement['view_url'] ?? '' ) ),
-			'featured_cars_link_label' => trim( (string) ( $placement['view_label'] ?? '' ) ) ?: 'همه مدل‌ها ←',
+			'featured_cars_link_url'   => $view_url !== '' ? $view_url : CarsInfoDirectory::archive_url(),
+			'featured_cars_link_label' => trim( (string) ( $placement['view_label'] ?? '' ) ) ?: 'آرشیو دانشنامه ←',
 			'featured_cars'            => $cards,
 			'featured_cars_has_items'  => $cards !== array(),
 		);

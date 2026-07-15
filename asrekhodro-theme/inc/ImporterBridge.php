@@ -56,6 +56,9 @@ final class ImporterBridge {
 		$functions['ak_post_content_images'] = array(
 			'callable' => array( self::class, 'get_post_content_images' ),
 		);
+		$functions['ak_post_under_title'] = array(
+			'callable' => array( SinglePost::class, 'get_under_title_from_block' ),
+		);
 
 		return $functions;
 	}

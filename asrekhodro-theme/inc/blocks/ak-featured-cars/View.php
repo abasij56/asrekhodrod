@@ -18,8 +18,8 @@ final class View {
 		unset( $post );
 
 		$title      = trim( (string) ( $fields['section_title'] ?? '' ) );
-		$view_url   = trim( (string) ( $fields['view_url'] ?? '' ) );
-		$view_label = trim( (string) ( $fields['view_label'] ?? '' ) ) ?: 'همه مدل‌ها ←';
+		$view_url   = trim( (string) ( $fields['view_url'] ?? '' ) ) ?: CarsInfoDirectory::archive_url();
+		$view_label = trim( (string) ( $fields['view_label'] ?? '' ) ) ?: 'آرشیو دانشنامه ←';
 		$mode       = (string) ( $fields['selection_mode'] ?? 'latest' );
 
 		if ( $mode === 'manual' ) {

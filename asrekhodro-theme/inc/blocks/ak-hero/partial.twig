@@ -7,6 +7,7 @@
     <img data-hero-image src="{{ hero_main.image }}" width="1200" height="800" alt="{{ hero_main.title }}" loading="eager" decoding="async" />
     <div class="hero__content">
       <h1 id="hero-heading"><a data-hero-title-link href="{{ hero_main.link }}"><span data-hero-title>{{ hero_main.title }}</span></a></h1>
+      <span class="tag tag--ev" data-hero-under-title{% if not hero_main.under_title %} hidden{% endif %}>{{ hero_main.under_title }}</span>
       <p data-hero-excerpt>{{ hero_main.excerpt }}</p>
       <a data-hero-cta href="{{ hero_main.link }}" class="btn btn--primary">ادامه مطلب</a>
       {% if hero_side_items|length > 1 %}
@@ -22,6 +23,7 @@
         <button type="button" class="hero-text-item__trigger" data-hero-trigger aria-pressed="{{ loop.first ? 'true' : 'false' }}">
           {% if item.badge %}<span class="tag tag--breaking">{{ item.badge }}</span>{% endif %}
           <h3>{{ item.title }}</h3>
+          {% if item.under_title %}<span class="tag tag--breaking">{{ item.under_title }}</span>{% endif %}
           <time datetime="{{ item.date_iso }}">{{ item.date }}</time>
         </button>
       </article>
