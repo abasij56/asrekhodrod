@@ -25,6 +25,7 @@ final class AcfFields {
 
 		add_action( 'acf/include_fields', array( self::class, 'register_field_groups' ) );
 		add_action( 'acf/input/admin_enqueue_scripts', array( self::class, 'enqueue_admin_assets' ) );
+		add_filter( 'acf/validate_value', array( self::class, 'validate_value_active_tab_only' ), 5, 4 );
 		add_filter( 'acf/load_field/key=field_ak_carsinfo_country_category', array( self::class, 'load_carsinfo_category_select_field' ) );
 		add_filter( 'acf/load_field/key=field_ak_carsinfo_brand_category', array( self::class, 'load_carsinfo_category_select_field' ) );
 		add_filter( 'acf/load_field/key=field_ak_category_brand_logo', array( CarBrandAssets::class, 'load_acf_select_field' ) );
@@ -64,6 +65,122 @@ final class AcfFields {
 					'socialSvgDefaults' => FooterSocial::default_svgs_for_admin(),
 				)
 			);
+		}
+	}
+
+	/**
+	 * On theme options page, only validate fields that belong to the active left tab.
+	 * Required fields on other tabs otherwise block saving (e.g. footer while editing watermark).
+	 *
+	 * @param mixed                $valid
+	 * @param mixed                $value
+	 * @param array<string, mixed> $field
+	 * @param string               $input
+	 * @return mixed
+	 */
+	public static function validate_value_active_tab_only( $valid, $value, array $field, $input ) {
+		if ( $valid === true ) {
+			return $valid;
+		}
+
+		$active_tab = '';
+		if ( isset( $_REQUEST['ak_active_options_tab'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$active_tab = sanitize_text_field( wp_unslash( (string) $_REQUEST['ak_active_options_tab'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		}
+
+		// Only when our theme-options JS tagged the active tab.
+		if ( $active_tab === '' ) {
+			return $valid;
+		}
+
+		$field_key = (string) ( $field['key'] ?? '' );
+		if ( $field_key === '' ) {
+			return $valid;
+		}
+
+		$map       = self::options_field_tab_map();
+		$owner_tab = $map[ $field_key ] ?? null;
+
+		// Sub fields: resolve via parent field key when present.
+		if ( $owner_tab === null && ! empty( $field['parent'] ) ) {
+			$parent = (string) $field['parent'];
+			$owner_tab = $map[ $parent ] ?? null;
+		}
+
+		if ( is_string( $owner_tab ) && $owner_tab !== '' && $owner_tab !== $active_tab ) {
+			return true;
+		}
+
+		return $valid;
+	}
+
+	/**
+	 * Map each options field key → owning left-tab field key.
+	 *
+	 * @return array<string, string>
+	 */
+	private static function options_field_tab_map(): array {
+		static $map = null;
+		if ( is_array( $map ) ) {
+			return $map;
+		}
+
+		$map    = array();
+		$fields = apply_filters(
+			'ak_theme_options_fields',
+			array_merge(
+				self::general_option_fields(),
+				self::homepage_option_fields(),
+				self::archive_option_fields(),
+				self::contact_option_fields(),
+				self::carsinfo_option_fields(),
+				self::footer_option_fields()
+			)
+		);
+
+		$current_tab = '';
+		self::walk_fields_for_tab_map( $fields, $current_tab, $map );
+
+		return $map;
+	}
+
+	/**
+	 * @param array<int, array<string, mixed>> $fields
+	 * @param array<string, string>            $map
+	 */
+	private static function walk_fields_for_tab_map( array $fields, string &$current_tab, array &$map ): void {
+		foreach ( $fields as $field ) {
+			if ( ! is_array( $field ) || empty( $field['key'] ) ) {
+				continue;
+			}
+
+			$key  = (string) $field['key'];
+			$type = (string) ( $field['type'] ?? '' );
+
+			if ( $type === 'tab' ) {
+				$current_tab = $key;
+				$map[ $key ] = $key;
+				continue;
+			}
+
+			if ( $current_tab !== '' ) {
+				$map[ $key ] = $current_tab;
+			}
+
+			if ( ! empty( $field['sub_fields'] ) && is_array( $field['sub_fields'] ) ) {
+				foreach ( $field['sub_fields'] as $sub ) {
+					if ( ! is_array( $sub ) || empty( $sub['key'] ) ) {
+						continue;
+					}
+					$sub_key = (string) $sub['key'];
+					if ( $current_tab !== '' ) {
+						$map[ $sub_key ] = $current_tab;
+					}
+					if ( ! empty( $sub['sub_fields'] ) && is_array( $sub['sub_fields'] ) ) {
+						self::walk_fields_for_tab_map( array( $sub ), $current_tab, $map );
+					}
+				}
+			}
 		}
 	}
 

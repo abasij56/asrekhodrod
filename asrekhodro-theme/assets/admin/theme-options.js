@@ -134,12 +134,119 @@
       });
   }
 
+  /**
+   * Theme options uses left tabs. ACF validates the whole form, so required
+   * fields on inactive tabs block save. Limit validation to the active tab.
+   */
+  function isThemeOptionsPage() {
+    return document.body && document.body.classList.contains('toplevel_page_asrekhodro-settings');
+  }
+
+  function getActiveTabKey($form) {
+    var $scope = $form && $form.length ? $form : $(document);
+    var $active = $scope.find('.acf-tab-group .acf-tab-button.-active, .acf-tab-group a.acf-tab-button.active').first();
+    if (!$active.length) {
+      $active = $('.acf-tab-group .acf-tab-button.-active').first();
+    }
+    return $active.length ? String($active.data('key') || '') : '';
+  }
+
+  function fieldBelongsToActiveTab($field, activeTabKey) {
+    if (!$field || !$field.length) {
+      return true;
+    }
+
+    // Hidden by conditional logic → never fail validation.
+    if ($field.hasClass('acf-hidden') || $field.is('[hidden]') || !$field.is(':visible')) {
+      return false;
+    }
+
+    if (!activeTabKey) {
+      return true;
+    }
+
+    // Walk previous siblings until the nearest tab field.
+    var $prevTab = $field.prevAll('.acf-field-tab').first();
+    if (!$prevTab.length) {
+      return true;
+    }
+
+    return String($prevTab.data('key') || '') === activeTabKey;
+  }
+
+  function filterErrorsToActiveTab(json, $form) {
+    if (!isThemeOptionsPage() || !json || json.valid == 1 || !json.errors || !json.errors.length) {
+      return json;
+    }
+
+    var activeTabKey = getActiveTabKey($form);
+    var remaining = [];
+
+    json.errors.forEach(function (err) {
+      if (!err || !err.input) {
+        remaining.push(err);
+        return;
+      }
+
+      var $input = $form.find('[name="' + err.input + '"]').first();
+      if (!$input.length) {
+        // Keep unknown errors (safer) unless clearly not visible.
+        remaining.push(err);
+        return;
+      }
+
+      var $field = $input.closest('.acf-field');
+      if (fieldBelongsToActiveTab($field, activeTabKey)) {
+        remaining.push(err);
+      }
+    });
+
+    if (!remaining.length) {
+      json.valid = 1;
+      delete json.errors;
+    } else {
+      json.errors = remaining;
+    }
+
+    return json;
+  }
+
+  function syncActiveTabInput($form) {
+    if (!isThemeOptionsPage()) {
+      return;
+    }
+
+    var key = getActiveTabKey($form);
+    var $input = $form.find('input[name="ak_active_options_tab"]');
+    if (!$input.length) {
+      $input = $('<input type="hidden" name="ak_active_options_tab" />');
+      $form.append($input);
+    }
+    $input.val(key);
+  }
+
   if (window.acf) {
     acf.addAction('ready', function () {
       initAllSocialSvgFields();
     });
     acf.addAction('append', function ($el) {
       initAllSocialSvgFields($el);
+    });
+
+    acf.addAction('validation_begin', function ($form) {
+      syncActiveTabInput($form);
+    });
+
+    acf.addFilter('validation_complete', function (json, $form) {
+      return filterErrorsToActiveTab(json, $form);
+    });
+
+    acf.addFilter('prepare_for_ajax', function (data) {
+      if (!isThemeOptionsPage()) {
+        return data;
+      }
+      data.ak_active_options_tab = getActiveTabKey($(document));
+      return data;
     });
   } else {
     $(function () {
