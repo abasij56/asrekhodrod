@@ -85,6 +85,7 @@ final class AuthorAccess {
 		'asrekhodro-settings',
 		'asrekhodro-layout-builder',
 		'asrekhodro-icon-gallery',
+		'asrekhodro-news-slug-repair',
 		'add-external-media',
 	);
 
@@ -333,6 +334,7 @@ final class AuthorAccess {
 				'asrekhodro-settings',
 				'asrekhodro-layout-builder',
 				'asrekhodro-icon-gallery',
+				'asrekhodro-news-slug-repair',
 			),
 			'profile.php' => array(
 				'profile.php',
