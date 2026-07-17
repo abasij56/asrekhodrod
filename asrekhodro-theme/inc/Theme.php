@@ -28,6 +28,9 @@ final class Theme {
 		require_once ASREKHODRO_THEME_DIR . '/inc/VideosArchive.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/NewsPermalinks.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/VideoPermalinks.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/MagazinePermalinks.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/ReviewPermalinks.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/CarsinfoPermalinks.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/HomepageData.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/blocks/load.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/ThemeCategories.php';
@@ -86,6 +89,9 @@ final class Theme {
 		VideosArchive::init();
 		NewsPermalinks::init();
 		VideoPermalinks::init();
+		MagazinePermalinks::init();
+		ReviewPermalinks::init();
+		CarsinfoPermalinks::init();
 		\AsreKhodro\Theme\CdnServer\Module::init();
 		LegacyRedirects::init();
 		PostViews::init();

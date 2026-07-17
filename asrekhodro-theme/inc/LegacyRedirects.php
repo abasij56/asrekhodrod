@@ -17,7 +17,7 @@ final class LegacyRedirects {
 			return;
 		}
 
-		if ( is_singular( 'ak_magazine' ) || is_post_type_archive( 'ak_magazine' ) ) {
+		if ( is_singular( array( 'ak_magazine', 'ak_video', 'ak_review', 'carsinfo' ) ) || is_post_type_archive( 'ak_magazine' ) ) {
 			return;
 		}
 
@@ -110,6 +110,11 @@ final class LegacyRedirects {
 			return (int) $matches[1];
 		}
 
+		// ID still present even if path was cut mid-slug.
+		if ( preg_match( '#^/Gallery/Content/(\d+)#i', $path, $matches ) ) {
+			return (int) $matches[1];
+		}
+
 		return 0;
 	}
 
@@ -118,6 +123,8 @@ final class LegacyRedirects {
 			'#^/News/(\d+)(?:/|$)#i',
 			'#^/Home/News/(\d+)(?:/|$)#i',
 			'#^/news/(\d+)(?:/|$)#i',
+			'#^/News/(\d+)#i',
+			'#^/Home/News/(\d+)#i',
 		);
 
 		foreach ( $patterns as $pattern ) {
@@ -130,7 +137,7 @@ final class LegacyRedirects {
 	}
 
 	private static function extract_kiosk_file_id( string $path ): int {
-		if ( preg_match( '#^/Home/Kiosk/(\d+)/?$#i', $path, $matches ) ) {
+		if ( preg_match( '#^/Home/Kiosk/(\d+)(?:/|$)#i', $path, $matches ) ) {
 			return (int) $matches[1];
 		}
 
@@ -144,22 +151,15 @@ final class LegacyRedirects {
 			return $cached;
 		}
 
-		$posts = get_posts(
-			array(
-				'post_type'      => 'ak_magazine',
-				'posts_per_page' => 1,
-				'post_status'    => 'publish',
-				'meta_key'       => '_asrekhodro_file_id',
-				'meta_value'     => $file_id,
-				'fields'         => 'ids',
-			)
-		);
-
-		if ( empty( $posts ) ) {
+		$post_id = MagazinePermalinks::resolve_post_id_by_route_id( $file_id );
+		if ( $post_id <= 0 ) {
 			return null;
 		}
 
-		$url = get_permalink( $posts[0] );
+		$url = MagazinePermalinks::build_url_for_post( $post_id );
+		if ( ! $url ) {
+			$url = get_permalink( $post_id );
+		}
 		if ( ! $url ) {
 			return null;
 		}
@@ -176,7 +176,7 @@ final class LegacyRedirects {
 			return $cached;
 		}
 
-		$post_id = VideoPermalinks::find_post_id_by_content_id( $content_id );
+		$post_id = VideoPermalinks::resolve_post_id_by_route_id( $content_id );
 		if ( $post_id <= 0 ) {
 			return null;
 		}
@@ -202,22 +202,15 @@ final class LegacyRedirects {
 			return $cached;
 		}
 
-		$posts = get_posts(
-			array(
-				'post_type'      => 'any',
-				'posts_per_page' => 1,
-				'post_status'    => 'publish',
-				'meta_key'       => '_asrekhodro_content_id',
-				'meta_value'     => $content_id,
-				'fields'         => 'ids',
-			)
-		);
-
-		if ( empty( $posts ) ) {
+		$post_id = NewsPermalinks::resolve_post_id_by_route_id( $content_id );
+		if ( $post_id <= 0 ) {
 			return null;
 		}
 
-		$url = get_permalink( $posts[0] );
+		$url = NewsPermalinks::build_url_for_post( $post_id );
+		if ( ! $url ) {
+			$url = get_permalink( $post_id );
+		}
 		if ( ! $url ) {
 			return null;
 		}
@@ -385,7 +378,7 @@ final class LegacyRedirects {
 	}
 
 	private static function match_legacy_home_category( string $path ): ?string {
-		if ( ! preg_match( '#^/home/category/(\d+)/?$#i', $path, $matches ) ) {
+		if ( ! preg_match( '#^/home/category/(\d+)(?:/|$)#i', $path, $matches ) ) {
 			return null;
 		}
 

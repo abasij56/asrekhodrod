@@ -13,6 +13,8 @@ final class Setup {
 		add_action( 'wp_enqueue_scripts', array( self::class, 'enqueue_assets' ) );
 		add_action( 'wp_head', array( self::class, 'preload_font' ), 1 );
 		add_action( 'wp_head', array( self::class, 'output_site_icons' ), 2 );
+		add_action( 'wp_head', array( self::class, 'output_google_site_verification' ), 1 );
+		add_action( 'wp_footer', array( self::class, 'output_google_analytics' ), 99 );
 		add_filter( 'get_site_icon_url', array( self::class, 'filter_site_icon_url' ), 10, 2 );
 		add_action( 'init', array( self::class, 'register_menus' ) );
 		add_action( 'init', array( self::class, 'ensure_ad_positions' ), 20 );
@@ -194,6 +196,22 @@ final class Setup {
 
 	public static function preload_font(): void {
 		Appearance::preload_font();
+	}
+
+	public static function output_google_site_verification(): void {
+		echo '<meta name="google-site-verification" content="56H4T3VJFN6i4BJLQc_yaU8BjmOZ4UKjX7dpq4Z5uig" />' . "\n";
+	}
+
+	public static function output_google_analytics(): void {
+		?>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-107048289-1"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-107048289-1');
+</script>
+		<?php
 	}
 
 	public static function output_site_icons(): void {

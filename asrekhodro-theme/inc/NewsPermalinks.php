@@ -17,7 +17,8 @@ final class NewsPermalinks {
 		add_filter( 'query_vars', array( self::class, 'register_query_vars' ) );
 		add_filter( 'post_link', array( self::class, 'filter_permalink' ), 10, 2 );
 		add_filter( 'post_type_link', array( self::class, 'filter_permalink' ), 10, 2 );
-		add_action( 'parse_request', array( self::class, 'parse_request' ) );
+		add_action( 'parse_request', array( self::class, 'parse_request' ), 0 );
+		add_filter( 'pre_handle_404', array( self::class, 'pre_handle_404' ), 10, 2 );
 		add_filter( 'redirect_canonical', array( self::class, 'filter_redirect_canonical' ), 10, 2 );
 		add_filter( 'wp_insert_post_data', array( self::class, 'filter_insert_post_data' ), 50, 2 );
 		add_filter( 'dbdelta_create_queries', array( self::class, 'filter_dbdelta_create_queries' ) );
@@ -37,44 +38,120 @@ final class NewsPermalinks {
 	public static function register_rewrites(): void {
 		add_rewrite_tag( '%ak_news_content_id%', '([0-9]+)' );
 
+		// Match News/{id} with any slug length — do not capture/require the slug.
 		add_rewrite_rule(
-			'^News/([0-9]+)/([^/]+)/?$',
+			'^News/([0-9]+)(?:/.*)?$',
 			'index.php?ak_news_content_id=$matches[1]',
 			'top'
 		);
 
 		add_rewrite_rule(
-			'^News/([0-9]+)/?$',
+			'^Home/News/([0-9]+)(?:/.*)?$',
 			'index.php?ak_news_content_id=$matches[1]',
 			'top'
 		);
 
-		add_rewrite_rule(
-			'^Home/News/([0-9]+)/([^/]+)/?$',
-			'index.php?ak_news_content_id=$matches[1]',
-			'top'
-		);
-
-		add_rewrite_rule(
-			'^Home/News/([0-9]+)/?$',
-			'index.php?ak_news_content_id=$matches[1]',
-			'top'
-		);
+		if ( ! get_option( 'ak_news_rewrite_long_slug_v2' ) ) {
+			flush_rewrite_rules( false );
+			update_option( 'ak_news_rewrite_long_slug_v2', 1, false );
+		}
 	}
 
 	public static function parse_request( \WP $wp ): void {
-		if ( empty( $wp->query_vars['ak_news_content_id'] ) ) {
+		$route_id = 0;
+
+		if ( ! empty( $wp->query_vars['ak_news_content_id'] ) ) {
+			$route_id = (int) $wp->query_vars['ak_news_content_id'];
+		} else {
+			$route_id = self::content_id_from_request_uri();
+			if ( $route_id > 0 ) {
+				$wp->query_vars['ak_news_content_id'] = $route_id;
+			}
+		}
+
+		if ( $route_id <= 0 ) {
 			return;
 		}
 
-		$content_id = (int) $wp->query_vars['ak_news_content_id'];
-		$post_id    = self::find_post_id_by_content_id( $content_id );
-
+		$post_id = self::resolve_post_id_by_route_id( $route_id );
 		if ( $post_id <= 0 ) {
 			return;
 		}
 
-		$wp->query_vars['p'] = $post_id;
+		// Force a single-post query by route id (legacy content_id or WP post ID).
+		$wp->query_vars['p']             = $post_id;
+		$wp->query_vars['post_type']     = 'post';
+		$wp->query_vars['name']          = '';
+		$wp->query_vars['pagename']      = '';
+		$wp->query_vars['category_name'] = '';
+		$wp->query_vars['error']         = '';
+		unset( $wp->query_vars['page_id'], $wp->query_vars['attachment'], $wp->query_vars['attachment_id'] );
+	}
+
+	/**
+	 * Rescue long /News/{id}/... URLs that rewrite matching may miss (e.g. very long paths).
+	 *
+	 * @param mixed     $preempt
+	 * @param \WP_Query $query
+	 * @return mixed
+	 */
+	public static function pre_handle_404( $preempt, $query ) {
+		if ( $preempt || ! $query instanceof \WP_Query || ! $query->is_main_query() ) {
+			return $preempt;
+		}
+
+		$route_id = self::content_id_from_request_uri();
+		if ( $route_id <= 0 ) {
+			return $preempt;
+		}
+
+		$post_id = self::resolve_post_id_by_route_id( $route_id );
+		$post    = $post_id > 0 ? get_post( $post_id ) : null;
+		if ( ! $post instanceof \WP_Post || $post->post_type !== 'post' || $post->post_status === 'trash' ) {
+			return $preempt;
+		}
+
+		$query->posts             = array( $post );
+		$query->post_count        = 1;
+		$query->found_posts       = 1;
+		$query->post              = $post;
+		$query->queried_object    = $post;
+		$query->queried_object_id = (int) $post->ID;
+		$query->is_404            = false;
+		$query->is_single         = true;
+		$query->is_singular       = true;
+		$query->is_page           = false;
+		$query->is_archive        = false;
+		$query->is_home           = false;
+		$query->is_category       = false;
+		$query->is_tag            = false;
+		$query->is_tax            = false;
+
+		status_header( 200 );
+		nocache_headers();
+
+		return true;
+	}
+
+	private static function content_id_from_request_uri(): int {
+		$uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+		if ( $uri === '' ) {
+			return 0;
+		}
+
+		$path = (string) wp_parse_url( $uri, PHP_URL_PATH );
+		$path = '/' . ltrim( $path, '/' );
+
+		if ( preg_match( '#/(?:Home/)?News/(\d+)(?:/|$)#i', $path, $matches ) ) {
+			return (int) $matches[1];
+		}
+
+		// Fallback: ID still present even if path was cut oddly mid-slug.
+		if ( preg_match( '#/(?:Home/)?News/(\d+)#i', $path, $matches ) ) {
+			return (int) $matches[1];
+		}
+
+		return 0;
 	}
 
 	/**
@@ -249,7 +326,7 @@ final class NewsPermalinks {
 		return trim( $slug, '-' );
 	}
 
-	public static function unique_post_slug( string $slug, int $post_id = 0 ): string {
+	public static function unique_post_slug( string $slug, int $post_id = 0, string $post_type = 'post' ): string {
 		$slug = trim( $slug, '-' );
 		if ( $slug === '' ) {
 			return $slug;
@@ -258,7 +335,7 @@ final class NewsPermalinks {
 		$base   = $slug;
 		$suffix = 2;
 
-		while ( self::post_slug_exists( $slug, $post_id ) ) {
+		while ( self::post_slug_exists( $slug, $post_id, $post_type ) ) {
 			$slug = $base . '-' . $suffix;
 			++$suffix;
 		}
@@ -266,12 +343,13 @@ final class NewsPermalinks {
 		return $slug;
 	}
 
-	private static function post_slug_exists( string $slug, int $exclude_post_id = 0 ): bool {
+	private static function post_slug_exists( string $slug, int $exclude_post_id = 0, string $post_type = 'post' ): bool {
 		global $wpdb;
 
 		$sql = $wpdb->prepare(
-			"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = 'post' AND ID != %d LIMIT 1",
+			"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = %s AND ID != %d LIMIT 1",
 			$slug,
+			$post_type,
 			$exclude_post_id
 		);
 
@@ -433,11 +511,11 @@ final class NewsPermalinks {
 	/**
 	 * Repair a small slice so the admin UI can show progress and stop safely.
 	 *
-	 * @return array{total: int, offset: int, next_offset: int, checked: int, updated: int, skipped: int, errors: int, done: bool, column_ok: bool}
+	 * @return array{total: int, offset: int, next_offset: int, checked: int, updated: int, skipped: int, errors: int, done: bool, column_ok: bool, force: bool}
 	 */
-	public static function repair_imported_news_slugs_batch( int $offset = 0, int $limit = 50 ): array {
+	public static function repair_imported_news_slugs_batch( int $offset = 0, int $limit = 50, bool $force = false ): array {
 		$offset = max( 0, $offset );
-		$limit  = max( 1, min( 200, $limit ) );
+		$limit  = max( 1, min( 5000, $limit ) );
 		$total  = self::count_imported_news_posts();
 		$stats  = array(
 			'total'       => $total,
@@ -449,6 +527,7 @@ final class NewsPermalinks {
 			'errors'      => 0,
 			'done'        => true,
 			'column_ok'   => self::ensure_post_name_column(),
+			'force'       => $force,
 		);
 
 		if ( $total <= 0 || $offset >= $total ) {
@@ -474,7 +553,7 @@ final class NewsPermalinks {
 
 		foreach ( $posts as $post_id ) {
 			++$stats['checked'];
-			$result = self::repair_single_news_slug( (int) $post_id );
+			$result = self::repair_single_news_slug( (int) $post_id, $force );
 
 			if ( $result === 'updated' ) {
 				++$stats['updated'];
@@ -494,7 +573,7 @@ final class NewsPermalinks {
 	/**
 	 * @return 'updated'|'skipped'|'error'
 	 */
-	public static function repair_single_news_slug( int $post_id ): string {
+	public static function repair_single_news_slug( int $post_id, bool $force = false ): string {
 		$post = get_post( $post_id );
 		if ( ! $post instanceof \WP_Post || $post->post_type !== 'post' ) {
 			return 'error';
@@ -505,24 +584,46 @@ final class NewsPermalinks {
 			return 'skipped';
 		}
 
-		$desired = self::slug_from_title( $post->post_title );
-		if ( $desired === '' ) {
-			$desired = 'content-' . $content_id;
+		$base = self::slug_from_title( $post->post_title );
+		if ( $base === '' ) {
+			$base = 'content-' . $content_id;
 		}
 
-		$desired = self::unique_post_slug( $desired, $post_id );
-		$current = (string) $post->post_name;
+		if ( $force ) {
+			// Unconditional overwrite: title slug exactly, no skip / no uniqueness reshuffle.
+			$saved = self::write_post_name( $post_id, $base );
+			if ( ! $saved ) {
+				return 'error';
+			}
 
-		if ( $current === $desired ) {
-			$legacy = self::build_legacy_path( $content_id, $desired );
+			update_post_meta( $post_id, '_asrekhodro_legacy_path', self::build_legacy_path( $content_id, $base ) );
+			clean_post_cache( $post_id );
+
+			return 'updated';
+		}
+
+		// Normalize percent-encoded legacy slugs for comparison.
+		$current = rawurldecode( (string) $post->post_name );
+		$current = trim( $current, '/' );
+
+		// Already full slug (or a stable uniquified variant like title-2): do not reshuffle.
+		if ( self::slug_already_ok( $current, $base ) ) {
+			$legacy = self::build_legacy_path( $content_id, $current );
 			if ( (string) get_post_meta( $post_id, '_asrekhodro_legacy_path', true ) !== $legacy ) {
 				update_post_meta( $post_id, '_asrekhodro_legacy_path', $legacy );
+			}
+
+			// Persist decoded Unicode form if DB still had percent-encoding.
+			if ( $current !== (string) $post->post_name ) {
+				self::write_post_name( $post_id, $current );
+				clean_post_cache( $post_id );
 			}
 
 			return 'skipped';
 		}
 
-		$saved = self::write_post_name( $post_id, $desired );
+		$desired = self::unique_post_slug( $base, $post_id );
+		$saved   = self::write_post_name( $post_id, $desired );
 		if ( ! $saved ) {
 			return 'error';
 		}
@@ -531,6 +632,26 @@ final class NewsPermalinks {
 		clean_post_cache( $post_id );
 
 		return 'updated';
+	}
+
+	/**
+	 * True when stored slug is already the full title slug (or title-N), not a truncated leftover.
+	 */
+	private static function slug_already_ok( string $current, string $base ): bool {
+		if ( $current === '' || $base === '' ) {
+			return false;
+		}
+
+		if ( $current === $base ) {
+			return true;
+		}
+
+		// Keep existing uniquified forms: {base}-2, {base}-3, ...
+		if ( preg_match( '/^' . preg_quote( $base, '/' ) . '-(\d+)$/u', $current ) ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -559,24 +680,52 @@ final class NewsPermalinks {
 		return '/' . self::BASE_PATH . '/' . $content_id . '/' . trim( $slug, '/' );
 	}
 
-	public static function build_url( int $content_id, string $slug ): string {
-		return home_url( user_trailingslashit( self::BASE_PATH . '/' . $content_id . '/' . $slug ) );
+	public static function build_url( int $route_id, string $slug ): string {
+		return home_url( user_trailingslashit( self::BASE_PATH . '/' . $route_id . '/' . $slug ) );
+	}
+
+	/**
+	 * Route id in /News/{id}/... — legacy content_id when present, otherwise WP post ID.
+	 */
+	public static function route_id_for_post( int $post_id ): int {
+		$content_id = (int) get_post_meta( $post_id, '_asrekhodro_content_id', true );
+
+		return $content_id > 0 ? $content_id : max( 0, $post_id );
+	}
+
+	/**
+	 * Resolve /News/{id}/... — prefer imported content_id, else WP post ID.
+	 */
+	public static function resolve_post_id_by_route_id( int $route_id ): int {
+		if ( $route_id <= 0 ) {
+			return 0;
+		}
+
+		$by_meta = self::find_post_id_by_content_id( $route_id );
+		if ( $by_meta > 0 ) {
+			return $by_meta;
+		}
+
+		$post = get_post( $route_id );
+		if ( $post instanceof \WP_Post && $post->post_type === 'post' && $post->post_status !== 'trash' ) {
+			return (int) $post->ID;
+		}
+
+		return 0;
 	}
 
 	public static function build_url_for_post( int $post_id ): ?string {
-		$content_id = (int) get_post_meta( $post_id, '_asrekhodro_content_id', true );
-		if ( $content_id <= 0 ) {
-			return null;
-		}
-
 		$post = get_post( $post_id );
-		if ( ! $post instanceof \WP_Post ) {
+		if ( ! $post instanceof \WP_Post || $post->post_type !== 'post' ) {
 			return null;
 		}
 
-		$slug = self::resolve_slug( $post );
+		$route_id = self::route_id_for_post( $post_id );
+		if ( $route_id <= 0 ) {
+			return null;
+		}
 
-		return self::build_url( $content_id, $slug );
+		return self::build_url( $route_id, self::resolve_slug( $post ) );
 	}
 
 	public static function resolve_slug( \WP_Post $post ): string {
