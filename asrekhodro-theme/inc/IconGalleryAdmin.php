@@ -23,14 +23,14 @@ final class IconGalleryAdmin {
 			'asrekhodro-settings',
 			'گالری آیکون‌ها',
 			'گالری آیکون‌ها',
-			'edit_theme_options',
+			AuthorAccess::THEME_SETTINGS_CAP,
 			self::MENU_SLUG,
 			array( self::class, 'render_page' )
 		);
 	}
 
 	public static function render_page(): void {
-		if ( ! current_user_can( 'edit_theme_options' ) ) {
+		if ( ! AuthorAccess::can_manage_theme_settings() ) {
 			return;
 		}
 

@@ -145,7 +145,7 @@ final class Ajax {
 	 * Test the FTP/SFTP connection (settings page button).
 	 */
 	public static function handle_test_connection(): void {
-		if ( ! current_user_can( 'edit_theme_options' ) ) {
+		if ( ! \AsreKhodro\Theme\AuthorAccess::can_manage_theme_settings() ) {
 			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'asrekhodro' ) ), 403 );
 		}
 

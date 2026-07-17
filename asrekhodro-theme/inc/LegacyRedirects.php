@@ -29,6 +29,11 @@ final class LegacyRedirects {
 		$path = (string) wp_parse_url( $uri, PHP_URL_PATH );
 		$path = '/' . trim( $path, '/' );
 
+		// Legacy mobile site used /Mobile/...; strip so existing redirects apply.
+		if ( preg_match( '#^/mobile(/.*)?$#i', $path, $mobile_match ) ) {
+			$path = ( isset( $mobile_match[1] ) && $mobile_match[1] !== '' ) ? $mobile_match[1] : '/';
+		}
+
 		$gallery_id = self::extract_gallery_content_id( $path );
 		if ( $gallery_id > 0 ) {
 			$target = self::find_video_url_by_content_id( $gallery_id );

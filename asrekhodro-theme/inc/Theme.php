@@ -12,6 +12,7 @@ final class Theme {
 		Appearance::init();
 
 		require_once ASREKHODRO_THEME_DIR . '/inc/Setup.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/AuthorAccess.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/PostTypes.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/MediaAlt.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/ImporterBridge.php';
@@ -70,6 +71,7 @@ final class Theme {
 		IconGalleryAdmin::init();
 
 		Setup::init();
+		AuthorAccess::init();
 		PostTypes::init();
 		CarsInfo::init();
 		CarInfo3d::init();

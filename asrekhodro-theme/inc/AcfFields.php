@@ -18,7 +18,7 @@ final class AcfFields {
 				'page_title' => 'تنظیمات عصر خودرو',
 				'menu_title' => 'تنظیمات تم',
 				'menu_slug'  => 'asrekhodro-settings',
-				'capability' => 'edit_theme_options',
+				'capability' => AuthorAccess::THEME_SETTINGS_CAP,
 				'redirect'   => false,
 			)
 		);

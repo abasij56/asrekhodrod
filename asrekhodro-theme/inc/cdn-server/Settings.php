@@ -32,7 +32,7 @@ final class Settings {
 	 * Enqueue the test-connection script on the theme settings page.
 	 */
 	public static function enqueue( string $hook_suffix ): void {
-		if ( ! current_user_can( 'edit_theme_options' ) ) {
+		if ( ! \AsreKhodro\Theme\AuthorAccess::can_manage_theme_settings() ) {
 			return;
 		}
 

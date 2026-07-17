@@ -24,7 +24,7 @@ final class LayoutBuilderAdmin {
 			'asrekhodro-settings',
 			'چیدمان صفحات',
 			'چیدمان صفحات',
-			'edit_theme_options',
+			AuthorAccess::THEME_SETTINGS_CAP,
 			'asrekhodro-layout-builder',
 			array( self::class, 'render_page' )
 		);
@@ -254,7 +254,7 @@ final class LayoutBuilderAdmin {
 	}
 
 	public static function render_page(): void {
-		if ( ! current_user_can( 'edit_theme_options' ) ) {
+		if ( ! AuthorAccess::can_manage_theme_settings() ) {
 			return;
 		}
 
@@ -272,7 +272,7 @@ final class LayoutBuilderAdmin {
 	public static function ajax_save(): void {
 		check_ajax_referer( 'ak_layout_builder', 'nonce' );
 
-		if ( ! current_user_can( 'edit_theme_options' ) ) {
+		if ( ! AuthorAccess::can_manage_theme_settings() ) {
 			wp_send_json_error( array( 'message' => 'forbidden' ), 403 );
 		}
 
@@ -299,7 +299,7 @@ final class LayoutBuilderAdmin {
 	public static function ajax_search_posts(): void {
 		check_ajax_referer( 'ak_layout_builder', 'nonce' );
 
-		if ( ! current_user_can( 'edit_theme_options' ) ) {
+		if ( ! AuthorAccess::can_manage_theme_settings() ) {
 			wp_send_json_error( array( 'message' => 'forbidden' ), 403 );
 		}
 
@@ -339,7 +339,7 @@ final class LayoutBuilderAdmin {
 	public static function ajax_resolve_manual_posts(): void {
 		check_ajax_referer( 'ak_layout_builder', 'nonce' );
 
-		if ( ! current_user_can( 'edit_theme_options' ) ) {
+		if ( ! AuthorAccess::can_manage_theme_settings() ) {
 			wp_send_json_error( array( 'message' => 'forbidden' ), 403 );
 		}
 

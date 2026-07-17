@@ -234,7 +234,7 @@ final class UploadUi {
 				<div class="emwi-cdn-error"></div>
 				<div class="emwi-cdn-debug" style="display:none;"></div>
 			</div>
-		<?php elseif ( current_user_can( 'edit_theme_options' ) && $missing !== array() ) : ?>
+		<?php elseif ( \AsreKhodro\Theme\AuthorAccess::can_manage_theme_settings() && $missing !== array() ) : ?>
 			<div id="<?php echo esc_attr( $section_id ); ?>" class="emwi-cdn-section emwi-cdn-section--inactive<?php echo $is_inline ? ' emwi-cdn-section--inline' : ''; ?>">
 				<p class="emwi-cdn-notice">
 					<strong><?php esc_html_e( 'آپلود CDN غیرفعال است:', 'asrekhodro' ); ?></strong>
