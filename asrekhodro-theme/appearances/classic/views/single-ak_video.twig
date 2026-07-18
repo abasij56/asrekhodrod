@@ -13,9 +13,11 @@
         <div class="video-cinema__backdrop" aria-hidden="true"></div>
 
         <div class="video-cinema__inner">
-          <div class="video-cinema-stage">
-            {% include 'partials/video-cinema-stage.twig' %}
-          </div>
+          {% if video_url or video_embed_html %}
+            <div class="video-cinema-stage">
+              {% include 'partials/video-cinema-stage.twig' %}
+            </div>
+          {% endif %}
 
           <header class="video-cinema__meta">
             {% set vcat = post.terms('video_category')|first %}

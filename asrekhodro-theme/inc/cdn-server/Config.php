@@ -2,6 +2,8 @@
 
 namespace AsreKhodro\Theme\CdnServer;
 
+use AsreKhodro\Theme\CdnServer\Connection\LocalFilesystemConnection;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -63,14 +65,26 @@ final class Config {
 	}
 
 	/**
-	 * Saved FTP/SFTP credentials present (ignores the enable toggle).
+	 * Saved connection settings present (ignores the enable toggle).
 	 */
 	public static function is_connection_ready(): bool {
-		return self::get_public_base_url() !== ''
-			&& self::host() !== ''
+		if ( self::get_public_base_url() === '' || self::remote_base_path() === '' || self::remote_base_path() === '/' ) {
+			return false;
+		}
+
+		$settings = self::connection_settings();
+
+		if ( self::protocol() === 'local' ) {
+			return LocalFilesystemConnection::is_available( $settings );
+		}
+
+		if ( LocalFilesystemConnection::is_available( $settings ) ) {
+			return true;
+		}
+
+		return self::host() !== ''
 			&& self::user() !== ''
-			&& self::pass() !== ''
-			&& self::remote_base_path() !== '';
+			&& self::pass() !== '';
 	}
 
 	/**
@@ -92,14 +106,24 @@ final class Config {
 		if ( self::get_public_base_url() === '' ) {
 			$missing[] = __( 'نشانی پایه عمومی خالی است.', 'asrekhodro' );
 		}
-		if ( self::host() === '' ) {
-			$missing[] = __( 'میزبان (Host) خالی است.', 'asrekhodro' );
+		if ( self::remote_base_path() === '' || self::remote_base_path() === '/' ) {
+			$missing[] = __( 'مسیر پایه روی سرور خالی است.', 'asrekhodro' );
 		}
-		if ( self::user() === '' ) {
-			$missing[] = __( 'نام کاربری خالی است.', 'asrekhodro' );
-		}
-		if ( self::pass() === '' ) {
-			$missing[] = __( 'رمز عبور ذخیره نشده — دوباره وارد کنید و دکمه ذخیره را بزنید.', 'asrekhodro' );
+
+		if ( self::protocol() === 'local' ) {
+			if ( ! LocalFilesystemConnection::is_available( self::connection_settings() ) ) {
+				$missing[] = __( 'مسیر پایه به‌صورت پوشه محلی قابل نوشتن پیدا نشد.', 'asrekhodro' );
+			}
+		} elseif ( ! LocalFilesystemConnection::is_available( self::connection_settings() ) ) {
+			if ( self::host() === '' ) {
+				$missing[] = __( 'میزبان (Host) خالی است.', 'asrekhodro' );
+			}
+			if ( self::user() === '' ) {
+				$missing[] = __( 'نام کاربری خالی است.', 'asrekhodro' );
+			}
+			if ( self::pass() === '' ) {
+				$missing[] = __( 'رمز عبور ذخیره نشده — دوباره وارد کنید و دکمه ذخیره را بزنید.', 'asrekhodro' );
+			}
 		}
 
 		return $missing;
@@ -112,7 +136,7 @@ final class Config {
 	public static function protocol(): string {
 		$protocol = strtolower( trim( (string) self::get( 'protocol' ) ) );
 
-		return in_array( $protocol, array( 'ftp', 'ftps', 'sftp' ), true ) ? $protocol : 'ftp';
+		return in_array( $protocol, array( 'ftp', 'ftps', 'sftp', 'local' ), true ) ? $protocol : 'ftp';
 	}
 
 	public static function host(): string {
@@ -248,7 +272,7 @@ final class Config {
 
 		if ( $from_form ) {
 			$protocol = strtolower( trim( (string) ( $input['protocol'] ?? '' ) ) );
-			$protocol = in_array( $protocol, array( 'ftp', 'ftps', 'sftp' ), true ) ? $protocol : self::protocol();
+			$protocol = in_array( $protocol, array( 'ftp', 'ftps', 'sftp', 'local' ), true ) ? $protocol : self::protocol();
 
 			$port = (int) ( $input['port'] ?? 0 );
 			$port = $port > 0 ? $port : ( $protocol === 'sftp' ? 22 : 21 );

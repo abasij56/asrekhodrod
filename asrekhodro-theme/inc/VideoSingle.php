@@ -2,6 +2,8 @@
 
 namespace AsreKhodro\Theme;
 
+use AsreKhodro\Theme\AcfBlocks\Support\EmbedSanitizer;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -38,14 +40,19 @@ final class VideoSingle {
 			);
 		}
 
-		$split = self::split_video_content( $post );
+		$video_url         = self::get_video_url( $post );
+		$video_embed_html  = $video_url === '' ? self::get_video_embed_html( $post ) : '';
+		$split             = self::split_video_content( $post );
 
-		$context['related_videos']     = \Timber\Timber::get_posts( $related_args );
-		$context['video_url']          = self::get_video_url( $post );
-		$context['video_poster_url']   = self::get_poster_url( $post );
-		$context['video_poster_alt']   = self::get_poster_alt( $post );
-		$context['video_player_html']  = $split['player'];
-		$context['video_body_html']    = $split['body'];
+		$context['related_videos']    = \Timber\Timber::get_posts( $related_args );
+		$context['video_url']         = $video_url;
+		$context['video_embed_html']  = $video_embed_html;
+		$context['video_poster_url']  = self::get_poster_url( $post );
+		$context['video_poster_alt']  = self::get_poster_alt( $post );
+		$context['video_player_html'] = $video_url !== ''
+			? self::native_player_markup( $video_url )
+			: $video_embed_html;
+		$context['video_body_html']   = $split['body'];
 
 		return $context;
 	}
@@ -105,6 +112,31 @@ final class VideoSingle {
 		return '';
 	}
 
+	public static function get_video_embed_html( \Timber\Post $post ): string {
+		$raw = '';
+
+		if ( function_exists( 'get_field' ) ) {
+			$value = get_field( 'video_embed', (int) $post->ID );
+			if ( is_string( $value ) ) {
+				$raw = $value;
+			}
+		}
+
+		if ( $raw === '' ) {
+			$meta = get_post_meta( (int) $post->ID, 'video_embed', true );
+			if ( is_string( $meta ) ) {
+				$raw = $meta;
+			}
+		}
+
+		$raw = trim( $raw );
+		if ( $raw === '' ) {
+			return '';
+		}
+
+		return EmbedSanitizer::video_embed( $raw );
+	}
+
 	public static function get_player_markup( int $post_id ): string {
 		if ( $post_id <= 0 ) {
 			return '';
@@ -113,6 +145,16 @@ final class VideoSingle {
 		$post = \Timber\Timber::get_post( $post_id );
 		if ( ! $post instanceof \Timber\Post ) {
 			return '';
+		}
+
+		$url = self::get_video_url( $post );
+		if ( $url !== '' ) {
+			return self::native_player_markup( $url );
+		}
+
+		$embed = self::get_video_embed_html( $post );
+		if ( $embed !== '' ) {
+			return $embed;
 		}
 
 		$split = self::split_video_content( $post );
@@ -129,7 +171,7 @@ final class VideoSingle {
 
 		if ( $raw === '' ) {
 			return array(
-				'player' => self::native_player_markup( self::get_video_url( $post ) ),
+				'player' => '',
 				'body'   => '',
 			);
 		}
@@ -146,8 +188,6 @@ final class VideoSingle {
 		} elseif ( preg_match( '#^\s*(<video\b[^>]*>.*?</video>)#is', $raw, $matches ) ) {
 			$player = '<div class="ak-video-player">' . $matches[1] . '</div>';
 			$rest   = (string) preg_replace( '#^\s*<video\b[^>]*>.*?</video>#is', '', $raw, 1 );
-		} else {
-			$player = self::native_player_markup( self::get_video_url( $post ) );
 		}
 
 		if ( $player === '' ) {

@@ -286,15 +286,26 @@ final class AcfFields {
 
 		acf_add_local_field_group(
 			array(
-				'key'    => 'group_ak_video_fields',
-				'title'  => 'ویدیو',
-				'fields' => array(
+				'key'      => 'group_ak_video_fields',
+				'title'    => 'ویدیو',
+				'position' => 'side',
+				'style'    => 'default',
+				'fields'   => array(
 					array(
 						'key'          => 'field_ak_video_url',
-						'label'        => 'نشانی ویدیو',
+						'label'        => 'نشانی مستقیم ویدیو',
 						'name'         => 'video_url',
 						'type'         => 'url',
-						'instructions' => 'نشانی مستقیم MP4/FLV روی media.asrekhodro.com (واردشده از CMS قدیمی).',
+						'instructions' => 'لینک مستقیم فایل MP4/FLV. اگر پر باشد، اولویت با این فیلد است.',
+					),
+					array(
+						'key'          => 'field_ak_video_embed',
+						'label'        => 'کد ویدیو (امبد)',
+						'name'         => 'video_embed',
+						'type'         => 'textarea',
+						'rows'         => 6,
+						'new_lines'    => '',
+						'instructions' => 'کد iframe یا embed آپارات/یوتیوب را اینجا paste کنید. فقط وقتی نشانی مستقیم خالی باشد استفاده می‌شود.',
 					),
 				),
 				'location' => array(

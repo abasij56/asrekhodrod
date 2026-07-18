@@ -1,49 +1,42 @@
-{% set player_html_lower = video_player_html|lower %}
-{% set has_iframe = video_player_html and '<iframe' in player_html_lower %}
-{% set has_native_html = video_player_html and '<video' in player_html_lower and not has_iframe %}
-
+{% if video_url %}
 <div class="video-cinema-stage__frame">
   <div class="video-cinema-stage__frame-glow" aria-hidden="true"></div>
   <div class="video-cinema-stage__frame-inner">
-    {% if video_player_html and not has_native_html %}
-      <div class="video-cinema-stage__embed">
-        {{ video_player_html|raw }}
+    <div class="video-cinema-stage__native{% if video_poster_url %} video-cinema-stage__native--poster{% endif %}" data-video-cinema-native>
+      {% if video_poster_url %}
+        <button type="button" class="video-cinema-stage__poster" data-video-cinema-play aria-label="پخش ویدیو">
+          <img
+            class="video-cinema-stage__poster-image"
+            src="{{ video_poster_url }}"
+            alt="{{ video_poster_alt|default('')|e('html_attr') }}"
+            width="1280"
+            height="720"
+            loading="eager"
+            decoding="async"
+          />
+          <span class="video-cinema-stage__poster-shade" aria-hidden="true"></span>
+          {% include 'partials/video-card-play.twig' %}
+        </button>
+      {% endif %}
+      <div class="ak-video-player">
+        <video
+          controls
+          preload="metadata"
+          playsinline
+          src="{{ video_url }}"
+          {% if video_poster_url %}poster="{{ video_poster_url }}"{% endif %}
+        ></video>
       </div>
-    {% elseif video_url or has_native_html %}
-      <div class="video-cinema-stage__native{% if video_poster_url %} video-cinema-stage__native--poster{% endif %}" data-video-cinema-native>
-        {% if video_poster_url %}
-          <button type="button" class="video-cinema-stage__poster" data-video-cinema-play aria-label="پخش ویدیو">
-            <img
-              class="video-cinema-stage__poster-image"
-              src="{{ video_poster_url }}"
-              alt="{{ video_poster_alt|default('')|e('html_attr') }}"
-              width="1280"
-              height="720"
-              loading="eager"
-              decoding="async"
-            />
-            <span class="video-cinema-stage__poster-shade" aria-hidden="true"></span>
-            {% include 'partials/video-card-play.twig' %}
-          </button>
-        {% endif %}
-        {% if has_native_html %}
-          {{ video_player_html|raw }}
-        {% else %}
-          <div class="ak-video-player">
-            <video
-              controls
-              preload="metadata"
-              playsinline
-              src="{{ video_url }}"
-              {% if video_poster_url %}poster="{{ video_poster_url }}"{% endif %}
-            ></video>
-          </div>
-        {% endif %}
-      </div>
-    {% else %}
-      <div class="video-cinema-stage__empty">
-        <p>ویدیویی برای پخش موجود نیست.</p>
-      </div>
-    {% endif %}
+    </div>
   </div>
 </div>
+{% elseif video_embed_html %}
+<div class="video-cinema-stage__frame">
+  <div class="video-cinema-stage__frame-glow" aria-hidden="true"></div>
+  <div class="video-cinema-stage__frame-inner">
+    <div class="video-cinema-stage__embed">
+      {{ video_embed_html|raw }}
+    </div>
+  </div>
+</div>
+{% endif %}

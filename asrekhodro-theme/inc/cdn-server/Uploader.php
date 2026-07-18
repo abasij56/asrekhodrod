@@ -4,6 +4,7 @@ namespace AsreKhodro\Theme\CdnServer;
 
 use AsreKhodro\Theme\CdnServer\Connection\ConnectionInterface;
 use AsreKhodro\Theme\CdnServer\Connection\FtpConnection;
+use AsreKhodro\Theme\CdnServer\Connection\LocalFilesystemConnection;
 use AsreKhodro\Theme\CdnServer\Connection\SftpConnection;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -216,6 +217,18 @@ final class Uploader {
 		$settings = $settings ?? Config::connection_settings();
 		$protocol = strtolower( (string) ( $settings['protocol'] ?? 'ftp' ) );
 
+		// Same-server Parspack/DirectAdmin: public FTP IP is often refused from PHP.
+		if ( $protocol === 'local' || LocalFilesystemConnection::is_available( $settings ) ) {
+			if ( ! LocalFilesystemConnection::is_available( $settings ) ) {
+				return new \WP_Error(
+					'ak_cdn_local_missing',
+					__( 'پروتکل «کپی محلی» انتخاب شده اما مسیر پایه روی دیسک این سرور پیدا نشد یا قابل نوشتن نیست.', 'asrekhodro' )
+				);
+			}
+
+			return new LocalFilesystemConnection( $settings );
+		}
+
 		return $protocol === 'sftp'
 			? new SftpConnection( $settings )
 			: new FtpConnection( $settings );
@@ -248,8 +261,10 @@ final class Uploader {
 			'pwd_after_mkdir'     => __( 'pwd بعد از ساخت پوشه', 'asrekhodro' ),
 			'data_mode'           => __( 'حالت کانال داده', 'asrekhodro' ),
 			'upload_mode'         => __( 'حالت آپلود موفق', 'asrekhodro' ),
+			'local_base'          => __( 'پوشه محلی استفاده‌شده', 'asrekhodro' ),
 			'upload_remote'       => __( 'مسیر remote استفاده‌شده', 'asrekhodro' ),
 			'ftp_last_message'    => __( 'آخرین پیام سرور FTP', 'asrekhodro' ),
+			'curl_error'          => __( 'خطای cURL', 'asrekhodro' ),
 			'ftp_file_path'       => __( 'مسیر واقعی فایل روی FTP (pwd)', 'asrekhodro' ),
 			'filezilla_full_path' => __( 'مسیر کامل برای FileZilla', 'asrekhodro' ),
 			'canonical_relative'  => __( 'مسیر وب (canonical)', 'asrekhodro' ),
@@ -276,7 +291,7 @@ final class Uploader {
 	}
 
 	private static function merge_connection_debug( ConnectionInterface $connection ): void {
-		if ( $connection instanceof FtpConnection ) {
+		if ( $connection instanceof FtpConnection || $connection instanceof LocalFilesystemConnection ) {
 			self::$last_upload_debug = array_merge( self::$last_upload_debug, $connection->get_last_debug() );
 		}
 	}
@@ -302,8 +317,8 @@ final class Uploader {
 		$response = wp_remote_head(
 			$url,
 			array(
-				'timeout'     => 15,
-				'redirection' => 3,
+				'timeout'     => 8,
+				'redirection' => 2,
 			)
 		);
 
@@ -318,8 +333,8 @@ final class Uploader {
 		$get = wp_remote_get(
 			$url,
 			array(
-				'timeout'     => 15,
-				'redirection' => 3,
+				'timeout'     => 8,
+				'redirection' => 2,
 				'headers'     => array(
 					'Range' => 'bytes=0-1023',
 				),

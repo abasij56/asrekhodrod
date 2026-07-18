@@ -215,14 +215,51 @@ final class AuthorAccess {
 	}
 
 	/**
-	 * @param list<string>          $caps
-	 * @param list<mixed>           $args
+	 * Meta capabilities that receive a post ID in $args[0].
+	 *
+	 * @var list<string>
+	 */
+	private const POST_OBJECT_META_CAPS = array(
+		'edit_post',
+		'read_post',
+		'delete_post',
+		'publish_post',
+		'edit_page',
+		'read_page',
+		'delete_page',
+		'edit_post_meta',
+		'delete_post_meta',
+		'add_post_meta',
+	);
+
+	/**
+	 * Meta capabilities that receive a term ID in $args[0].
+	 *
+	 * @var list<string>
+	 */
+	private const TERM_OBJECT_META_CAPS = array(
+		'assign_term',
+		'edit_term',
+		'delete_term',
+	);
+
+	/**
+	 * @param list<string> $caps
+	 * @param list<mixed>  $args
 	 * @return list<string>
 	 */
 	public static function map_meta_cap( array $caps, string $cap, int $user_id, array $args ): array {
-		unset( $cap );
-
 		if ( $user_id <= 0 || ! self::user_is_restricted_author( $user_id ) ) {
+			return $caps;
+		}
+
+		// Term meta-caps pass a term ID — never treat it as a post ID
+		// (collision caused "not allowed to assign the provided terms").
+		if ( in_array( $cap, self::TERM_OBJECT_META_CAPS, true ) ) {
+			return self::map_term_meta_cap( $caps, $args );
+		}
+
+		if ( ! in_array( $cap, self::POST_OBJECT_META_CAPS, true ) ) {
 			return $caps;
 		}
 
@@ -237,6 +274,29 @@ final class AuthorAccess {
 		}
 
 		if ( ! in_array( $post->post_type, self::ALLOWED_POST_TYPES, true ) ) {
+			return array( 'do_not_allow' );
+		}
+
+		return $caps;
+	}
+
+	/**
+	 * @param list<string> $caps
+	 * @param list<mixed>  $args
+	 * @return list<string>
+	 */
+	private static function map_term_meta_cap( array $caps, array $args ): array {
+		$term_id = isset( $args[0] ) ? (int) $args[0] : 0;
+		if ( $term_id <= 0 ) {
+			return $caps;
+		}
+
+		$term = get_term( $term_id );
+		if ( ! $term instanceof \WP_Term ) {
+			return $caps;
+		}
+
+		if ( ! in_array( $term->taxonomy, self::ALLOWED_TAXONOMIES, true ) ) {
 			return array( 'do_not_allow' );
 		}
 

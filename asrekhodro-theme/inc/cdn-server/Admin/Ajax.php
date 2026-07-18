@@ -96,49 +96,66 @@ final class Ajax {
 
 		check_ajax_referer( self::UPLOAD_NONCE, 'nonce' );
 
+		if ( function_exists( 'set_time_limit' ) ) {
+			@set_time_limit( 120 );
+		}
+
 		if ( empty( $_FILES['file'] ) || ! is_array( $_FILES['file'] ) ) {
 			wp_send_json_error( array( 'message' => __( 'فایلی دریافت نشد.', 'asrekhodro' ) ) );
 		}
 
-		// $_FILES is validated inside Uploader (is_uploaded_file, size, mime).
-		$file       = self::sanitize_file_array( $_FILES['file'] );
-		$public_url = Uploader::handle( $file );
+		try {
+			// $_FILES is validated inside Uploader (is_uploaded_file, size, mime).
+			$file       = self::sanitize_file_array( $_FILES['file'] );
+			$public_url = Uploader::handle( $file );
 
-		if ( is_wp_error( $public_url ) ) {
+			if ( is_wp_error( $public_url ) ) {
+				wp_send_json_error(
+					array(
+						'message'      => $public_url->get_error_message(),
+						'upload_debug' => Uploader::format_upload_debug_rows(),
+					)
+				);
+			}
+
+			$attachment_id = ExternalMedia::register_url(
+				$public_url,
+				array(
+					'allow_fallback'    => true,
+					'skip_remote_probe' => true,
+				)
+			);
+
+			if ( $attachment_id <= 0 ) {
+				wp_send_json_error(
+					array(
+						'message' => __( 'فایل آپلود شد اما ثبت در کتابخانه رسانه ناموفق بود.', 'asrekhodro' ),
+						'url'     => $public_url,
+					)
+				);
+			}
+
+			$attachment = wp_prepare_attachment_for_js( $attachment_id );
+
+			wp_send_json_success(
+				array(
+					'url'          => $public_url,
+					'attachments'  => $attachment ? array( $attachment ) : array(),
+					'upload_debug' => Uploader::format_upload_debug_rows(),
+				)
+			);
+		} catch ( \Throwable $e ) {
 			wp_send_json_error(
 				array(
-					'message'      => $public_url->get_error_message(),
+					'message' => sprintf(
+						/* translators: %s: exception message */
+						__( 'خطای سرور هنگام آپلود CDN: %s', 'asrekhodro' ),
+						$e->getMessage()
+					),
 					'upload_debug' => Uploader::format_upload_debug_rows(),
 				)
 			);
 		}
-
-		$attachment_id = ExternalMedia::register_url(
-			$public_url,
-			array(
-				'allow_fallback'    => true,
-				'skip_remote_probe' => true,
-			)
-		);
-
-		if ( $attachment_id <= 0 ) {
-			wp_send_json_error(
-				array(
-					'message' => __( 'فایل آپلود شد اما ثبت در کتابخانه رسانه ناموفق بود.', 'asrekhodro' ),
-					'url'     => $public_url,
-				)
-			);
-		}
-
-		$attachment = wp_prepare_attachment_for_js( $attachment_id );
-
-		wp_send_json_success(
-			array(
-				'url'          => $public_url,
-				'attachments'  => $attachment ? array( $attachment ) : array(),
-				'upload_debug' => Uploader::format_upload_debug_rows(),
-			)
-		);
 	}
 
 	/**
