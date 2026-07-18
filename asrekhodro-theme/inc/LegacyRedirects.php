@@ -17,11 +17,11 @@ final class LegacyRedirects {
 			return;
 		}
 
-		if ( is_singular( array( 'ak_magazine', 'ak_video', 'ak_review', 'carsinfo' ) ) || is_post_type_archive( 'ak_magazine' ) ) {
+		if ( is_singular( array( 'post', 'ak_magazine', 'ak_video', 'ak_review', 'carsinfo' ) ) ) {
 			return;
 		}
 
-		if ( is_singular( 'post' ) ) {
+		if ( is_post_type_archive( 'ak_magazine' ) ) {
 			return;
 		}
 
@@ -52,6 +52,8 @@ final class LegacyRedirects {
 				wp_safe_redirect( $target, 301 );
 				exit;
 			}
+
+			return;
 		}
 
 		$content_id = self::extract_news_content_id( $path );
@@ -61,6 +63,8 @@ final class LegacyRedirects {
 				wp_safe_redirect( $target, 301 );
 				exit;
 			}
+
+			return;
 		}
 
 		$kiosk_file_id = self::extract_kiosk_file_id( $path );
@@ -70,20 +74,11 @@ final class LegacyRedirects {
 				wp_safe_redirect( $target, 301 );
 				exit;
 			}
+
+			return;
 		}
 
-		$redirect = self::match_legacy_redirect_file( $path );
-		if ( $redirect ) {
-			wp_safe_redirect( $redirect, 301 );
-			exit;
-		}
-
-		$legacy_target = self::match_stored_legacy_path( $path, $uri );
-		if ( $legacy_target ) {
-			wp_safe_redirect( $legacy_target, 301 );
-			exit;
-		}
-
+		// Cheap pattern redirects only — skip heavy meta probes on normal archives/home.
 		$legacy_category = self::match_legacy_category_slug( $path );
 		if ( $legacy_category ) {
 			wp_safe_redirect( $legacy_category, 301 );
@@ -95,6 +90,65 @@ final class LegacyRedirects {
 			wp_safe_redirect( $legacy_home_category, 301 );
 			exit;
 		}
+
+		if ( self::is_normal_wp_front_path( $path ) ) {
+			return;
+		}
+
+		$redirect = self::match_legacy_redirect_file( $path );
+		if ( $redirect ) {
+			wp_safe_redirect( $redirect, 301 );
+			exit;
+		}
+
+		if ( ! self::should_probe_stored_legacy_path( $path ) ) {
+			return;
+		}
+
+		$legacy_target = self::match_stored_legacy_path( $path, $uri );
+		if ( $legacy_target ) {
+			wp_safe_redirect( $legacy_target, 301 );
+			exit;
+		}
+	}
+
+	/**
+	 * Home, blog index, category/tag/author archives — no stored-legacy meta lookup.
+	 */
+	private static function is_normal_wp_front_path( string $path ): bool {
+		if ( $path === '/' || $path === '' ) {
+			return true;
+		}
+
+		if ( preg_match( '#^/page/\d+/?$#i', $path ) ) {
+			return true;
+		}
+
+		if ( preg_match( '#^/(category|tag|author|search|comments|feed)(/|$)#i', $path ) ) {
+			return true;
+		}
+
+		if ( is_home() || is_front_page() || is_category() || is_tag() || is_author() || is_date() || is_search() ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Only probe _asrekhodro_legacy_path meta for paths that look legacy-shaped.
+	 */
+	private static function should_probe_stored_legacy_path( string $path ): bool {
+		if ( self::is_normal_wp_front_path( $path ) ) {
+			return false;
+		}
+
+		// Known modern ID routes already handled above.
+		if ( preg_match( '#^/(News|video|review|carsinfo|Home/Kiosk|Home/News|Gallery/Content)/\d+#i', $path ) ) {
+			return false;
+		}
+
+		return (bool) preg_match( '#^/(Home|News|Gallery|video|Mobile)/#i', $path );
 	}
 
 	private static function extract_legacy_video_slug_id( string $path ): int {

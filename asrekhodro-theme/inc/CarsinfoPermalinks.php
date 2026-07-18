@@ -111,7 +111,6 @@ final class CarsinfoPermalinks {
 		$query->is_home           = false;
 
 		status_header( 200 );
-		nocache_headers();
 
 		return true;
 	}
@@ -218,9 +217,9 @@ final class CarsinfoPermalinks {
 			return null;
 		}
 
-		$slug = NewsPermalinks::slug_from_title( $post->post_title );
-		if ( $slug === '' ) {
-			$slug = (string) $post->post_name;
+		$slug = trim( (string) $post->post_name, '/' );
+		if ( $slug === '' || str_contains( $slug, '%' ) ) {
+			$slug = NewsPermalinks::slug_from_title( $post->post_title );
 		}
 		if ( $slug === '' ) {
 			$slug = 'carsinfo-' . $post_id;

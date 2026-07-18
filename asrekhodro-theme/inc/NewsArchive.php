@@ -145,7 +145,7 @@ final class NewsArchive {
 		$year        = (int) ( $active['year'] ?? 0 );
 		$month       = (int) ( $active['month'] ?? 0 );
 		$day         = (int) ( $active['day'] ?? 0 );
-		$year_start  = max( 1380, $now['year'] - 15 );
+		$year_start  = 1388;
 		$year_end    = $now['year'];
 		$years       = array();
 

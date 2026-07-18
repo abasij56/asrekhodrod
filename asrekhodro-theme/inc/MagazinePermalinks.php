@@ -111,7 +111,6 @@ final class MagazinePermalinks {
 		$query->is_home           = false;
 
 		status_header( 200 );
-		nocache_headers();
 
 		return true;
 	}
@@ -202,27 +201,40 @@ final class MagazinePermalinks {
 			return 0;
 		}
 
-		$posts = get_posts(
-			array(
-				'post_type'      => self::CPT,
-				'posts_per_page' => 1,
-				'post_status'    => 'any',
-				'meta_key'       => '_asrekhodro_file_id',
-				'meta_value'     => $route_id,
-				'fields'         => 'ids',
-			)
-		);
-
-		if ( ! empty( $posts ) ) {
-			return (int) $posts[0];
+		$cache_key = 'ak_kiosk_route_' . $route_id;
+		$cached    = wp_cache_get( $cache_key, 'asrekhodro' );
+		if ( false !== $cached && is_numeric( $cached ) ) {
+			return (int) $cached;
 		}
 
 		$post = get_post( $route_id );
 		if ( $post instanceof \WP_Post && $post->post_type === self::CPT && $post->post_status !== 'trash' ) {
-			return (int) $post->ID;
+			$file_id = (int) get_post_meta( $post->ID, '_asrekhodro_file_id', true );
+			if ( $file_id <= 0 || $file_id === $route_id ) {
+				wp_cache_set( $cache_key, (int) $post->ID, 'asrekhodro', HOUR_IN_SECONDS );
+
+				return (int) $post->ID;
+			}
 		}
 
-		return 0;
+		$posts = get_posts(
+			array(
+				'post_type'              => self::CPT,
+				'posts_per_page'         => 1,
+				'post_status'            => 'any',
+				'meta_key'               => '_asrekhodro_file_id',
+				'meta_value'             => $route_id,
+				'fields'                 => 'ids',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			)
+		);
+
+		$post_id = ! empty( $posts ) ? (int) $posts[0] : 0;
+		wp_cache_set( $cache_key, $post_id, 'asrekhodro', HOUR_IN_SECONDS );
+
+		return $post_id;
 	}
 
 	public static function build_url_for_post( int $post_id ): ?string {
@@ -236,9 +248,9 @@ final class MagazinePermalinks {
 			return null;
 		}
 
-		$slug = NewsPermalinks::slug_from_title( $post->post_title );
-		if ( $slug === '' ) {
-			$slug = (string) $post->post_name;
+		$slug = trim( (string) $post->post_name, '/' );
+		if ( $slug === '' || str_contains( $slug, '%' ) ) {
+			$slug = NewsPermalinks::slug_from_title( $post->post_title );
 		}
 		if ( $slug === '' ) {
 			$slug = 'kiosk-' . $post_id;

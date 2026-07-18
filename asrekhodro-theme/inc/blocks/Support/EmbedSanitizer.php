@@ -25,8 +25,46 @@ final class EmbedSanitizer {
 		 * @param string $html Raw embed HTML from the block field.
 		 */
 		$html = (string) apply_filters( 'asrekhodro/cinfo_video_embed_raw', $html );
+		$html = self::normalize_aparat_responsive_iframe( $html );
 
 		return wp_kses( $html, self::allowed_tags() );
+	}
+
+	/**
+	 * Aparat's responsive iframe snippet relies on an inline <style> block and
+	 * absolute positioning. Theme CSS (aspect-ratio / height:auto on
+	 * .ci-video__player iframe) breaks that layout, and wp_kses may strip
+	 * display:block from the spacer span. Collapse it to a plain iframe that
+	 * the player CSS already sizes correctly. Script-based Aparat embeds are left alone.
+	 */
+	private static function normalize_aparat_responsive_iframe( string $html ): string {
+		if ( ! preg_match( '/aparat\.com/i', $html ) ) {
+			return $html;
+		}
+
+		// Script embeds (e.g. aparat.com/embed/...) already work.
+		if ( preg_match( '/<script\b/i', $html ) ) {
+			return $html;
+		}
+
+		$is_responsive_wrapper = (bool) preg_match( '/h_iframe-aparat_embed_frame/i', $html );
+		if ( ! $is_responsive_wrapper ) {
+			return $html;
+		}
+
+		if ( ! preg_match( '/<iframe\b[^>]*\bsrc\s*=\s*(["\'])(.*?)\1[^>]*>/i', $html, $match ) ) {
+			return $html;
+		}
+
+		$src = esc_url( $match[2] );
+		if ( $src === '' ) {
+			return $html;
+		}
+
+		return sprintf(
+			'<iframe src="%s" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" loading="lazy"></iframe>',
+			esc_attr( $src )
+		);
 	}
 
 	/**

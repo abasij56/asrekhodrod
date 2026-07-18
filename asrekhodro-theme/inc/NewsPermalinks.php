@@ -128,7 +128,6 @@ final class NewsPermalinks {
 		$query->is_tax            = false;
 
 		status_header( 200 );
-		nocache_headers();
 
 		return true;
 	}
@@ -694,24 +693,36 @@ final class NewsPermalinks {
 	}
 
 	/**
-	 * Resolve /News/{id}/... — prefer imported content_id, else WP post ID.
+	 * Resolve /News/{id}/... — try WP post by ID first (cheap), then content_id meta.
+	 * No new meta written; result cached in object cache only.
 	 */
 	public static function resolve_post_id_by_route_id( int $route_id ): int {
 		if ( $route_id <= 0 ) {
 			return 0;
 		}
 
-		$by_meta = self::find_post_id_by_content_id( $route_id );
-		if ( $by_meta > 0 ) {
-			return $by_meta;
+		$cache_key = 'ak_news_route_' . $route_id;
+		$cached    = wp_cache_get( $cache_key, 'asrekhodro' );
+		if ( false !== $cached && is_numeric( $cached ) ) {
+			return (int) $cached;
 		}
 
 		$post = get_post( $route_id );
 		if ( $post instanceof \WP_Post && $post->post_type === 'post' && $post->post_status !== 'trash' ) {
-			return (int) $post->ID;
+			$content_id = (int) get_post_meta( $post->ID, '_asrekhodro_content_id', true );
+			// New post (no content_id) or imported post whose content_id equals this ID.
+			if ( $content_id <= 0 || $content_id === $route_id ) {
+				wp_cache_set( $cache_key, (int) $post->ID, 'asrekhodro', HOUR_IN_SECONDS );
+
+				return (int) $post->ID;
+			}
+			// Different content_id on this WP row — URL id is not this post; fall through.
 		}
 
-		return 0;
+		$by_meta = self::find_post_id_by_content_id( $route_id );
+		wp_cache_set( $cache_key, $by_meta, 'asrekhodro', HOUR_IN_SECONDS );
+
+		return $by_meta;
 	}
 
 	public static function build_url_for_post( int $post_id ): ?string {
@@ -728,26 +739,21 @@ final class NewsPermalinks {
 		return self::build_url( $route_id, self::resolve_slug( $post ) );
 	}
 
+	/**
+	 * Permalink slug from stored post_name (cheap). Rebuild from title only if empty/broken.
+	 */
 	public static function resolve_slug( \WP_Post $post ): string {
-		$from_title = self::slug_from_title( $post->post_title );
-		$slug       = (string) $post->post_name;
-
-		if ( $from_title !== '' ) {
-			if (
-				$slug === ''
-				|| str_starts_with( $slug, 'content-' )
-				|| str_contains( $slug, '%' )
-				|| ( $slug !== $from_title && str_starts_with( $from_title, $slug ) )
-			) {
-				return $from_title;
-			}
-		}
-
-		if ( $slug !== '' ) {
+		$slug = trim( (string) $post->post_name, '/' );
+		if ( $slug !== '' && ! str_contains( $slug, '%' ) ) {
 			return $slug;
 		}
 
-		return $from_title !== '' ? $from_title : 'post-' . $post->ID;
+		$from_title = self::slug_from_title( $post->post_title );
+		if ( $from_title !== '' ) {
+			return $from_title;
+		}
+
+		return $slug !== '' ? $slug : 'post-' . $post->ID;
 	}
 
 	public static function sync_post( int $post_id, int $content_id, string $title ): string {
@@ -769,17 +775,29 @@ final class NewsPermalinks {
 			return 0;
 		}
 
+		$cache_key = 'ak_news_cid_' . $content_id;
+		$cached    = wp_cache_get( $cache_key, 'asrekhodro' );
+		if ( false !== $cached && is_numeric( $cached ) ) {
+			return (int) $cached;
+		}
+
 		$posts = get_posts(
 			array(
-				'post_type'      => 'post',
-				'posts_per_page' => 1,
-				'post_status'    => 'any',
-				'meta_key'       => '_asrekhodro_content_id',
-				'meta_value'     => $content_id,
-				'fields'         => 'ids',
+				'post_type'              => 'post',
+				'posts_per_page'         => 1,
+				'post_status'            => 'any',
+				'meta_key'               => '_asrekhodro_content_id',
+				'meta_value'             => $content_id,
+				'fields'                 => 'ids',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
 			)
 		);
 
-		return ! empty( $posts ) ? (int) $posts[0] : 0;
+		$post_id = ! empty( $posts ) ? (int) $posts[0] : 0;
+		wp_cache_set( $cache_key, $post_id, 'asrekhodro', HOUR_IN_SECONDS );
+
+		return $post_id;
 	}
 }

@@ -240,17 +240,21 @@ final class Uploader {
 		}
 
 		$map = array(
-			'configured_base'    => __( 'مسیر پایه (تنظیمات)', 'asrekhodro' ),
-			'login_pwd'          => __( 'pwd بعد از ورود FTP', 'asrekhodro' ),
-			'base_mode'          => __( 'نحوه ورود به پایه', 'asrekhodro' ),
-			'pwd_after_base'     => __( 'pwd بعد از ورود به پایه', 'asrekhodro' ),
-			'ftp_relative'       => __( 'مسیر نسبی FTP', 'asrekhodro' ),
-			'pwd_after_mkdir'    => __( 'pwd بعد از ساخت پوشه', 'asrekhodro' ),
-			'ftp_file_path'      => __( 'مسیر واقعی فایل روی FTP (pwd)', 'asrekhodro' ),
+			'configured_base'     => __( 'مسیر پایه (تنظیمات)', 'asrekhodro' ),
+			'login_pwd'           => __( 'pwd بعد از ورود FTP', 'asrekhodro' ),
+			'base_mode'           => __( 'نحوه ورود به پایه', 'asrekhodro' ),
+			'pwd_after_base'      => __( 'pwd بعد از ورود به پایه', 'asrekhodro' ),
+			'ftp_relative'        => __( 'مسیر نسبی FTP', 'asrekhodro' ),
+			'pwd_after_mkdir'     => __( 'pwd بعد از ساخت پوشه', 'asrekhodro' ),
+			'data_mode'           => __( 'حالت کانال داده', 'asrekhodro' ),
+			'upload_mode'         => __( 'حالت آپلود موفق', 'asrekhodro' ),
+			'upload_remote'       => __( 'مسیر remote استفاده‌شده', 'asrekhodro' ),
+			'ftp_last_message'    => __( 'آخرین پیام سرور FTP', 'asrekhodro' ),
+			'ftp_file_path'       => __( 'مسیر واقعی فایل روی FTP (pwd)', 'asrekhodro' ),
 			'filezilla_full_path' => __( 'مسیر کامل برای FileZilla', 'asrekhodro' ),
-			'canonical_relative' => __( 'مسیر وب (canonical)', 'asrekhodro' ),
-			'public_url'         => __( 'URL عمومی', 'asrekhodro' ),
-			'logical_absolute'   => __( 'مسیر منطقی مطلق', 'asrekhodro' ),
+			'canonical_relative'  => __( 'مسیر وب (canonical)', 'asrekhodro' ),
+			'public_url'          => __( 'URL عمومی', 'asrekhodro' ),
+			'logical_absolute'    => __( 'مسیر منطقی مطلق', 'asrekhodro' ),
 		);
 
 		foreach ( $map as $key => $label ) {

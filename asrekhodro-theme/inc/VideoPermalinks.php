@@ -120,7 +120,6 @@ final class VideoPermalinks {
 		$query->is_home           = false;
 
 		status_header( 200 );
-		nocache_headers();
 
 		return true;
 	}
@@ -216,17 +215,26 @@ final class VideoPermalinks {
 			return 0;
 		}
 
-		$by_meta = self::find_post_id_by_content_id( $route_id );
-		if ( $by_meta > 0 ) {
-			return $by_meta;
+		$cache_key = 'ak_video_route_' . $route_id;
+		$cached    = wp_cache_get( $cache_key, 'asrekhodro' );
+		if ( false !== $cached && is_numeric( $cached ) ) {
+			return (int) $cached;
 		}
 
 		$post = get_post( $route_id );
 		if ( $post instanceof \WP_Post && $post->post_type === self::CPT && $post->post_status !== 'trash' ) {
-			return (int) $post->ID;
+			$content_id = (int) get_post_meta( $post->ID, '_asrekhodro_content_id', true );
+			if ( $content_id <= 0 || $content_id === $route_id ) {
+				wp_cache_set( $cache_key, (int) $post->ID, 'asrekhodro', HOUR_IN_SECONDS );
+
+				return (int) $post->ID;
+			}
 		}
 
-		return 0;
+		$by_meta = self::find_post_id_by_content_id( $route_id );
+		wp_cache_set( $cache_key, $by_meta, 'asrekhodro', HOUR_IN_SECONDS );
+
+		return $by_meta;
 	}
 
 	public static function build_url( int $route_id, string $slug ): string {
@@ -253,25 +261,17 @@ final class VideoPermalinks {
 	}
 
 	public static function resolve_slug( \WP_Post $post ): string {
-		$from_title = NewsPermalinks::slug_from_title( $post->post_title );
-		$slug       = (string) $post->post_name;
-
-		if ( $from_title !== '' ) {
-			if (
-				$slug === ''
-				|| preg_match( '/^video-\d+$/', $slug )
-				|| str_contains( $slug, '%' )
-				|| ( $slug !== $from_title && str_starts_with( $from_title, $slug ) )
-			) {
-				return $from_title;
-			}
-		}
-
-		if ( $slug !== '' ) {
+		$slug = trim( (string) $post->post_name, '/' );
+		if ( $slug !== '' && ! str_contains( $slug, '%' ) ) {
 			return $slug;
 		}
 
-		return $from_title !== '' ? $from_title : 'video-' . $post->ID;
+		$from_title = NewsPermalinks::slug_from_title( $post->post_title );
+		if ( $from_title !== '' ) {
+			return $from_title;
+		}
+
+		return $slug !== '' ? $slug : 'video-' . $post->ID;
 	}
 
 	public static function unique_video_slug( string $title, int $post_id, int $content_id ): string {
@@ -352,18 +352,30 @@ final class VideoPermalinks {
 			return 0;
 		}
 
+		$cache_key = 'ak_video_cid_' . $content_id;
+		$cached    = wp_cache_get( $cache_key, 'asrekhodro' );
+		if ( false !== $cached && is_numeric( $cached ) ) {
+			return (int) $cached;
+		}
+
 		$posts = get_posts(
 			array(
-				'post_type'      => self::CPT,
-				'posts_per_page' => 1,
-				'post_status'    => 'any',
-				'meta_key'       => '_asrekhodro_content_id',
-				'meta_value'     => $content_id,
-				'fields'         => 'ids',
+				'post_type'              => self::CPT,
+				'posts_per_page'         => 1,
+				'post_status'            => 'any',
+				'meta_key'               => '_asrekhodro_content_id',
+				'meta_value'             => $content_id,
+				'fields'                 => 'ids',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
 			)
 		);
 
-		return ! empty( $posts ) ? (int) $posts[0] : 0;
+		$post_id = ! empty( $posts ) ? (int) $posts[0] : 0;
+		wp_cache_set( $cache_key, $post_id, 'asrekhodro', HOUR_IN_SECONDS );
+
+		return $post_id;
 	}
 
 	public static function maybe_redirect_canonical(): void {

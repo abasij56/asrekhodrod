@@ -285,27 +285,60 @@ final class PersianDate {
 	}
 
 	/**
+	 * Unix timestamp for a post/comment.
+	 *
+	 * Do not use bare strtotime() on post_date / comment_date: those strings are
+	 * already in the site timezone. Interpreting them as UTC (common when PHP
+	 * default TZ is UTC) and then applying wp_timezone() shifts the clock by
+	 * the Iran offset (+03:30) — e.g. 16:50 becomes 20:20.
+	 *
 	 * @param mixed $object
 	 */
 	private static function object_timestamp( $object ): int {
-		if ( $object instanceof \Timber\Post || $object instanceof \Timber\Comment ) {
-			$ts = strtotime( $object->date( 'Y-m-d H:i:s' ) );
+		if ( $object instanceof \Timber\Post ) {
+			$ts = get_post_timestamp( (int) $object->ID );
 
-			return $ts ? $ts : 0;
+			return is_int( $ts ) && $ts > 0 ? $ts : 0;
 		}
 
 		if ( $object instanceof \WP_Post ) {
-			$ts = strtotime( (string) $object->post_date );
+			$ts = get_post_timestamp( $object );
 
-			return $ts ? $ts : 0;
+			return is_int( $ts ) && $ts > 0 ? $ts : 0;
+		}
+
+		if ( $object instanceof \Timber\Comment ) {
+			$comment_id = (int) ( $object->ID ?? $object->id ?? 0 );
+
+			return $comment_id > 0 ? self::comment_timestamp( $comment_id ) : 0;
 		}
 
 		if ( $object instanceof \WP_Comment ) {
-			$ts = strtotime( (string) $object->comment_date );
-
-			return $ts ? $ts : 0;
+			return self::comment_timestamp( (int) $object->comment_ID );
 		}
 
 		return 0;
+	}
+
+	private static function comment_timestamp( int $comment_id ): int {
+		if ( $comment_id <= 0 ) {
+			return 0;
+		}
+
+		$comment = get_comment( $comment_id );
+		if ( ! $comment instanceof \WP_Comment ) {
+			return 0;
+		}
+
+		$gmt = (string) $comment->comment_date_gmt;
+		if ( $gmt !== '' && $gmt !== '0000-00-00 00:00:00' ) {
+			$datetime = date_create_immutable( $gmt, new \DateTimeZone( 'UTC' ) );
+
+			return $datetime instanceof \DateTimeImmutable ? $datetime->getTimestamp() : 0;
+		}
+
+		$datetime = date_create_immutable( (string) $comment->comment_date, wp_timezone() );
+
+		return $datetime instanceof \DateTimeImmutable ? $datetime->getTimestamp() : 0;
 	}
 }

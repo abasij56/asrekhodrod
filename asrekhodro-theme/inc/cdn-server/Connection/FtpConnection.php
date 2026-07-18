@@ -84,34 +84,63 @@ final class FtpConnection implements ConnectionInterface {
 
 		$this->last_debug['local_size'] = $local_size;
 
-		$ok = @ftp_put( $conn, $filename, $local_path, FTP_BINARY );
+		$base_pwd = (string) ( $this->last_debug['pwd_after_base'] ?? '' );
+
+		// Attempt 1: STOR from the target directory (basename only).
+		$this->enable_passive_mode( $conn );
+		$ok = $this->put_with_mode_fallback( $conn, $filename, $local_path );
+
+		// Attempt 2: return to base and STOR with relative path (helps some shared hosts).
+		if ( ! $ok && $relative !== $filename && $base_pwd !== '' && $base_pwd !== '?' ) {
+			$this->restore_pwd( $conn, $base_pwd );
+			$this->enable_passive_mode( $conn );
+			$this->last_debug['put_from_base'] = true;
+			$ok = $this->put_with_mode_fallback( $conn, $relative, $local_path );
+			if ( $ok ) {
+				// Verification below expects to be in the file's directory for SIZE/NLST.
+				$dir_pwd = self::join_ftp_path( $base_pwd, dirname( $relative ) );
+				$this->restore_pwd( $conn, $dir_pwd );
+			}
+		}
+
 		if ( ! $ok ) {
-			$this->last_debug['pwd_after_upload'] = $this->pwd_or_unknown( $conn );
+			$pwd = $this->pwd_or_unknown( $conn );
+			$this->last_debug['pwd_after_upload'] = $pwd;
+			$ftp_msg = (string) ( $this->last_debug['ftp_last_message'] ?? '' );
 			ftp_close( $conn );
 			return $this->attach_debug(
 				new \WP_Error(
 					'ak_cdn_ftp_put_failed',
 					sprintf(
-						__( 'آپلود فایل ناموفق بود (%1$s) در مسیر FTP: %2$s', 'asrekhodro' ),
+						__( 'آپلود فایل ناموفق بود (%1$s) در مسیر FTP: %2$s%3$s', 'asrekhodro' ),
 						$filename,
-						(string) $this->last_debug['pwd_after_upload']
+						$pwd,
+						$ftp_msg !== '' ? ' — ' . $ftp_msg : ''
 					)
 				)
 			);
 		}
 
-		$remote_size = @ftp_size( $conn, $filename );
-		$listed      = $this->file_listed( $conn, $filename );
-		$pwd         = $this->pwd_or_unknown( $conn );
+		$remote_name = basename( str_replace( '\\', '/', (string) ( $this->last_debug['upload_remote'] ?? $filename ) ) );
+		$remote_size = @ftp_size( $conn, $remote_name );
+		if ( $remote_size < 0 ) {
+			$alt = (string) ( $this->last_debug['upload_remote'] ?? '' );
+			if ( $alt !== '' && $alt !== $remote_name ) {
+				$remote_size = @ftp_size( $conn, $alt );
+			}
+		}
+		$listed = $this->file_listed( $conn, $remote_name );
+		$pwd    = $this->pwd_or_unknown( $conn );
 
 		$this->last_debug['pwd_after_upload'] = $pwd;
 		$this->last_debug['remote_size']      = $remote_size;
 		$this->last_debug['file_listed']      = $listed;
-		$this->last_debug['ftp_file_path']    = self::join_ftp_path( $pwd, $filename );
+		$this->last_debug['ftp_file_path']    = self::join_ftp_path( $pwd, $remote_name );
 
 		ftp_close( $conn );
 
-		if ( $remote_size < 0 || $remote_size !== $local_size || ! $listed ) {
+		// Size match is enough; NLST often fails on NAT hosts even when STOR succeeded.
+		if ( $remote_size < 0 || $remote_size !== $local_size ) {
 			return $this->attach_debug(
 				new \WP_Error(
 					'ak_cdn_ftp_verify_failed',
@@ -141,19 +170,34 @@ final class FtpConnection implements ConnectionInterface {
 			return $entered;
 		}
 
-		$this->last_debug['pwd_after_base'] = $this->pwd_or_unknown( $conn );
-		$listing                            = @ftp_nlist( $conn, '.' );
+		$pwd                                = $this->pwd_or_unknown( $conn );
+		$this->last_debug['pwd_after_base'] = $pwd;
+
+		$listing = $this->nlist_with_mode_fallback( $conn );
+		if ( is_array( $listing ) ) {
+			$this->last_debug['list_ok'] = true;
+			ftp_close( $conn );
+
+			return true;
+		}
+
+		$this->last_debug['list_ok'] = false;
+
+		// Listing can fail on Passive/NAT while upload still works — probe with a tiny file.
+		$probe = $this->probe_write_delete( $conn );
 		ftp_close( $conn );
 
-		if ( $listing === false ) {
+		if ( is_wp_error( $probe ) ) {
 			return new \WP_Error(
 				'ak_cdn_ftp_path',
 				sprintf(
-					__( 'اتصال برقرار شد اما لیست پوشه ممکن نیست (pwd: %s).', 'asrekhodro' ),
-					(string) $this->last_debug['pwd_after_base']
+					__( 'اتصال برقرار شد اما کانال داده FTP کار نمی‌کند (لیست/آپلود تستی ناموفق — pwd: %s).', 'asrekhodro' ),
+					$pwd
 				)
 			);
 		}
+
+		$this->last_debug['probe_ok'] = true;
 
 		return true;
 	}
@@ -212,9 +256,209 @@ final class FtpConnection implements ConnectionInterface {
 			);
 		}
 
-		@ftp_pasv( $conn, true );
+		$this->configure_transfer_options( $conn );
+		$this->enable_passive_mode( $conn );
 
 		return $conn;
+	}
+
+	/**
+	 * @param \FTP\Connection|resource $conn
+	 */
+	private function configure_transfer_options( $conn ): void {
+		if ( ! function_exists( 'ftp_set_option' ) ) {
+			return;
+		}
+
+		$timeout = (int) ( $this->settings['timeout'] ?? 20 );
+		$timeout = max( 60, $timeout > 0 ? $timeout : 60 );
+
+		if ( defined( 'FTP_TIMEOUT_SEC' ) ) {
+			@ftp_set_option( $conn, FTP_TIMEOUT_SEC, $timeout );
+			$this->last_debug['ftp_timeout'] = $timeout;
+		}
+
+		if ( defined( 'FTP_USEPASVADDRESS' ) ) {
+			@ftp_set_option( $conn, FTP_USEPASVADDRESS, false );
+			$this->last_debug['usepasvaddress'] = false;
+		}
+	}
+
+	/**
+	 * Prefer Passive, but ignore the PASV reply IP (common NAT/shared-host fix).
+	 *
+	 * @param \FTP\Connection|resource $conn
+	 */
+	private function enable_passive_mode( $conn ): void {
+		if ( defined( 'FTP_USEPASVADDRESS' ) && function_exists( 'ftp_set_option' ) ) {
+			@ftp_set_option( $conn, FTP_USEPASVADDRESS, false );
+			$this->last_debug['usepasvaddress'] = false;
+		}
+
+		@ftp_pasv( $conn, true );
+		$this->last_debug['data_mode'] = 'passive';
+	}
+
+	/**
+	 * @param \FTP\Connection|resource $conn
+	 */
+	private function enable_active_mode( $conn ): void {
+		@ftp_pasv( $conn, false );
+		$this->last_debug['data_mode'] = 'active';
+	}
+
+	/**
+	 * @param \FTP\Connection|resource $conn
+	 * @return list<string>|false
+	 */
+	private function nlist_with_mode_fallback( $conn ) {
+		$this->enable_passive_mode( $conn );
+		$listing = @ftp_nlist( $conn, '.' );
+		if ( is_array( $listing ) ) {
+			return $listing;
+		}
+
+		$this->enable_active_mode( $conn );
+		$listing = @ftp_nlist( $conn, '.' );
+		if ( is_array( $listing ) ) {
+			$this->last_debug['list_mode'] = 'active';
+			return $listing;
+		}
+
+		// Restore preferred mode for subsequent ops.
+		$this->enable_passive_mode( $conn );
+
+		return false;
+	}
+
+	/**
+	 * Try Passive then Active; relative name then absolute path; ftp_put then ftp_fput.
+	 *
+	 * @param \FTP\Connection|resource $conn
+	 */
+	private function put_with_mode_fallback( $conn, string $filename, string $local_path ): bool {
+		$pwd       = $this->pwd_or_unknown( $conn );
+		$absolute  = self::join_ftp_path( $pwd, $filename );
+		$remotes   = array_values( array_unique( array_filter( array( $filename, $absolute ) ) ) );
+		$attempts  = array();
+
+		foreach ( array( 'passive', 'active' ) as $mode ) {
+			if ( $mode === 'passive' ) {
+				$this->enable_passive_mode( $conn );
+			} else {
+				$this->enable_active_mode( $conn );
+			}
+
+			foreach ( $remotes as $remote ) {
+				// Re-assert mode immediately before each STOR (after CWD/MKD).
+				if ( $mode === 'passive' ) {
+					$this->enable_passive_mode( $conn );
+				} else {
+					$this->enable_active_mode( $conn );
+				}
+
+				if ( $this->try_stor( $conn, $remote, $local_path ) ) {
+					$this->last_debug['upload_mode']   = $mode;
+					$this->last_debug['upload_remote'] = $remote;
+					$this->last_debug['put_attempts']  = $attempts;
+
+					return true;
+				}
+
+				$msg = $this->ftp_message( $conn );
+				$attempts[] = array(
+					'mode'   => $mode,
+					'remote' => $remote,
+					'msg'    => $msg,
+				);
+				$this->last_debug['ftp_last_message'] = $msg;
+
+				// Some servers return false from ftp_put even though STOR finished.
+				$size = @ftp_size( $conn, $remote );
+				$local_size = filesize( $local_path );
+				if ( is_int( $local_size ) && $local_size > 0 && $size === $local_size ) {
+					$this->last_debug['upload_mode']      = $mode;
+					$this->last_debug['upload_remote']    = $remote;
+					$this->last_debug['put_false_negative'] = true;
+					$this->last_debug['put_attempts']     = $attempts;
+
+					return true;
+				}
+			}
+		}
+
+		$this->last_debug['put_attempts'] = $attempts;
+		$this->enable_passive_mode( $conn );
+
+		return false;
+	}
+
+	/**
+	 * @param \FTP\Connection|resource $conn
+	 */
+	private function try_stor( $conn, string $remote, string $local_path ): bool {
+		if ( @ftp_put( $conn, $remote, $local_path, FTP_BINARY ) ) {
+			return true;
+		}
+
+		$handle = @fopen( $local_path, 'rb' );
+		if ( ! $handle ) {
+			return false;
+		}
+
+		$ok = @ftp_fput( $conn, $remote, $handle, FTP_BINARY, 0 );
+		fclose( $handle );
+
+		return (bool) $ok;
+	}
+
+	/**
+	 * @param \FTP\Connection|resource $conn
+	 */
+	private function ftp_message( $conn ): string {
+		if ( ! function_exists( 'ftp_last_message' ) ) {
+			return '';
+		}
+
+		$msg = @ftp_last_message( $conn );
+
+		return is_string( $msg ) ? trim( $msg ) : '';
+	}
+
+	/**
+	 * Confirm the data channel can write even when NLST is blocked.
+	 *
+	 * @param \FTP\Connection|resource $conn
+	 * @return true|\WP_Error
+	 */
+	private function probe_write_delete( $conn ): bool|\WP_Error {
+		$tmp = wp_tempnam( 'ak-cdn-ftp-probe' );
+		if ( ! is_string( $tmp ) || $tmp === '' ) {
+			return new \WP_Error( 'ak_cdn_ftp_probe_tmp', __( 'ساخت فایل موقت تست ناموفق بود.', 'asrekhodro' ) );
+		}
+
+		$payload = 'ak-cdn-probe';
+		if ( false === file_put_contents( $tmp, $payload ) ) {
+			@unlink( $tmp );
+			return new \WP_Error( 'ak_cdn_ftp_probe_tmp', __( 'نوشتن فایل موقت تست ناموفق بود.', 'asrekhodro' ) );
+		}
+
+		$remote = '.ak-cdn-probe-' . wp_generate_password( 8, false, false ) . '.txt';
+		$ok     = $this->put_with_mode_fallback( $conn, $remote, $tmp );
+		@unlink( $tmp );
+
+		if ( ! $ok ) {
+			return new \WP_Error( 'ak_cdn_ftp_probe_put', __( 'آپلود تستی روی FTP ناموفق بود.', 'asrekhodro' ) );
+		}
+
+		$size = @ftp_size( $conn, $remote );
+		@ftp_delete( $conn, $remote );
+
+		if ( $size !== strlen( $payload ) ) {
+			return new \WP_Error( 'ak_cdn_ftp_probe_size', __( 'تأیید اندازه فایل تستی روی FTP ناموفق بود.', 'asrekhodro' ) );
+		}
+
+		return true;
 	}
 
 	/**
@@ -315,7 +559,7 @@ final class FtpConnection implements ConnectionInterface {
 	 * @param \FTP\Connection|resource $conn
 	 */
 	private function file_listed( $conn, string $filename ): bool {
-		$list = @ftp_nlist( $conn, '.' );
+		$list = $this->nlist_with_mode_fallback( $conn );
 		if ( ! is_array( $list ) ) {
 			return false;
 		}
