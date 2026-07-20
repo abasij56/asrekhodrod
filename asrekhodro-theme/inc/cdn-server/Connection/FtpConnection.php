@@ -85,13 +85,13 @@ final class FtpConnection implements ConnectionInterface {
 		}
 		$this->last_debug['pwd_after_mkdir'] = $this->pwd_or_unknown( $conn );
 
-		// One Passive STOR (FileZilla-like). Do not stack many hanging fallbacks.
-		$this->enable_passive_mode( $conn );
+		// Active FTP (host support): ftp_pasv(false). Do not stack many hanging fallbacks.
+		$this->enable_active_mode( $conn );
 		$ok = @ftp_put( $conn, $filename, $local_path, FTP_BINARY );
 		$this->last_debug['ftp_last_message'] = $this->ftp_message( $conn );
 
 		if ( $ok ) {
-			$this->last_debug['upload_mode']   = 'passive';
+			$this->last_debug['upload_mode']   = 'active';
 			$this->last_debug['upload_remote'] = $filename;
 		} else {
 			// Fast cURL fallback (often works when ext-ftp data channel hangs/fails).
@@ -162,7 +162,7 @@ final class FtpConnection implements ConnectionInterface {
 		$pwd                                = $this->pwd_or_unknown( $conn );
 		$this->last_debug['pwd_after_base'] = $pwd;
 
-		$this->enable_passive_mode( $conn );
+		$this->enable_active_mode( $conn );
 		$listing = @ftp_nlist( $conn, '.' );
 		if ( is_array( $listing ) ) {
 			$this->last_debug['list_ok'] = true;
@@ -254,7 +254,7 @@ final class FtpConnection implements ConnectionInterface {
 		}
 
 		$this->configure_transfer_options( $conn );
-		$this->enable_passive_mode( $conn );
+		$this->enable_active_mode( $conn );
 
 		return $conn;
 	}
@@ -271,24 +271,16 @@ final class FtpConnection implements ConnectionInterface {
 			@ftp_set_option( $conn, FTP_TIMEOUT_SEC, self::TRANSFER_TIMEOUT );
 			$this->last_debug['ftp_timeout'] = self::TRANSFER_TIMEOUT;
 		}
-
-		if ( defined( 'FTP_USEPASVADDRESS' ) ) {
-			@ftp_set_option( $conn, FTP_USEPASVADDRESS, false );
-			$this->last_debug['usepasvaddress'] = false;
-		}
 	}
 
 	/**
+	 * Host support requires Active FTP (PORT), not Passive (PASV).
+	 *
 	 * @param \FTP\Connection|resource $conn
 	 */
-	private function enable_passive_mode( $conn ): void {
-		if ( defined( 'FTP_USEPASVADDRESS' ) && function_exists( 'ftp_set_option' ) ) {
-			@ftp_set_option( $conn, FTP_USEPASVADDRESS, false );
-			$this->last_debug['usepasvaddress'] = false;
-		}
-
-		@ftp_pasv( $conn, true );
-		$this->last_debug['data_mode'] = 'passive';
+	private function enable_active_mode( $conn ): void {
+		@ftp_pasv( $conn, false );
+		$this->last_debug['data_mode'] = 'active';
 	}
 
 	/**
@@ -325,7 +317,8 @@ final class FtpConnection implements ConnectionInterface {
 			CURLOPT_UPLOAD         => true,
 			CURLOPT_INFILE         => $handle,
 			CURLOPT_INFILESIZE     => (int) filesize( $local_path ),
-			CURLOPT_FTP_USE_EPSV   => true,
+			CURLOPT_FTP_USE_EPSV   => false,
+			CURLOPT_FTPPORT        => '-', // Active FTP (PORT); matches ftp_pasv(false).
 			CURLOPT_TIMEOUT        => self::TRANSFER_TIMEOUT,
 			CURLOPT_CONNECTTIMEOUT => 10,
 			CURLOPT_RETURNTRANSFER => true,
@@ -389,7 +382,7 @@ final class FtpConnection implements ConnectionInterface {
 		}
 
 		$remote = '.ak-cdn-probe-' . wp_generate_password( 8, false, false ) . '.txt';
-		$this->enable_passive_mode( $conn );
+		$this->enable_active_mode( $conn );
 		$ok = @ftp_put( $conn, $remote, $tmp, FTP_BINARY );
 		@unlink( $tmp );
 

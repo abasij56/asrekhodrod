@@ -34,45 +34,42 @@ final class LegacyRedirects {
 			$path = ( isset( $mobile_match[1] ) && $mobile_match[1] !== '' ) ? $mobile_match[1] : '/';
 		}
 
+		$legacy_search = self::match_legacy_search( $path, $uri );
+		if ( $legacy_search ) {
+			wp_safe_redirect( $legacy_search, 301 );
+			exit;
+		}
+
 		$gallery_id = self::extract_gallery_content_id( $path );
 		if ( $gallery_id > 0 ) {
-			$target = self::find_video_url_by_content_id( $gallery_id );
-			if ( $target && ! self::paths_match( $path, $target ) ) {
-				wp_safe_redirect( $target, 301 );
-				exit;
-			}
-
+			self::redirect_or_404_by_content_id( $gallery_id, $path, array( 'ak_video', 'post' ) );
 			return;
 		}
 
-		$legacy_video_id = self::extract_legacy_video_slug_id( $path );
+		$legacy_video_id = self::extract_video_route_id( $path );
 		if ( $legacy_video_id > 0 ) {
-			$target = self::find_video_url_by_content_id( $legacy_video_id );
-			if ( $target && ! self::paths_match( $path, $target ) ) {
-				wp_safe_redirect( $target, 301 );
-				exit;
-			}
-
+			self::redirect_or_404_by_content_id( $legacy_video_id, $path, array( 'ak_video', 'post' ) );
 			return;
 		}
 
 		$content_id = self::extract_news_content_id( $path );
 		if ( $content_id > 0 ) {
-			$target = self::find_post_url_by_content_id( $content_id );
-			if ( $target && ! self::paths_match( $path, $target ) ) {
-				wp_safe_redirect( $target, 301 );
-				exit;
-			}
-
+			self::redirect_or_404_by_content_id( $content_id, $path, array( 'post' ) );
 			return;
 		}
 
 		$kiosk_file_id = self::extract_kiosk_file_id( $path );
 		if ( $kiosk_file_id > 0 ) {
 			$target = self::find_magazine_url_by_file_id( $kiosk_file_id );
-			if ( $target ) {
+			if ( ! $target ) {
+				$target = self::find_url_by_content_id( $kiosk_file_id, array( 'ak_magazine', 'post' ) );
+			}
+			if ( $target && ! self::paths_match( $path, $target ) ) {
 				wp_safe_redirect( $target, 301 );
 				exit;
+			}
+			if ( ! $target ) {
+				self::force_not_found();
 			}
 
 			return;
@@ -151,8 +148,12 @@ final class LegacyRedirects {
 		return (bool) preg_match( '#^/(Home|News|Gallery|video|Mobile)/#i', $path );
 	}
 
-	private static function extract_legacy_video_slug_id( string $path ): int {
+	private static function extract_video_route_id( string $path ): int {
 		if ( preg_match( '#^/video/video-(\d+)/?$#i', $path, $matches ) ) {
+			return (int) $matches[1];
+		}
+
+		if ( preg_match( '#^/video/(\d+)(?:/|$)#i', $path, $matches ) ) {
 			return (int) $matches[1];
 		}
 
@@ -198,6 +199,170 @@ final class LegacyRedirects {
 		return 0;
 	}
 
+	/**
+	 * Prefer typed matches, then any post with the same legacy content id. 301 or real 404.
+	 *
+	 * @param list<string> $preferred_types Post types to try first, in order.
+	 */
+	private static function redirect_or_404_by_content_id( int $content_id, string $path, array $preferred_types ): void {
+		$target = self::find_url_by_content_id( $content_id, $preferred_types );
+		if ( $target ) {
+			if ( ! self::paths_match( $path, $target ) ) {
+				wp_safe_redirect( $target, 301 );
+				exit;
+			}
+
+			return;
+		}
+
+		self::force_not_found();
+	}
+
+	/**
+	 * @param list<string> $preferred_types
+	 */
+	private static function find_url_by_content_id( int $content_id, array $preferred_types = array() ): ?string {
+		if ( $content_id <= 0 ) {
+			return null;
+		}
+
+		$cache_key = 'ak_legacy_cid_v2_' . $content_id . '_' . md5( implode( ',', $preferred_types ) );
+		$cached    = wp_cache_get( $cache_key, 'asrekhodro' );
+		if ( is_string( $cached ) && $cached !== '' ) {
+			return $cached;
+		}
+		if ( $cached === 0 ) {
+			return null;
+		}
+
+		$candidates = self::find_posts_by_content_id( $content_id );
+		if ( $candidates === array() ) {
+			wp_cache_set( $cache_key, 0, 'asrekhodro', HOUR_IN_SECONDS );
+
+			return null;
+		}
+
+		$tried = array();
+		foreach ( $preferred_types as $type ) {
+			foreach ( $candidates as $candidate ) {
+				if ( $candidate['type'] !== $type ) {
+					continue;
+				}
+				$tried[ $candidate['id'] ] = true;
+				$url = self::url_for_content_post( $candidate['id'] );
+				if ( $url ) {
+					wp_cache_set( $cache_key, $url, 'asrekhodro', HOUR_IN_SECONDS );
+
+					return $url;
+				}
+			}
+		}
+
+		foreach ( $candidates as $candidate ) {
+			if ( isset( $tried[ $candidate['id'] ] ) ) {
+				continue;
+			}
+			$url = self::url_for_content_post( $candidate['id'] );
+			if ( $url ) {
+				wp_cache_set( $cache_key, $url, 'asrekhodro', HOUR_IN_SECONDS );
+
+				return $url;
+			}
+		}
+
+		wp_cache_set( $cache_key, 0, 'asrekhodro', HOUR_IN_SECONDS );
+
+		return null;
+	}
+
+	/**
+	 * @return list<array{id: int, type: string}>
+	 */
+	private static function find_posts_by_content_id( int $content_id ): array {
+		$posts = get_posts(
+			array(
+				'post_type'              => array( 'post', 'ak_video', 'ak_review', 'ak_magazine', 'carsinfo' ),
+				'posts_per_page'         => 20,
+				'post_status'            => 'publish',
+				'meta_key'               => '_asrekhodro_content_id',
+				'meta_value'             => $content_id,
+				'orderby'                => 'ID',
+				'order'                  => 'ASC',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			)
+		);
+
+		$out = array();
+		foreach ( $posts as $post ) {
+			if ( ! $post instanceof \WP_Post || $post->post_status === 'trash' ) {
+				continue;
+			}
+			$out[] = array(
+				'id'   => (int) $post->ID,
+				'type' => (string) $post->post_type,
+			);
+		}
+
+		return $out;
+	}
+
+	private static function url_for_content_post( int $post_id ): ?string {
+		$post = get_post( $post_id );
+		if ( ! $post instanceof \WP_Post || $post->post_status === 'trash' ) {
+			return null;
+		}
+
+		$url = null;
+		switch ( $post->post_type ) {
+			case 'ak_video':
+				$url = VideoPermalinks::build_url_for_post( $post_id );
+				break;
+			case 'post':
+				$url = NewsPermalinks::build_url_for_post( $post_id );
+				break;
+			case 'ak_review':
+				$url = ReviewPermalinks::build_url_for_post( $post_id );
+				break;
+			case 'ak_magazine':
+				$url = MagazinePermalinks::build_url_for_post( $post_id );
+				break;
+			case 'carsinfo':
+				$url = CarsinfoPermalinks::build_url_for_post( $post_id );
+				break;
+		}
+
+		if ( ! is_string( $url ) || $url === '' ) {
+			$permalink = get_permalink( $post_id );
+			$url       = is_string( $permalink ) && $permalink !== '' ? $permalink : null;
+		}
+
+		return $url;
+	}
+
+	private static function force_not_found(): void {
+		global $wp_query;
+
+		if ( $wp_query instanceof \WP_Query ) {
+			$wp_query->set_404();
+			$wp_query->posts             = array();
+			$wp_query->post_count        = 0;
+			$wp_query->found_posts       = 0;
+			$wp_query->is_home           = false;
+			$wp_query->is_front_page     = false;
+			$wp_query->is_singular       = false;
+			$wp_query->is_single         = false;
+			$wp_query->is_page           = false;
+			$wp_query->is_archive        = false;
+			$wp_query->queried_object    = null;
+			$wp_query->queried_object_id = 0;
+		}
+
+		status_header( 404 );
+		nocache_headers();
+	}
+
 	private static function find_magazine_url_by_file_id( int $file_id ): ?string {
 		$cache_key = 'ak_kiosk_' . $file_id;
 		$cached    = wp_cache_get( $cache_key, 'asrekhodro' );
@@ -211,57 +376,6 @@ final class LegacyRedirects {
 		}
 
 		$url = MagazinePermalinks::build_url_for_post( $post_id );
-		if ( ! $url ) {
-			$url = get_permalink( $post_id );
-		}
-		if ( ! $url ) {
-			return null;
-		}
-
-		wp_cache_set( $cache_key, $url, 'asrekhodro', HOUR_IN_SECONDS );
-
-		return $url;
-	}
-
-	private static function find_video_url_by_content_id( int $content_id ): ?string {
-		$cache_key = 'ak_legacy_video_' . $content_id;
-		$cached    = wp_cache_get( $cache_key, 'asrekhodro' );
-		if ( is_string( $cached ) && $cached !== '' ) {
-			return $cached;
-		}
-
-		$post_id = VideoPermalinks::resolve_post_id_by_route_id( $content_id );
-		if ( $post_id <= 0 ) {
-			return null;
-		}
-
-		$url = VideoPermalinks::build_url_for_post( $post_id );
-		if ( ! $url ) {
-			$url = get_permalink( $post_id );
-		}
-
-		if ( ! $url ) {
-			return null;
-		}
-
-		wp_cache_set( $cache_key, $url, 'asrekhodro', HOUR_IN_SECONDS );
-
-		return $url;
-	}
-
-	private static function find_post_url_by_content_id( int $content_id ): ?string {
-		$cache_key = 'ak_legacy_' . $content_id;
-		$cached    = wp_cache_get( $cache_key, 'asrekhodro' );
-		if ( is_string( $cached ) && $cached !== '' ) {
-			return $cached;
-		}
-
-		$post_id = NewsPermalinks::resolve_post_id_by_route_id( $content_id );
-		if ( $post_id <= 0 ) {
-			return null;
-		}
-
-		$url = NewsPermalinks::build_url_for_post( $post_id );
 		if ( ! $url ) {
 			$url = get_permalink( $post_id );
 		}
@@ -429,6 +543,33 @@ final class LegacyRedirects {
 		wp_cache_set( $cache_key, $link, 'asrekhodro', HOUR_IN_SECONDS );
 
 		return $link;
+	}
+
+	/**
+	 * Old ASP.NET search: /Home/Search?query=... or /Mobile/Home/Search?query=...
+	 * → WordPress /?s=...
+	 */
+	private static function match_legacy_search( string $path, string $full_uri ): ?string {
+		if ( ! preg_match( '#^/home/search/?$#i', $path ) ) {
+			return null;
+		}
+
+		$query = '';
+		$qs    = (string) wp_parse_url( $full_uri, PHP_URL_QUERY );
+		if ( $qs !== '' ) {
+			parse_str( $qs, $params );
+			if ( isset( $params['query'] ) && is_string( $params['query'] ) ) {
+				$query = trim( wp_unslash( $params['query'] ) );
+			} elseif ( isset( $params['q'] ) && is_string( $params['q'] ) ) {
+				$query = trim( wp_unslash( $params['q'] ) );
+			}
+		}
+
+		if ( $query === '' ) {
+			return home_url( '/' );
+		}
+
+		return add_query_arg( 's', $query, home_url( '/' ) );
 	}
 
 	private static function match_legacy_home_category( string $path ): ?string {

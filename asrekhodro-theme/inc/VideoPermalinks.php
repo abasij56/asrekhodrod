@@ -103,7 +103,22 @@ final class VideoPermalinks {
 		$post_id = self::resolve_post_id_by_route_id( $route_id );
 		$post    = $post_id > 0 ? get_post( $post_id ) : null;
 		if ( ! $post instanceof \WP_Post || $post->post_type !== self::CPT || $post->post_status === 'trash' ) {
-			return $preempt;
+			// Legacy /Gallery/Content/{id} without a video must not fall through to the blog index.
+			$query->set_404();
+			$query->posts             = array();
+			$query->post_count        = 0;
+			$query->found_posts       = 0;
+			$query->is_home           = false;
+			$query->is_front_page     = false;
+			$query->is_singular       = false;
+			$query->is_single         = false;
+			$query->is_page           = false;
+			$query->is_archive        = false;
+			$query->queried_object    = null;
+			$query->queried_object_id = 0;
+			status_header( 404 );
+
+			return true;
 		}
 
 		$query->posts             = array( $post );
