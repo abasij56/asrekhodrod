@@ -108,6 +108,54 @@ final class NavMenu {
 	}
 
 	/**
+	 * URL for «جدیدترین شرایط فروش» — prefers main-nav match, then page/category by title.
+	 */
+	public static function sales_conditions_url(): string {
+		$label = 'جدیدترین شرایط فروش';
+
+		foreach ( self::items() as $item ) {
+			if ( trim( (string) ( $item['title'] ?? '' ) ) === $label ) {
+				$link = trim( (string) ( $item['link'] ?? '' ) );
+				if ( $link !== '' && $link !== '#' ) {
+					return $link;
+				}
+			}
+		}
+
+		$page = get_page_by_path( 'jadidtarin-sharayet-foroush' );
+		if ( ! $page instanceof \WP_Post ) {
+			$pages = get_posts(
+				array(
+					'post_type'              => 'page',
+					'title'                  => $label,
+					'post_status'            => 'publish',
+					'posts_per_page'         => 1,
+					'no_found_rows'          => true,
+					'update_post_meta_cache' => false,
+					'update_post_term_cache' => false,
+				)
+			);
+			$page = $pages[0] ?? null;
+		}
+		if ( $page instanceof \WP_Post ) {
+			$url = get_permalink( $page );
+			if ( is_string( $url ) && $url !== '' ) {
+				return $url;
+			}
+		}
+
+		$term = get_term_by( 'name', $label, 'category' );
+		if ( $term instanceof \WP_Term && ! is_wp_error( $term ) ) {
+			$link = get_term_link( $term );
+			if ( is_string( $link ) && $link !== '' ) {
+				return $link;
+			}
+		}
+
+		return home_url( '/' );
+	}
+
+	/**
 	 * @return list<array<string, mixed>>
 	 */
 	private static function default_items(): array {

@@ -131,6 +131,7 @@ final class Theme {
 		$context['sidebar_ads']      = ImporterBridge::get_ads_by_position( 'sidebar_left', 40 );
 		$context['main_nav']         = \Timber\Timber::get_menu( 'main-nav' );
 		$context['main_nav_items']   = NavMenu::items();
+		$context['sales_conditions_url'] = NavMenu::sales_conditions_url();
 		$context['nav_date_filter']  = NewsArchive::nav_date_filter_context();
 		$context['footer_nav_about'] = \Timber\Timber::get_menu( 'footer-about' );
 		$context['footer_nav_cats']  = \Timber\Timber::get_menu( 'footer-categories' );

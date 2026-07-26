@@ -666,16 +666,72 @@
       var status = root.querySelector("[data-ak-share-status]");
       if (!toggle || !panel) return;
 
+      var panelHomeParent = panel.parentNode;
+      var panelHomeNext = panel.nextSibling;
+
+      function isRtl() {
+        return (document.documentElement.getAttribute("dir") || "").toLowerCase() === "rtl"
+          || window.getComputedStyle(document.documentElement).direction === "rtl";
+      }
+
+      function clearPanelPosition() {
+        panel.style.position = "";
+        panel.style.top = "";
+        panel.style.left = "";
+        panel.style.right = "";
+        panel.style.bottom = "";
+        panel.style.zIndex = "";
+        panel.style.minWidth = "";
+      }
+
+      function positionPanel() {
+        var rect = toggle.getBoundingClientRect();
+        var gap = 7;
+        panel.style.position = "fixed";
+        panel.style.top = Math.round(rect.bottom + gap) + "px";
+        panel.style.bottom = "auto";
+        panel.style.zIndex = "10030";
+        panel.style.minWidth = Math.max(168, Math.round(rect.width)) + "px";
+        if (isRtl()) {
+          panel.style.right = Math.round(window.innerWidth - rect.right) + "px";
+          panel.style.left = "auto";
+        } else {
+          panel.style.left = Math.round(rect.left) + "px";
+          panel.style.right = "auto";
+        }
+      }
+
+      function mountPanelToBody() {
+        if (panel.parentNode !== document.body) {
+          document.body.appendChild(panel);
+        }
+      }
+
+      function restorePanelHome() {
+        if (!panelHomeParent || panel.parentNode === panelHomeParent) {
+          return;
+        }
+        if (panelHomeNext && panelHomeNext.parentNode === panelHomeParent) {
+          panelHomeParent.insertBefore(panel, panelHomeNext);
+        } else {
+          panelHomeParent.appendChild(panel);
+        }
+      }
+
       function closeMenu() {
         root.classList.remove("is-open");
         panel.hidden = true;
         toggle.setAttribute("aria-expanded", "false");
+        clearPanelPosition();
+        restorePanelHome();
       }
 
       function openMenu() {
         root.classList.add("is-open");
         panel.hidden = false;
         toggle.setAttribute("aria-expanded", "true");
+        mountPanelToBody();
+        positionPanel();
       }
 
       toggle.addEventListener("click", function (event) {
@@ -688,14 +744,35 @@
       });
 
       document.addEventListener("click", function (event) {
-        if (!root.contains(event.target)) {
-          closeMenu();
+        if (panel.hidden) {
+          return;
         }
+        var target = event.target;
+        if (root.contains(target) || panel.contains(target)) {
+          return;
+        }
+        closeMenu();
       });
 
       document.addEventListener("keydown", function (event) {
         if (event.key === "Escape") {
           closeMenu();
+        }
+      });
+
+      window.addEventListener(
+        "scroll",
+        function () {
+          if (!panel.hidden) {
+            positionPanel();
+          }
+        },
+        true
+      );
+
+      window.addEventListener("resize", function () {
+        if (!panel.hidden) {
+          positionPanel();
         }
       });
 

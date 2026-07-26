@@ -626,6 +626,14 @@ address {
   flex: 0 1 450px;
 }
 
+.site-header__tools {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 450px;
+}
+
 .site-header__date {
   display: flex;
   align-items: center;
@@ -643,7 +651,12 @@ address {
 .site-header__search-wrap {
   position: relative;
   width: 100%;
-  max-width: 450px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.site-header__sales-btn {
+  display: none;
 }
 
 .site-header__search {
@@ -4844,12 +4857,56 @@ address {
     display: none;
   }
 
-  .site-header__search-wrap {
+  .site-header__tools {
     max-width: none;
+    gap: 0.45rem;
+  }
+
+  .site-header__search-wrap {
+    flex: 3 1 0;
+    width: auto;
+    max-width: none;
+    min-width: 0;
   }
 
   .site-header__search {
     max-width: none;
+  }
+
+  .site-header__search input {
+    font-size: 0.72rem;
+    padding: 0.4rem 0.65rem;
+  }
+
+  .site-header__search input::placeholder {
+    font-size: 0.68rem;
+  }
+
+  .site-header__sales-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 0;
+    width: auto;
+    max-width: none;
+    min-width: 0;
+    min-height: 2.15rem;
+    padding: 0.35rem 0.45rem;
+    border: 1px solid rgba(67, 92, 112, 0.25);
+    border-radius: var(--radius-sm);
+    background: var(--logo-asre);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: center;
+    text-decoration: none;
+    white-space: normal;
+  }
+
+  .site-header__sales-btn:hover {
+    background: #364a5a;
+    color: #fff;
   }
 
   .nav-toggle {
@@ -5791,6 +5848,10 @@ address {
   position: relative;
 }
 
+.single-share-menu.is-open {
+  z-index: 40;
+}
+
 .single-share-menu__trigger {
   display: inline-flex;
   align-items: center;
@@ -5837,7 +5898,7 @@ address {
   position: absolute;
   top: calc(100% + 0.45rem);
   inset-inline-start: 0;
-  z-index: 20;
+  z-index: 10030;
   min-width: 10.5rem;
   padding: 0.35rem;
   border: 1px solid rgba(225, 6, 0, 0.12);
@@ -5849,7 +5910,13 @@ address {
 }
 
 .single-share-menu__panel[hidden] {
-  display: none;
+  display: none !important;
+}
+
+/* Portaled to body while open — escapes overflow/backdrop stacking on single posts. */
+body > .single-share-menu__panel {
+  position: fixed;
+  inset-inline-start: auto;
 }
 
 .single-share-menu__item {

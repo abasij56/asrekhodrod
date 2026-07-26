@@ -42,6 +42,15 @@
       تلگرام
     </a>
     <a
+      href="https://api.whatsapp.com/send?text={{ (share_page_title ~ ' ' ~ share_page_url)|url_encode }}"
+      class="single-share-menu__item"
+      role="menuitem"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      واتساپ
+    </a>
+    <a
       href="https://twitter.com/intent/tweet?url={{ share_page_url|url_encode }}&text={{ share_page_title|url_encode }}"
       class="single-share-menu__item"
       role="menuitem"

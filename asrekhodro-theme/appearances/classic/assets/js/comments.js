@@ -8,10 +8,35 @@
   var lists = document.querySelectorAll("[data-ak-comments-list]");
 
   initSubmissionNotice();
+  initAutoGrowTextareas();
 
   if (lists.length && config.ajaxUrl) {
     lists.forEach(function (list) {
       initCommentList(list);
+    });
+  }
+
+  function initAutoGrowTextareas() {
+    var areas = document.querySelectorAll(
+      ".ak-comments-form__textarea, .ak-comments-form__control--textarea, #comment"
+    );
+    if (!areas.length) {
+      return;
+    }
+
+    areas.forEach(function (area) {
+      if (!(area instanceof HTMLTextAreaElement)) {
+        return;
+      }
+
+      function fit() {
+        area.style.height = "auto";
+        area.style.height = area.scrollHeight + "px";
+      }
+
+      area.addEventListener("input", fit);
+      area.addEventListener("change", fit);
+      fit();
     });
   }
 

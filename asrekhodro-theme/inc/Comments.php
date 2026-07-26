@@ -490,6 +490,10 @@ final class Comments {
 	private static function comment_field_markup( string $field ): string {
 		$field = preg_replace( '/<label for="comment">.*?<\/label>/', '', $field, 1 ) ?? $field;
 		$field = preg_replace( '/<\/?p[^>]*>/', '', $field ) ?? $field;
+		$field = preg_replace( '/\srows=("|\')\d+\1/', ' rows="2"', $field ) ?? $field;
+		if ( ! preg_match( '/\srows=/', $field ) ) {
+			$field = str_replace( '<textarea', '<textarea rows="2"', $field );
+		}
 		$field = str_replace(
 			'id="comment"',
 			'id="comment" class="ak-comments-form__control ak-comments-form__control--textarea ak-comments-form__textarea"',
@@ -501,7 +505,7 @@ final class Comments {
 			'متن نظر',
 			$field,
 			false,
-			'نظر خود را بنویسید. لطفاً محترمانه و مرتبط با مطلب باشد.'
+			''
 		);
 	}
 
