@@ -56,6 +56,9 @@ final class ImporterBridge {
 		$functions['ak_post_content_images'] = array(
 			'callable' => array( self::class, 'get_post_content_images' ),
 		);
+		$functions['ak_post_gallery_images'] = array(
+			'callable' => array( self::class, 'get_post_gallery_images' ),
+		);
 		$functions['ak_post_under_title'] = array(
 			'callable' => array( SinglePost::class, 'get_under_title_from_block' ),
 		);
@@ -564,6 +567,35 @@ final class ImporterBridge {
 		self::$content_images_cache[ $post_id ] = $images;
 
 		return $images;
+	}
+
+	/**
+	 * Hero + inline content images for single-post lightbox (hero first).
+	 *
+	 * @param \Timber\Post|int $post
+	 * @return list<array{url: string, alt: string}>
+	 */
+	public static function get_post_gallery_images( $post ): array {
+		$items = array();
+		$hero  = self::get_post_hero_image_url( $post );
+
+		if ( $hero !== '' ) {
+			$alt = '';
+			if ( $post instanceof \Timber\Post ) {
+				$alt = trim( (string) $post->title );
+			}
+
+			$items[] = array(
+				'url' => $hero,
+				'alt' => $alt,
+			);
+		}
+
+		foreach ( self::get_post_content_images( $post ) as $url ) {
+			$items[] = $url;
+		}
+
+		return self::normalize_image_items( $items );
 	}
 
 	private static function normalize_image_url_key( string $url ): string {

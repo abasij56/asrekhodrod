@@ -12,7 +12,7 @@
   single_main_backdrop: single_main_backdrop|default(false)
 } %}
   {% block system_content %}
-    <article class="single-article">
+    <article class="single-article"{% if post_gallery_images|default([])|length %} data-article-gallery data-gallery-images="{{ post_gallery_images|json_encode(constant('JSON_UNESCAPED_UNICODE'))|e('html_attr') }}"{% endif %}>
       <div class="single-hero">
         <div class="single-hero__text">
           {% if post.meta('_asrekhodro_over_title') %}
@@ -29,10 +29,10 @@
         {% set hero_image = ak_post_hero_image_url(post) %}
         {% if hero_image %}
           <figure class="single-hero__media">
-            <a href="{{ hero_image }}" class="single-hero__zoom" target="_blank" rel="noopener">
+            <button type="button" class="single-hero__zoom" data-news-gallery-open data-gallery-index="0" aria-label="بزرگنمایی تصویر">
               <img src="{{ hero_image }}" alt="{{ post.title }}" width="455" height="303" loading="eager" fetchpriority="high" decoding="async" />
               <span class="single-hero__zoom-icon" aria-hidden="true"></span>
-            </a>
+            </button>
           </figure>
         {% endif %}
       </div>

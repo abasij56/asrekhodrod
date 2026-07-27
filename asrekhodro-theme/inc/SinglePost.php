@@ -141,6 +141,7 @@ final class SinglePost {
 		$context['post_tags']                  = self::get_tags_with_counts( $post );
 		$context['post_under_title']           = self::get_under_title_from_block( $post );
 		$context['post_has_under_title_block'] = self::has_under_title_block( $post );
+		$context['post_gallery_images']        = ImporterBridge::get_post_gallery_images( $post );
 		$context['related_posts']     = self::get_related_posts( $post, 20 );
 		$context['latest_posts']      = ImporterBridge::query_posts(
 			array(

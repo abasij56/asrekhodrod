@@ -1241,6 +1241,31 @@
       event.preventDefault();
       event.stopPropagation();
 
+      var article = trigger.closest("[data-article-gallery]");
+      if (article) {
+        var allImages = parseImages(article.getAttribute("data-gallery-images"));
+        if (!allImages.length) return;
+
+        var startIndex = parseInt(trigger.getAttribute("data-gallery-index") || "0", 10);
+        var group = trigger.closest("[data-news-gallery-group]");
+        if (group) {
+          var groupImages = parseImages(group.getAttribute("data-gallery-images"));
+          var localIndex = parseInt(trigger.getAttribute("data-gallery-index") || "0", 10);
+          var targetUrl = galleryImageUrl(
+            groupImages[isNaN(localIndex) ? 0 : localIndex]
+          );
+          if (targetUrl) {
+            var matched = allImages.findIndex(function (item) {
+              return galleryImageUrl(item) === targetUrl;
+            });
+            if (matched >= 0) startIndex = matched;
+          }
+        }
+
+        openGallery(allImages, isNaN(startIndex) ? 0 : startIndex);
+        return;
+      }
+
       var group = trigger.closest("[data-news-gallery-group]");
       if (!group) return;
 
