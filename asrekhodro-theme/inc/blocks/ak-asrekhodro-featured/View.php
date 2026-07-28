@@ -112,7 +112,7 @@ final class View {
 			'id'       => (int) $post->ID,
 			'link'     => (string) $post->link(),
 			'title'    => $title,
-			'excerpt'  => ImporterBridge::get_list_excerpt( $post, 220 ),
+			'excerpt'  => ImporterBridge::get_list_excerpt( $post, ImporterBridge::excerpt_max( 'hero' ) ),
 			'image'    => ImporterBridge::get_post_image_url( $post ),
 			'badge'    => $badge,
 			'under_title' => SinglePost::get_under_title_from_block( $post ),

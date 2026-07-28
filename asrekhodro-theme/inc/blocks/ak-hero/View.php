@@ -117,7 +117,7 @@ final class View {
 			'link'        => (string) $main->link(),
 			'title'       => trim( (string) $main->title() ),
 			'under_title' => SinglePost::get_under_title_from_block( $main ),
-			'excerpt'     => ImporterBridge::get_list_excerpt( $main, 220 ),
+			'excerpt'     => ImporterBridge::get_list_excerpt( $main, ImporterBridge::excerpt_max( 'hero' ) ),
 			'image'       => ImporterBridge::get_post_image_url( $visual ),
 		);
 	}
@@ -151,7 +151,7 @@ final class View {
 				'date'        => ImporterBridge::format_post_date( $post ),
 				'date_iso'    => (string) $post->date( 'Y-m-d' ),
 				'link'        => (string) $post->link(),
-				'excerpt'     => ImporterBridge::get_list_excerpt( $post, 220 ),
+				'excerpt'     => ImporterBridge::get_list_excerpt( $post, ImporterBridge::excerpt_max( 'hero' ) ),
 				'image'       => ImporterBridge::get_post_image_url( $image_post ),
 			);
 		}

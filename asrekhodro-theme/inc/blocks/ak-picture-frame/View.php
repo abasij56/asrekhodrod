@@ -68,7 +68,7 @@ final class View {
 				'thumb'     => $thumb !== '' ? $thumb : $image,
 				'image_alt' => $image_alt,
 				'link'      => (string) $post->link(),
-				'caption'   => ImporterBridge::get_list_excerpt( $post, 160 ),
+				'caption'   => ImporterBridge::get_list_excerpt( $post, ImporterBridge::excerpt_max( 'list' ) ),
 			);
 		}
 

@@ -62,6 +62,12 @@ final class ImporterBridge {
 		$functions['ak_post_under_title'] = array(
 			'callable' => array( SinglePost::class, 'get_under_title_from_block' ),
 		);
+		$functions['ak_excerpt_max'] = array(
+			'callable' => array( self::class, 'excerpt_max' ),
+		);
+		$functions['ak_list_excerpt'] = array(
+			'callable' => array( self::class, 'twig_list_excerpt' ),
+		);
 
 		return $functions;
 	}
@@ -1308,8 +1314,64 @@ final class ImporterBridge {
 		return PersianDate::format_object_time( $post );
 	}
 
-	public static function get_list_excerpt( \Timber\Post $post, int $max = 160 ): string {
-		$raw = $post->post_excerpt ?: $post->post_content;
+	/**
+	 * Excerpt length from theme options (عمومی).
+	 *
+	 * @param string $context One of: list, hero, single.
+	 */
+	public static function excerpt_max( string $context = 'list' ): int {
+		$defaults = array(
+			'list'   => 160,
+			'hero'   => 220,
+			'single' => 320,
+		);
+		$keys     = array(
+			'list'   => 'excerpt_max_list',
+			'hero'   => 'excerpt_max_hero',
+			'single' => 'excerpt_max_single',
+		);
+
+		$context = strtolower( trim( $context ) );
+		if ( ! isset( $defaults[ $context ] ) ) {
+			$context = 'list';
+		}
+
+		$default = $defaults[ $context ];
+		$value   = null;
+
+		if ( function_exists( 'get_field' ) ) {
+			$raw = get_field( $keys[ $context ], 'option' );
+			if ( $raw !== null && $raw !== false && $raw !== '' ) {
+				$value = (int) $raw;
+			}
+		}
+
+		if ( $value === null || $value <= 0 ) {
+			$value = (int) get_option( 'options_' . $keys[ $context ], $default );
+		}
+
+		$min = 40;
+		$max = $context === 'single' ? 2000 : 1000;
+
+		return max( $min, min( $max, $value > 0 ? $value : $default ) );
+	}
+
+	/**
+	 * Twig helper: excerpt for list/hero contexts.
+	 *
+	 * @param \Timber\Post|mixed $post
+	 */
+	public static function twig_list_excerpt( $post, string $context = 'list' ): string {
+		if ( ! $post instanceof \Timber\Post ) {
+			return '';
+		}
+
+		return self::get_list_excerpt( $post, self::excerpt_max( $context ) );
+	}
+
+	public static function get_list_excerpt( \Timber\Post $post, ?int $max = null ): string {
+		$max  = $max ?? self::excerpt_max( 'list' );
+		$raw  = $post->post_excerpt ?: $post->post_content;
 		$text = wp_strip_all_tags( $raw );
 		$text = preg_replace( '/^عصر خودرو[-–—\s]*/u', '', $text ) ?? $text;
 

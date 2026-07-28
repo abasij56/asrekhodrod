@@ -136,7 +136,7 @@ final class SinglePost {
 
 		$context['single_main_backdrop'] = self::uses_main_backdrop( $post );
 
-		$context['post_lead']         = ImporterBridge::get_list_excerpt( $post, 320 );
+		$context['post_lead']         = ImporterBridge::get_list_excerpt( $post, ImporterBridge::excerpt_max( 'single' ) );
 		$context['post_datetime']     = ImporterBridge::format_post_datetime( $post );
 		$context['post_tags']                  = self::get_tags_with_counts( $post );
 		$context['post_under_title']           = self::get_under_title_from_block( $post );

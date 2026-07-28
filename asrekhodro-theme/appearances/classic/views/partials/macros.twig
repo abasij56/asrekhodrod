@@ -2,7 +2,6 @@
   <img src="{{ ak_post_image_url(post) }}" width="{{ width }}" height="{{ height }}" alt="{{ post.title }}" loading="{{ loading|default('lazy') }}" decoding="async" />
 {% endmacro %}
 
-{% macro list_excerpt(post) %}
-  {% set text = post.post_excerpt ?: post.post_content|striptags %}
-  {{ text|replace({'عصر خودرو-': ''})|slice(0, 160) }}{% if text|length > 160 %}…{% endif %}
+{% macro list_excerpt(post, context) %}
+  {{ ak_list_excerpt(post, context|default('list')) }}
 {% endmacro %}

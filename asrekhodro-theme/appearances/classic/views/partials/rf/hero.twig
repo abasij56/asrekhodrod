@@ -18,7 +18,7 @@
         <h1 id="rf-hero-heading" class="rf-lead-story__title">{{ hero_main.title }}</h1>
         {% set lead_under_title = ak_post_under_title(hero_main)|default('')|trim %}
         {% if lead_under_title %}<div class="rf-lead-story__category">{{ lead_under_title }}</div>{% endif %}
-        <p class="rf-lead-story__excerpt">{{ ak.list_excerpt(hero_main) }}</p>
+        <p class="rf-lead-story__excerpt">{{ ak.list_excerpt(hero_main, 'hero') }}</p>
         <div class="rf-lead-story__meta">
           <span>{{ rf_site_name|default('عصر خودرو') }}</span>
           <time datetime="{{ hero_main.date('Y-m-d') }}">{{ ak_post_date(hero_main) }}</time>

@@ -7,28 +7,46 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Limits the built-in Author role to the approved wp-admin areas:
- * news, categories/tags, media (+ CDN upload), comments, ads, videos,
- * magazines, carsinfo, and theme settings.
+ * Limits the built-in Author role to the approved wp-admin areas.
+ *
+ * Required author abilities:
+ * - Create/edit news posts
+ * - Upload/edit images and videos (media + ak_video)
+ * - Add/edit categories, tags (keywords)
+ * - Layout builder (hero slides / pinned news)
  */
 final class AuthorAccess {
 
 	public const THEME_SETTINGS_CAP = 'manage_asrekhodro_settings';
 
 	/**
-	 * Capabilities granted to authors beyond WordPress defaults.
+	 * Capabilities granted to authors beyond / reinforcing WordPress defaults.
 	 *
 	 * @var list<string>
 	 */
 	private const AUTHOR_EXTRA_CAPS = array(
-		'manage_categories',
-		'moderate_comments',
+		// News (own + others).
+		'edit_posts',
+		'edit_published_posts',
+		'publish_posts',
+		'delete_posts',
+		'delete_published_posts',
 		'edit_others_posts',
 		'edit_private_posts',
 		'read_private_posts',
 		'delete_others_posts',
 		'delete_private_posts',
-		'delete_published_posts',
+		// Media library (photos / files).
+		'upload_files',
+		// Categories + tags (keywords).
+		'manage_categories',
+		'manage_post_tags',
+		'edit_post_tags',
+		'delete_post_tags',
+		'assign_post_tags',
+		// Comments moderation (existing editorial workflow).
+		'moderate_comments',
+		// Theme settings includes «چیدمان صفحات» (slides / pin news).
 		self::THEME_SETTINGS_CAP,
 	);
 
@@ -86,6 +104,7 @@ final class AuthorAccess {
 		'asrekhodro-layout-builder',
 		'asrekhodro-icon-gallery',
 		'asrekhodro-news-slug-repair',
+		'asrekhodro-media-cdn-migrate',
 		'add-external-media',
 	);
 
@@ -395,6 +414,7 @@ final class AuthorAccess {
 				'asrekhodro-layout-builder',
 				'asrekhodro-icon-gallery',
 				'asrekhodro-news-slug-repair',
+				'asrekhodro-media-cdn-migrate',
 			),
 			'profile.php' => array(
 				'profile.php',

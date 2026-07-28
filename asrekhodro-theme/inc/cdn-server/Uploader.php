@@ -43,19 +43,87 @@ final class Uploader {
 			return $validated;
 		}
 
-		$tmp_path      = (string) $file['tmp_name'];
-		$original_name = (string) $file['name'];
-		$mime_type     = $validated['mime'];
-		$upload_path   = $tmp_path;
-		$temp_wm_path  = '';
+		return self::push_local_file(
+			(string) $file['tmp_name'],
+			(string) $file['name'],
+			$validated['mime'],
+			array( 'source' => 'browser_upload' )
+		);
+	}
+
+	/**
+	 * Upload an existing local file (migration / server-side) with optional watermark.
+	 *
+	 * @return string|\WP_Error Public URL on success.
+	 */
+	public static function handle_local_path( string $local_path, string $original_name, string $mime_type = '' ): string|\WP_Error {
+		self::$last_upload_debug = array();
+
+		if ( ! Config::is_configured() ) {
+			return new \WP_Error( 'ak_cdn_not_configured', __( 'سرور CDN پیکربندی نشده است.', 'asrekhodro' ) );
+		}
+
+		$local_path = wp_normalize_path( $local_path );
+		if ( $local_path === '' || ! is_readable( $local_path ) || ! is_file( $local_path ) ) {
+			return new \WP_Error( 'ak_cdn_local_unreadable', __( 'فایل محلی برای آپلود خوانا نیست.', 'asrekhodro' ) );
+		}
+
+		$size = (int) filesize( $local_path );
+		$max  = Config::max_upload_bytes();
+		if ( $size <= 0 ) {
+			return new \WP_Error( 'ak_cdn_empty_file', __( 'فایل خالی است.', 'asrekhodro' ) );
+		}
+		if ( $size > $max ) {
+			return new \WP_Error(
+				'ak_cdn_too_large',
+				sprintf(
+					/* translators: %s: max size in MB */
+					__( 'حجم فایل بیش از حد مجاز است (حداکثر %s مگابایت).', 'asrekhodro' ),
+					number_format_i18n( $max / ( 1024 * 1024 ) )
+				)
+			);
+		}
+
+		$original_name = $original_name !== '' ? $original_name : wp_basename( $local_path );
+		$check         = wp_check_filetype_and_ext( $local_path, $original_name );
+		$detected      = (string) ( $check['type'] ?? '' );
+		$mime          = $mime_type !== '' ? strtolower( $mime_type ) : strtolower( $detected );
+
+		if ( $mime === '' ) {
+			return new \WP_Error( 'ak_cdn_unknown_type', __( 'نوع فایل قابل تشخیص نیست.', 'asrekhodro' ) );
+		}
+
+		if ( ! self::is_allowed_mime( $mime ) ) {
+			return new \WP_Error(
+				'ak_cdn_type_not_allowed',
+				sprintf(
+					/* translators: %s: mime type */
+					__( 'این نوع فایل مجاز نیست: %s', 'asrekhodro' ),
+					$mime
+				)
+			);
+		}
+
+		return self::push_local_file( $local_path, $original_name, $mime, array( 'source' => 'local_path' ) );
+	}
+
+	/**
+	 * Shared upload pipeline (watermark → FTP/SFTP/local → HTTP verify).
+	 *
+	 * @param array<string, mixed> $context
+	 * @return string|\WP_Error
+	 */
+	private static function push_local_file( string $source_path, string $original_name, string $mime_type, array $context = array() ): string|\WP_Error {
+		$upload_path  = $source_path;
+		$temp_wm_path = '';
 
 		if ( Watermark::should_apply( $mime_type ) ) {
-			$watermarked = Watermark::apply( $tmp_path, $mime_type );
+			$watermarked = Watermark::apply( $source_path, $mime_type );
 			if ( is_wp_error( $watermarked ) ) {
-				if ( apply_filters( 'ak_cdn_watermark_fail_upload', false, $watermarked, $file ) ) {
+				if ( apply_filters( 'ak_cdn_watermark_fail_upload', false, $watermarked, $context ) ) {
 					return $watermarked;
 				}
-			} elseif ( is_string( $watermarked ) && $watermarked !== '' && $watermarked !== $tmp_path ) {
+			} elseif ( is_string( $watermarked ) && $watermarked !== '' && $watermarked !== $source_path ) {
 				$upload_path  = $watermarked;
 				$temp_wm_path = $watermarked;
 			}
@@ -66,13 +134,17 @@ final class Uploader {
 		$absolute     = PathBuilder::build_remote_absolute_path( $ftp_relative );
 		$public_url   = PathBuilder::build_public_url( $canonical );
 
-		self::$last_upload_debug = array(
-			'canonical_relative' => $canonical,
-			'ftp_relative'       => $ftp_relative,
-			'logical_absolute'   => $absolute,
-			'public_url'         => $public_url,
-			'configured_base'    => Config::remote_base_path(),
-			'watermark_applied' => $temp_wm_path !== '',
+		self::$last_upload_debug = array_merge(
+			self::$last_upload_debug,
+			array(
+				'canonical_relative' => $canonical,
+				'ftp_relative'       => $ftp_relative,
+				'logical_absolute'   => $absolute,
+				'public_url'         => $public_url,
+				'configured_base'    => Config::remote_base_path(),
+				'watermark_applied'  => $temp_wm_path !== '',
+				'source'             => (string) ( $context['source'] ?? '' ),
+			)
 		);
 
 		$connection = self::make_connection();
@@ -116,6 +188,10 @@ final class Uploader {
 		do_action( 'ak_cdn_uploaded', $public_url, $canonical, $mime_type );
 
 		return $public_url;
+	}
+
+	public static function public_url_is_reachable( string $url ): bool {
+		return self::verify_public_url( $url );
 	}
 
 	/**

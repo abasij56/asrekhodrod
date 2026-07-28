@@ -12,7 +12,7 @@
       <h1 id="hero-heading"><a href="{{ hero_main.link }}">{{ hero_main.title }}</a></h1>
       {% set hero_under_title = ak_post_under_title(hero_main)|default('')|trim %}
       {% if hero_under_title %}<span class="tag tag--ev">{{ hero_under_title }}</span>{% endif %}
-      <p>{{ hero_main.post_excerpt|default(hero_main.post_content|striptags|slice(0, 200)) }}</p>
+      <p>{{ ak.list_excerpt(hero_main, 'hero') }}</p>
       <a href="{{ hero_main.link }}" class="btn btn--primary">ادامه مطلب</a>
     </div>
   </article>

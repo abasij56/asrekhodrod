@@ -411,6 +411,38 @@ final class ExternalMedia {
 	}
 
 	/**
+	 * Ensure external / CDN-migrated attachments expose their remote GUID as the URL.
+	 *
+	 * @param string|false $url
+	 * @return string|false
+	 */
+	public static function filter_attachment_url( $url, int $attachment_id ) {
+		if ( is_string( $url ) && $url !== '' ) {
+			return $url;
+		}
+
+		if ( $attachment_id <= 0 ) {
+			return $url;
+		}
+
+		if ( ! self::is_external_attachment( $attachment_id ) && ! self::is_legacy_external_attachment( $attachment_id ) ) {
+			return $url;
+		}
+
+		$post = get_post( $attachment_id );
+		if ( ! $post instanceof \WP_Post ) {
+			return $url;
+		}
+
+		$guid = is_string( $post->guid ) ? $post->guid : '';
+		if ( $guid !== '' && (bool) preg_match( '#^https?://#i', $guid ) ) {
+			return $guid;
+		}
+
+		return $url;
+	}
+
+	/**
 	 * Full remote URL for an external attachment.
 	 */
 	public static function get_attachment_url( int $attachment_id ): string {

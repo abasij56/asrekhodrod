@@ -3,6 +3,7 @@
 namespace AsreKhodro\Theme\CdnServer;
 
 use AsreKhodro\Theme\CdnServer\Admin\Ajax;
+use AsreKhodro\Theme\CdnServer\Admin\MediaCdnMigrateAdmin;
 use AsreKhodro\Theme\CdnServer\Admin\UploadUi;
 use AsreKhodro\Theme\ExternalMedia;
 
@@ -21,10 +22,12 @@ final class Module {
 	public static function init(): void {
 		// Core external-media attachment behaviour (works with or without CDN).
 		add_filter( 'get_attached_file', array( ExternalMedia::class, 'filter_attached_file' ), 10, 2 );
+		add_filter( 'wp_get_attachment_url', array( ExternalMedia::class, 'filter_attachment_url' ), 10, 2 );
 
 		// Admin UI + AJAX.
 		UploadUi::init();
 		Ajax::init();
+		MediaCdnMigrateAdmin::init();
 
 		// Settings tab (appended to the main theme-options group) + its assets.
 		add_filter( 'ak_theme_options_fields', array( Settings::class, 'append_option_fields' ) );

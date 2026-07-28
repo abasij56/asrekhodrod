@@ -33,7 +33,7 @@
               </div>
               <div class="mag-page__body">
                 <h3>{{ post.title }}</h3>
-                <p>{{ post.post_excerpt|default(post.post_content|striptags|slice(0, 160)) }}</p>
+                <p>{{ ak_list_excerpt(post, 'list') }}</p>
                 <div class="mag-page__meta">
                   <time datetime="{{ post.date('Y-m-d') }}">{{ ak_post_date(post) }}</time>
                   <span class="mag-page__read">ادامه مطلب ←</span>
