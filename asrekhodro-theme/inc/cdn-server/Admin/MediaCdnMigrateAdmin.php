@@ -4,6 +4,7 @@ namespace AsreKhodro\Theme\CdnServer\Admin;
 
 use AsreKhodro\Theme\AuthorAccess;
 use AsreKhodro\Theme\CdnServer\Config;
+use AsreKhodro\Theme\CdnServer\ImageOptimize;
 use AsreKhodro\Theme\CdnServer\MediaCdnMigrate;
 use AsreKhodro\Theme\CdnServer\Watermark;
 
@@ -57,7 +58,10 @@ final class MediaCdnMigrateAdmin {
 		$limit   = isset( $_POST['limit'] ) ? max( 1, min( self::BATCH_MAX, (int) $_POST['limit'] ) ) : 1;
 		$dry_run = ! empty( $_POST['dry_run'] );
 
-		@set_time_limit( 120 );
+		@set_time_limit( 180 );
+		if ( function_exists( 'wp_raise_memory_limit' ) ) {
+			wp_raise_memory_limit( 'admin' );
+		}
 
 		wp_send_json_success( MediaCdnMigrate::process_batch( $offset, $limit, $dry_run ) );
 	}
@@ -70,6 +74,8 @@ final class MediaCdnMigrateAdmin {
 		$total      = MediaCdnMigrate::count_attachments();
 		$configured = Config::is_configured();
 		$wm_on      = Watermark::settings() !== null;
+		$opt_on     = ImageOptimize::settings() !== null;
+		$opt        = ImageOptimize::settings();
 		$cdn_base   = Config::get_public_base_url();
 
 		echo '<div class="wrap">';
@@ -77,7 +83,18 @@ final class MediaCdnMigrateAdmin {
 
 		echo '<div class="notice notice-info" style="padding:12px 16px;">';
 		echo '<p>' . esc_html__( 'رسانه‌های کتابخانه از جدیدترین به قدیمی‌ترین بررسی می‌شوند. اگر روی سرور CDN نباشند، آپلود می‌شوند و بعد از تأیید دسترسی عمومی، آدرس‌ها بازنویسی می‌شوند.', 'asrekhodro' ) . '</p>';
-		echo '<p><strong>' . esc_html__( 'ایمنی لایو:', 'asrekhodro' ) . '</strong> ' . esc_html__( 'فایل محلی حذف نمی‌شود. فقط بعد از verify موفق URL عمومی، دیتابیس تغییر می‌کند. قبل از اجرای واقعی از بکاپ مطمئن شوید.', 'asrekhodro' ) . '</p>';
+		echo '<p><strong>' . esc_html__( 'ایمنی لایو:', 'asrekhodro' ) . '</strong> ' . esc_html__( 'فایل محلی حذف نمی‌شود. بعد از انتقال موفق، نام فایل محلی با پسوند -move2cdn علامت می‌خورد. مهاجرت‌های ناقص قبلی در اجرای بعدی تعمیر می‌شوند (بدون آپلود مجدد). فقط بعد از verify موفق URL عمومی، دیتابیس تغییر می‌کند.', 'asrekhodro' ) . '</p>';
+		echo '<p><strong>' . esc_html__( 'بهینه‌سازی تصویر:', 'asrekhodro' ) . '</strong> ';
+		if ( $opt_on && is_array( $opt ) ) {
+			echo sprintf(
+				/* translators: %s: max width */
+				esc_html__( 'فعال است — حداکثر پهنا %s پیکسل، سپس فشرده‌سازی، بعد واترمارک و آپلود.', 'asrekhodro' ),
+				esc_html( number_format_i18n( (int) $opt['max_width'] ) )
+			);
+		} else {
+			echo esc_html__( 'غیرفعال است.', 'asrekhodro' );
+		}
+		echo '</p>';
 		echo '<p><strong>' . esc_html__( 'واترمارک:', 'asrekhodro' ) . '</strong> ';
 		echo $wm_on
 			? esc_html__( 'فعال است و روی تصاویر قابل‌پشتیبانی هنگام آپلود اعمال می‌شود.', 'asrekhodro' )
@@ -106,6 +123,11 @@ final class MediaCdnMigrateAdmin {
 			esc_html( number_format_i18n( self::BATCH_MAX ) )
 		) . '</label> ';
 		echo '<input type="number" id="ak-media-cdn-migrate-batch" min="1" max="' . esc_attr( (string) self::BATCH_MAX ) . '" step="1" value="1" />';
+		echo '</p>';
+
+		echo '<p class="ak-media-cdn-migrate__batch">';
+		echo '<label for="ak-media-cdn-migrate-max-total">' . esc_html__( 'تعداد کل انتقال (خالی = همه):', 'asrekhodro' ) . '</label> ';
+		echo '<input type="number" id="ak-media-cdn-migrate-max-total" min="1" step="1" value="" placeholder="' . esc_attr__( 'همه', 'asrekhodro' ) . '" />';
 		echo '</p>';
 
 		echo '<p class="ak-media-cdn-migrate__batch">';
@@ -164,14 +186,16 @@ final class MediaCdnMigrateAdmin {
 				'done'          => __( 'تمام شد.', 'asrekhodro' ),
 				'error'         => __( 'خطا در اجرا. ادامه ذخیره‌شده را امتحان کنید.', 'asrekhodro' ),
 				'notConfigured' => __( 'CDN پیکربندی نشده است.', 'asrekhodro' ),
-				'invalidBatch'  => sprintf(
+				'invalidBatch'    => sprintf(
 					/* translators: %s: max */
 					__( 'تعداد هر درخواست باید بین ۱ تا %s باشد.', 'asrekhodro' ),
 					number_format_i18n( self::BATCH_MAX )
 				),
-				'invalidOffset' => __( 'ردیف شروع نامعتبر است.', 'asrekhodro' ),
-				'resumeHint'    => __( 'آخرین نقطه: %s از %s', 'asrekhodro' ),
-				'noResume'      => __( 'نقطه ذخیره‌شده‌ای نیست.', 'asrekhodro' ),
+				'invalidMaxTotal' => __( 'تعداد کل انتقال باید خالی یا عددی بزرگ‌تر از صفر باشد.', 'asrekhodro' ),
+				'invalidOffset'   => __( 'ردیف شروع نامعتبر است.', 'asrekhodro' ),
+				'resumeHint'      => __( 'آخرین نقطه: %s از %s', 'asrekhodro' ),
+				'noResume'        => __( 'نقطه ذخیره‌شده‌ای نیست.', 'asrekhodro' ),
+				'limitReached'    => __( 'به سقف تعداد کل انتقال رسید.', 'asrekhodro' ),
 			),
 		);
 		?>
@@ -247,6 +271,7 @@ final class MediaCdnMigrateAdmin {
 			var resumeButton = document.getElementById('ak-media-cdn-migrate-resume');
 			var cancelButton = document.getElementById('ak-media-cdn-migrate-cancel');
 			var batchInput = document.getElementById('ak-media-cdn-migrate-batch');
+			var maxTotalInput = document.getElementById('ak-media-cdn-migrate-max-total');
 			var offsetInput = document.getElementById('ak-media-cdn-migrate-offset');
 			var dryInput = document.getElementById('ak-media-cdn-migrate-dry');
 			var resumeHint = document.getElementById('ak-media-cdn-migrate-resume-hint');
@@ -264,12 +289,23 @@ final class MediaCdnMigrateAdmin {
 			var stopped = false;
 			var totals = { checked: 0, uploaded: 0, rewritten: 0, skipped: 0, errors: 0 };
 			var currentOffset = 0;
+			var startOffset = 0;
+			var maxTotal = 0;
+			var runChecked = 0;
 			var totalCount = Number(root.dataset.total || 0);
 			var configured = root.dataset.configured === '1';
 
 			function readBatchSize() {
 				var value = parseInt(batchInput.value, 10);
 				if (!value || value < 1 || value > config.batchMax) return 0;
+				return value;
+			}
+
+			function readMaxTotal() {
+				var raw = String(maxTotalInput.value || '').trim();
+				if (raw === '') return 0;
+				var value = parseInt(raw, 10);
+				if (!value || value < 1) return -1;
 				return value;
 			}
 
@@ -282,6 +318,11 @@ final class MediaCdnMigrateAdmin {
 
 			function isDryRun() {
 				return !!(dryInput && dryInput.checked);
+			}
+
+			function runGoalCount() {
+				if (maxTotal > 0) return maxTotal;
+				return Math.max(0, totalCount - startOffset);
 			}
 
 			function loadProgress() {
@@ -305,6 +346,9 @@ final class MediaCdnMigrateAdmin {
 					skipped: totals.skipped,
 					errors: totals.errors,
 					batch: readBatchSize() || config.defaultBatch,
+					maxTotal: maxTotal > 0 ? maxTotal : 0,
+					runChecked: runChecked,
+					startOffset: startOffset,
 					dryRun: isDryRun(),
 					done: !!done,
 					updatedAt: Date.now()
@@ -335,13 +379,15 @@ final class MediaCdnMigrateAdmin {
 				resumeButton.disabled = isRunning || !loadProgress() || (loadProgress() && loadProgress().done);
 				cancelButton.disabled = !isRunning;
 				batchInput.disabled = isRunning;
+				maxTotalInput.disabled = isRunning;
 				offsetInput.disabled = isRunning;
 				if (dryInput) dryInput.disabled = isRunning;
 				if (!isRunning) refreshResumeUi();
 			}
 
-			function updateProgressUi(offset) {
-				var percent = totalCount > 0 ? Math.min(100, Math.round((offset / totalCount) * 100)) : 0;
+			function updateProgressUi() {
+				var goal = runGoalCount();
+				var percent = goal > 0 ? Math.min(100, Math.round((runChecked / goal) * 100)) : 0;
 				bar.style.width = percent + '%';
 				progress.setAttribute('aria-valuenow', String(percent));
 				percentEl.textContent = percent + '%';
@@ -365,7 +411,14 @@ final class MediaCdnMigrateAdmin {
 				if (item.message) lines.push('  ' + item.message);
 				if (item.current_url) lines.push('  old: ' + item.current_url);
 				if (item.new_url) lines.push('  new: ' + item.new_url);
+				if (item.optimize || item.optimize_done) lines.push('  optimize: yes');
 				if (item.watermark || item.watermark_done) lines.push('  watermark: yes');
+				if (item.local_renamed && item.local_renamed.length) {
+					lines.push('  local renamed (' + item.local_renamed.length + '):');
+					item.local_renamed.forEach(function (p) {
+						lines.push('    ' + p);
+					});
+				}
 				if (item.edit_link) lines.push('  media: ' + item.edit_link);
 				if (item.usages && item.usages.length) {
 					item.usages.forEach(function (u) {
@@ -390,11 +443,23 @@ final class MediaCdnMigrateAdmin {
 					return;
 				}
 
+				if (maxTotal > 0 && runChecked >= maxTotal) {
+					status.textContent = config.messages.limitReached;
+					updateProgressUi();
+					saveProgress(offset, true);
+					setRunning(false);
+					return;
+				}
+
 				var batch = readBatchSize();
 				if (!batch) {
 					status.textContent = config.messages.invalidBatch;
 					setRunning(false);
 					return;
+				}
+
+				if (maxTotal > 0) {
+					batch = Math.min(batch, maxTotal - runChecked);
 				}
 
 				status.textContent = config.messages.running + ' offset=' + offset;
@@ -408,18 +473,34 @@ final class MediaCdnMigrateAdmin {
 				if (isDryRun()) body.append('dry_run', '1');
 
 				fetch(config.ajaxUrl, { method: 'POST', credentials: 'same-origin', body: body })
-					.then(function (res) { return res.json(); })
+					.then(function (res) {
+						return res.text().then(function (text) {
+							var json = null;
+							try {
+								json = text ? JSON.parse(text) : null;
+							} catch (e) {
+								var snippet = (text || '').replace(/\s+/g, ' ').slice(0, 180);
+								throw new Error(
+									'پاسخ سرور JSON نبود (احتمالاً timeout/خطای PHP). HTTP ' +
+									res.status + (snippet ? ': ' + snippet : '')
+								);
+							}
+							return json;
+						});
+					})
 					.then(function (json) {
 						if (!json || !json.success || !json.data) {
 							throw new Error((json && json.data && json.data.message) || config.messages.error);
 						}
 
 						var data = json.data;
-						totals.checked += Number(data.checked || 0);
+						var checkedNow = Number(data.checked || 0);
+						totals.checked += checkedNow;
 						totals.uploaded += Number(data.uploaded || 0);
 						totals.rewritten += Number(data.rewritten || 0);
 						totals.skipped += Number(data.skipped || 0);
 						totals.errors += Number(data.errors || 0);
+						runChecked += checkedNow;
 
 						(data.items || []).forEach(function (item) {
 							appendLog(formatItem(item));
@@ -432,11 +513,16 @@ final class MediaCdnMigrateAdmin {
 							root.dataset.total = String(totalCount);
 						}
 
-						updateProgressUi(next);
-						saveProgress(next, !!data.done);
+						var hitLimit = maxTotal > 0 && runChecked >= maxTotal;
+						var finished = !!data.done || next >= totalCount || hitLimit;
 
-						if (data.done || next >= totalCount) {
-							status.textContent = config.messages.done;
+						updateProgressUi();
+						saveProgress(next, finished);
+
+						if (finished) {
+							status.textContent = hitLimit && !data.done && next < totalCount
+								? config.messages.limitReached
+								: config.messages.done;
 							setRunning(false);
 							return;
 						}
@@ -461,18 +547,31 @@ final class MediaCdnMigrateAdmin {
 					status.textContent = config.messages.invalidBatch;
 					return;
 				}
+				var limit = readMaxTotal();
+				if (limit < 0) {
+					status.textContent = config.messages.invalidMaxTotal;
+					return;
+				}
 				if (offset < 0) {
 					status.textContent = config.messages.invalidOffset;
 					return;
 				}
 
 				stopped = false;
+				maxTotal = limit;
+				startOffset = offset;
+				runChecked = 0;
 				totals = { checked: 0, uploaded: 0, rewritten: 0, skipped: 0, errors: 0 };
 				log.textContent = '';
-				updateProgressUi(offset);
+				updateProgressUi();
 				setRunning(true);
 				status.textContent = label;
-				appendLog(label + ' offset=' + offset + ', batch=' + batch + ', dry_run=' + (isDryRun() ? '1' : '0'));
+				appendLog(
+					label + ' offset=' + offset +
+					', batch=' + batch +
+					', max_total=' + (maxTotal > 0 ? maxTotal : 'all') +
+					', dry_run=' + (isDryRun() ? '1' : '0')
+				);
 				runBatch(offset);
 			}
 
@@ -502,6 +601,19 @@ final class MediaCdnMigrateAdmin {
 					dryInput.checked = !!saved.dryRun;
 				}
 				if (saved.batch) batchInput.value = String(saved.batch);
+				if (saved.maxTotal) {
+					maxTotalInput.value = String(saved.maxTotal);
+					maxTotal = Number(saved.maxTotal);
+				} else {
+					var limit = readMaxTotal();
+					if (limit < 0) {
+						status.textContent = config.messages.invalidMaxTotal;
+						return;
+					}
+					maxTotal = limit;
+				}
+				startOffset = Number(saved.startOffset || 0);
+				runChecked = Number(saved.runChecked || 0);
 				totals = {
 					checked: Number(saved.checked || 0),
 					uploaded: Number(saved.uploaded || 0),
@@ -512,8 +624,8 @@ final class MediaCdnMigrateAdmin {
 				stopped = false;
 				setRunning(true);
 				status.textContent = config.messages.resuming;
-				updateProgressUi(Number(saved.offset || 0));
-				appendLog(config.messages.resuming + ' offset=' + saved.offset);
+				updateProgressUi();
+				appendLog(config.messages.resuming + ' offset=' + saved.offset + ', max_total=' + (maxTotal > 0 ? maxTotal : 'all'));
 				runBatch(Number(saved.offset || 0));
 			});
 

@@ -19,6 +19,7 @@ require_once $cdn_dir . '/Connection/ConnectionInterface.php';
 require_once $cdn_dir . '/Connection/FtpConnection.php';
 require_once $cdn_dir . '/Connection/SftpConnection.php';
 require_once $cdn_dir . '/Connection/LocalFilesystemConnection.php';
+require_once $cdn_dir . '/ImageOptimize.php';
 require_once $cdn_dir . '/Watermark.php';
 require_once $cdn_dir . '/Uploader.php';
 require_once $cdn_dir . '/MediaCdnMigrate.php';

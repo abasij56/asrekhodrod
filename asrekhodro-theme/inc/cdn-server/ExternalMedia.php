@@ -390,6 +390,11 @@ final class ExternalMedia {
 	}
 
 	public static function filter_attached_file( string $file, int $attachment_id ): string {
+		$cdn_url = self::get_migrated_cdn_url( $attachment_id );
+		if ( $cdn_url !== '' ) {
+			return $cdn_url;
+		}
+
 		if ( $file !== '' ) {
 			return $file;
 		}
@@ -411,18 +416,21 @@ final class ExternalMedia {
 	}
 
 	/**
-	 * Ensure external / CDN-migrated attachments expose their remote GUID as the URL.
+	 * Ensure external / CDN-migrated attachments expose their remote URL.
+	 *
+	 * Prefer `_ak_cdn_migrated_url` / GUID over any local uploads URL WordPress may still build.
 	 *
 	 * @param string|false $url
 	 * @return string|false
 	 */
 	public static function filter_attachment_url( $url, int $attachment_id ) {
-		if ( is_string( $url ) && $url !== '' ) {
+		if ( $attachment_id <= 0 ) {
 			return $url;
 		}
 
-		if ( $attachment_id <= 0 ) {
-			return $url;
+		$cdn_url = self::get_migrated_cdn_url( $attachment_id );
+		if ( $cdn_url !== '' ) {
+			return $cdn_url;
 		}
 
 		if ( ! self::is_external_attachment( $attachment_id ) && ! self::is_legacy_external_attachment( $attachment_id ) ) {
@@ -437,6 +445,18 @@ final class ExternalMedia {
 		$guid = is_string( $post->guid ) ? $post->guid : '';
 		if ( $guid !== '' && (bool) preg_match( '#^https?://#i', $guid ) ) {
 			return $guid;
+		}
+
+		return $url;
+	}
+
+	/**
+	 * CDN URL stored after a successful media→CDN migration.
+	 */
+	private static function get_migrated_cdn_url( int $attachment_id ): string {
+		$url = (string) get_post_meta( $attachment_id, '_ak_cdn_migrated_url', true );
+		if ( $url === '' || ! (bool) preg_match( '#^https?://#i', $url ) ) {
+			return '';
 		}
 
 		return $url;

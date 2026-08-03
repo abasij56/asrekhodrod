@@ -41,7 +41,7 @@ final class AjaxSearch {
 			);
 		}
 
-		$cache_key = 'q2_' . md5( mb_strtolower( $query ) );
+		$cache_key = 'q3_' . md5( mb_strtolower( $query ) );
 		$cached    = wp_cache_get( $cache_key, self::CACHE_GROUP );
 		if ( is_array( $cached ) && isset( $cached['items'] ) ) {
 			if ( ! isset( $cached['has_more'] ) ) {
@@ -87,7 +87,8 @@ final class AjaxSearch {
 	}
 
 	/**
-	 * Search titles only — much faster on large catalogs than default WP search.
+	 * Theme search: match title, excerpt, or content.
+	 * (Previously title-only for speed; body phrases were invisible in search.)
 	 *
 	 * @param string    $search SQL fragment.
 	 * @param \WP_Query $query  Current query.
@@ -106,7 +107,16 @@ final class AjaxSearch {
 
 		$like = '%' . $wpdb->esc_like( $term ) . '%';
 
-		return $wpdb->prepare( " AND ({$wpdb->posts}.post_title LIKE %s) ", $like );
+		return $wpdb->prepare(
+			" AND (
+				{$wpdb->posts}.post_title LIKE %s
+				OR {$wpdb->posts}.post_excerpt LIKE %s
+				OR {$wpdb->posts}.post_content LIKE %s
+			) ",
+			$like,
+			$like,
+			$like
+		);
 	}
 
 	private static function is_theme_search_query( \WP_Query $query ): bool {

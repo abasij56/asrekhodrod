@@ -80,7 +80,11 @@ final class Settings {
 	private static function fields(): array {
 		$defaults = Config::defaults();
 
-		return array_merge( self::watermark_fields(), self::cdn_fields( $defaults ) );
+		return array_merge(
+			self::watermark_fields(),
+			self::image_optimize_fields(),
+			self::cdn_fields( $defaults )
+		);
 	}
 
 	/**
@@ -164,6 +168,91 @@ final class Settings {
 				'min'               => 0,
 				'max'               => 120,
 				'step'              => 1,
+				'conditional_logic' => $when_enabled,
+			),
+		);
+	}
+
+	/**
+	 * Image optimize tab — resize + compress before watermark/upload.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	private static function image_optimize_fields(): array {
+		$when_enabled = array(
+			array(
+				array(
+					'field'    => 'field_ak_cdn_image_optimize_enabled',
+					'operator' => '==',
+					'value'    => '1',
+				),
+			),
+		);
+
+		return array(
+			array(
+				'key'       => 'field_ak_cdn_image_optimize_tab',
+				'label'     => __( 'بهینه‌سازی تصویر', 'asrekhodro' ),
+				'name'      => '',
+				'type'      => 'tab',
+				'placement' => 'left',
+			),
+			array(
+				'key'           => 'field_ak_cdn_image_optimize_enabled',
+				'label'         => __( 'فعال‌سازی بهینه‌سازی قبل از آپلود CDN', 'asrekhodro' ),
+				'name'          => 'cdn_image_optimize_enabled',
+				'type'          => 'true_false',
+				'ui'            => 1,
+				'ui_on_text'    => __( 'فعال', 'asrekhodro' ),
+				'ui_off_text'   => __( 'غیرفعال', 'asrekhodro' ),
+				'default_value' => 1,
+				'instructions'  => __( 'برای آپلود رسانه به CDN و انتقال رسانه به CDN: ابتدا در صورت نیاز پهنا کوچک می‌شود، سپس فشرده‌سازی، بعد واترمارک و در نهایت آپلود.', 'asrekhodro' ),
+			),
+			array(
+				'key'               => 'field_ak_cdn_image_max_width',
+				'label'             => __( 'حداکثر پهنای تصویر (پیکسل)', 'asrekhodro' ),
+				'name'              => 'cdn_image_max_width',
+				'type'              => 'number',
+				'default_value'     => 1200,
+				'min'               => 100,
+				'max'               => 5000,
+				'step'              => 50,
+				'instructions'      => __( 'اگر پهنای تصویر بیشتر از این مقدار باشد، با حفظ نسبت کوچک می‌شود. تصاویر باریک‌تر دست‌نخورده می‌مانند (فقط فشرده می‌شوند).', 'asrekhodro' ),
+				'conditional_logic' => $when_enabled,
+			),
+			array(
+				'key'               => 'field_ak_cdn_image_jpeg_quality',
+				'label'             => __( 'کیفیت JPEG', 'asrekhodro' ),
+				'name'              => 'cdn_image_jpeg_quality',
+				'type'              => 'number',
+				'default_value'     => 88,
+				'min'               => 60,
+				'max'               => 95,
+				'step'              => 1,
+				'instructions'      => __( '۸۸ پیشنهاد می‌شود؛ بالاتر = حجم بیشتر، پایین‌تر = فشرده‌تر.', 'asrekhodro' ),
+				'conditional_logic' => $when_enabled,
+			),
+			array(
+				'key'               => 'field_ak_cdn_image_webp_quality',
+				'label'             => __( 'کیفیت WebP', 'asrekhodro' ),
+				'name'              => 'cdn_image_webp_quality',
+				'type'              => 'number',
+				'default_value'     => 85,
+				'min'               => 60,
+				'max'               => 95,
+				'step'              => 1,
+				'conditional_logic' => $when_enabled,
+			),
+			array(
+				'key'               => 'field_ak_cdn_image_png_compression',
+				'label'             => __( 'فشرده‌سازی PNG (۰–۹)', 'asrekhodro' ),
+				'name'              => 'cdn_image_png_compression',
+				'type'              => 'number',
+				'default_value'     => 6,
+				'min'               => 0,
+				'max'               => 9,
+				'step'              => 1,
+				'instructions'      => __( 'عدد بالاتر = فایل کوچک‌تر و کندتر. ۶ معمولاً تعادل خوبی است.', 'asrekhodro' ),
 				'conditional_logic' => $when_enabled,
 			),
 		);

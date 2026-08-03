@@ -108,22 +108,38 @@ final class Uploader {
 	}
 
 	/**
-	 * Shared upload pipeline (watermark → FTP/SFTP/local → HTTP verify).
+	 * Shared upload pipeline (optimize → watermark → FTP/SFTP/local → HTTP verify).
 	 *
 	 * @param array<string, mixed> $context
 	 * @return string|\WP_Error
 	 */
 	private static function push_local_file( string $source_path, string $original_name, string $mime_type, array $context = array() ): string|\WP_Error {
-		$upload_path  = $source_path;
-		$temp_wm_path = '';
+		$upload_path     = $source_path;
+		$temp_opt_path   = '';
+		$temp_wm_path    = '';
+		$optimize_done   = false;
+
+		if ( ImageOptimize::should_apply( $mime_type ) ) {
+			$optimized = ImageOptimize::apply( $source_path, $mime_type );
+			if ( is_wp_error( $optimized ) ) {
+				if ( apply_filters( 'ak_cdn_optimize_fail_upload', false, $optimized, $context ) ) {
+					return $optimized;
+				}
+			} elseif ( is_string( $optimized ) && $optimized !== '' && $optimized !== $source_path ) {
+				$upload_path   = $optimized;
+				$temp_opt_path = $optimized;
+				$optimize_done = true;
+			}
+		}
 
 		if ( Watermark::should_apply( $mime_type ) ) {
-			$watermarked = Watermark::apply( $source_path, $mime_type );
+			$watermarked = Watermark::apply( $upload_path, $mime_type );
 			if ( is_wp_error( $watermarked ) ) {
 				if ( apply_filters( 'ak_cdn_watermark_fail_upload', false, $watermarked, $context ) ) {
+					self::cleanup_temp_file( $temp_opt_path );
 					return $watermarked;
 				}
-			} elseif ( is_string( $watermarked ) && $watermarked !== '' && $watermarked !== $source_path ) {
+			} elseif ( is_string( $watermarked ) && $watermarked !== '' && $watermarked !== $upload_path ) {
 				$upload_path  = $watermarked;
 				$temp_wm_path = $watermarked;
 			}
@@ -142,6 +158,7 @@ final class Uploader {
 				'logical_absolute'   => $absolute,
 				'public_url'         => $public_url,
 				'configured_base'    => Config::remote_base_path(),
+				'optimize_applied'   => $optimize_done,
 				'watermark_applied'  => $temp_wm_path !== '',
 				'source'             => (string) ( $context['source'] ?? '' ),
 			)
@@ -149,13 +166,13 @@ final class Uploader {
 
 		$connection = self::make_connection();
 		if ( is_wp_error( $connection ) ) {
-			self::cleanup_watermark_temp( $temp_wm_path );
+			self::cleanup_pipeline_temps( $temp_opt_path, $temp_wm_path );
 			return $connection;
 		}
 
 		$result = $connection->upload( $upload_path, $absolute );
 		self::merge_connection_debug( $connection );
-		self::cleanup_watermark_temp( $temp_wm_path );
+		self::cleanup_pipeline_temps( $temp_opt_path, $temp_wm_path );
 
 		if ( is_wp_error( $result ) ) {
 			self::merge_error_debug( $result );
@@ -346,24 +363,39 @@ final class Uploader {
 			'canonical_relative'  => __( 'مسیر وب (canonical)', 'asrekhodro' ),
 			'public_url'          => __( 'URL عمومی', 'asrekhodro' ),
 			'logical_absolute'    => __( 'مسیر منطقی مطلق', 'asrekhodro' ),
+			'optimize_applied'    => __( 'بهینه‌سازی تصویر', 'asrekhodro' ),
+			'watermark_applied'   => __( 'واترمارک', 'asrekhodro' ),
 		);
 
 		foreach ( $map as $key => $label ) {
-			if ( isset( $debug[ $key ] ) && (string) $debug[ $key ] !== '' ) {
-				$rows[] = array(
-					'label' => $label,
-					'value' => (string) $debug[ $key ],
-				);
+			if ( ! array_key_exists( $key, $debug ) ) {
+				continue;
 			}
+			$value = $debug[ $key ];
+			if ( is_bool( $value ) ) {
+				$value = $value ? __( 'بله', 'asrekhodro' ) : __( 'خیر', 'asrekhodro' );
+			}
+			if ( (string) $value === '' ) {
+				continue;
+			}
+			$rows[] = array(
+				'label' => $label,
+				'value' => (string) $value,
+			);
 		}
 
 		return $rows;
 	}
 
-	private static function cleanup_watermark_temp( string $path ): void {
+	private static function cleanup_temp_file( string $path ): void {
 		if ( $path !== '' && is_file( $path ) ) {
 			wp_delete_file( $path );
 		}
+	}
+
+	private static function cleanup_pipeline_temps( string $optimize_path, string $watermark_path ): void {
+		self::cleanup_temp_file( $watermark_path );
+		self::cleanup_temp_file( $optimize_path );
 	}
 
 	private static function merge_connection_debug( ConnectionInterface $connection ): void {

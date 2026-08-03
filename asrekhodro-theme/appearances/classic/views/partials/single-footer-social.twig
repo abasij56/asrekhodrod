@@ -1,5 +1,6 @@
 {% if footer_social_links|default([])|length %}
   <div class="single-article__social" aria-label="شبکه‌های اجتماعی">
+    <p class="single-article__social-label">به شبکه‌های اجتماعی ما بپیوندید.</p>
     <div class="footer-bottom__social">
       {% for item in footer_social_links %}
         <a href="{{ item.url }}" aria-label="{{ item.label }}" rel="noopener noreferrer" target="_blank">{{ item.svg|raw }}</a>

@@ -8,7 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class SinglePost {
 
-	private const UNDER_TITLE_BLOCK = 'acf/ak-under-title';
+	private const UNDER_TITLE_BLOCK   = 'acf/ak-under-title';
+	private const RELATED_CACHE_GROUP = 'ak_related_posts';
+	private const RELATED_CACHE_TTL   = 43200; // 12 hours
 
 	/** @var array<int, string> */
 	private static array $under_title_cache = array();
@@ -19,6 +21,7 @@ final class SinglePost {
 		add_filter( 'timber/twig/functions', array( self::class, 'register_twig_functions' ) );
 		add_filter( 'the_content', array( self::class, 'strip_duplicate_over_title' ), 5 );
 		add_filter( 'render_block', array( self::class, 'suppress_under_title_block_render' ), 10, 2 );
+		add_action( 'save_post_post', array( self::class, 'flush_related_cache' ), 20, 1 );
 	}
 
 	/**
@@ -280,53 +283,195 @@ final class SinglePost {
 	}
 
 	/**
+	 * Drop cached related IDs when a post is saved (tags/manual related may change).
+	 */
+	public static function flush_related_cache( int $post_id ): void {
+		if ( $post_id <= 0 || wp_is_post_revision( $post_id ) ) {
+			return;
+		}
+
+		wp_cache_delete( self::related_cache_key( $post_id ), self::RELATED_CACHE_GROUP );
+	}
+
+	private static function related_cache_key( int $post_id ): string {
+		return 'ids_v2_' . $post_id;
+	}
+
+	/**
+	 * Related posts: manual → tags (newest per tag, split quota) → same category → latest site-wide.
+	 * ID collection is cached (object cache / Redis) so single views stay fast.
+	 *
 	 * @return \Timber\PostQuery
 	 */
 	private static function get_related_posts( \Timber\Post $post, int $limit ): \Timber\PostQuery {
 		$post_id = (int) $post->ID;
+		$limit   = max( 1, $limit );
 
-		if ( function_exists( 'get_field' ) ) {
-			$related_ids = get_field( 'related_posts', $post_id );
-			if ( is_array( $related_ids ) && ! empty( $related_ids ) ) {
-				$related_ids = array_values(
-					array_filter(
-						array_map( 'intval', $related_ids ),
-						static fn( int $related_id ): bool => $related_id > 0 && $related_id !== $post_id
-					)
-				);
+		$manual = self::get_manual_related_ids( $post_id, $limit );
+		if ( $manual !== array() ) {
+			return self::query_related_by_ids( $manual );
+		}
 
-				if ( ! empty( $related_ids ) ) {
-					return ImporterBridge::query_posts(
+		$cache_key = self::related_cache_key( $post_id );
+		$cached    = wp_cache_get( $cache_key, self::RELATED_CACHE_GROUP );
+		if ( is_array( $cached ) ) {
+			$cached = array_values(
+				array_filter(
+					array_map( 'intval', $cached ),
+					static fn( int $id ): bool => $id > 0 && $id !== $post_id
+				)
+			);
+
+			return self::query_related_by_ids( array_slice( $cached, 0, $limit ) );
+		}
+
+		$ids = self::collect_related_ids( $post_id, $limit );
+		wp_cache_set( $cache_key, $ids, self::RELATED_CACHE_GROUP, self::RELATED_CACHE_TTL );
+
+		return self::query_related_by_ids( $ids );
+	}
+
+	/**
+	 * @return list<int>
+	 */
+	private static function get_manual_related_ids( int $post_id, int $limit ): array {
+		if ( ! function_exists( 'get_field' ) ) {
+			return array();
+		}
+
+		$related_ids = get_field( 'related_posts', $post_id );
+		if ( ! is_array( $related_ids ) || $related_ids === array() ) {
+			return array();
+		}
+
+		$related_ids = array_values(
+			array_filter(
+				array_map( 'intval', $related_ids ),
+				static fn( int $related_id ): bool => $related_id > 0 && $related_id !== $post_id
+			)
+		);
+
+		return array_slice( $related_ids, 0, $limit );
+	}
+
+	/**
+	 * @return list<int>
+	 */
+	private static function collect_related_ids( int $post_id, int $limit ): array {
+		$ids = array();
+
+		$tag_ids = wp_get_post_terms( $post_id, 'post_tag', array( 'fields' => 'ids' ) );
+		if ( ! is_wp_error( $tag_ids ) && is_array( $tag_ids ) && $tag_ids !== array() ) {
+			$tag_ids = array_values( array_filter( array_map( 'intval', $tag_ids ) ) );
+			$n       = count( $tag_ids );
+			if ( $n > 0 ) {
+				$per_tag   = max( 1, (int) floor( $limit / $n ) );
+				$remainder = $limit - ( $per_tag * $n );
+
+				foreach ( $tag_ids as $index => $tag_id ) {
+					if ( count( $ids ) >= $limit ) {
+						break;
+					}
+
+					$quota = $per_tag + ( $index < $remainder ? 1 : 0 );
+					$need  = min( $quota, $limit - count( $ids ) );
+					if ( $need <= 0 ) {
+						continue;
+					}
+
+					$found = self::query_related_ids(
 						array(
-							'posts_per_page' => min( $limit, count( $related_ids ) ),
-							'post__in'       => array_slice( $related_ids, 0, $limit ),
-							'orderby'        => 'post__in',
+							'tag_id'         => $tag_id,
+							'posts_per_page' => $need,
+							'post__not_in'   => array_merge( array( $post_id ), $ids ),
 						)
 					);
+					$ids = array_merge( $ids, $found );
 				}
 			}
 		}
 
-		$categories = wp_get_post_categories( $post_id );
-
-		$args = array(
-			'posts_per_page' => $limit,
-			'post__not_in'   => array( $post_id ),
-		);
-
-		if ( ! empty( $categories ) ) {
-			$args['category__in'] = $categories;
+		if ( count( $ids ) < $limit ) {
+			$categories = wp_get_post_categories( $post_id );
+			if ( is_array( $categories ) && $categories !== array() ) {
+				$found = self::query_related_ids(
+					array(
+						'category__in'   => $categories,
+						'posts_per_page' => $limit - count( $ids ),
+						'post__not_in'   => array_merge( array( $post_id ), $ids ),
+					)
+				);
+				$ids = array_merge( $ids, $found );
+			}
 		}
 
-		$related = ImporterBridge::query_posts( $args );
-		if ( count( $related ) >= 5 ) {
-			return $related;
+		if ( count( $ids ) < $limit ) {
+			$found = self::query_related_ids(
+				array(
+					'posts_per_page' => $limit - count( $ids ),
+					'post__not_in'   => array_merge( array( $post_id ), $ids ),
+				)
+			);
+			$ids = array_merge( $ids, $found );
+		}
+
+		return array_values( array_unique( array_map( 'intval', $ids ) ) );
+	}
+
+	/**
+	 * Lightweight ID-only query for related collection.
+	 *
+	 * @param array<string, mixed> $args
+	 * @return list<int>
+	 */
+	private static function query_related_ids( array $args ): array {
+		$query_args = array_merge(
+			array(
+				'post_type'              => 'post',
+				'post_status'            => 'publish',
+				'orderby'                => 'date',
+				'order'                  => 'DESC',
+				'fields'                 => 'ids',
+				'no_found_rows'          => true,
+				'ignore_sticky_posts'    => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			),
+			$args
+		);
+
+		$posts_per_page = (int) ( $query_args['posts_per_page'] ?? 0 );
+		if ( $posts_per_page <= 0 ) {
+			return array();
+		}
+
+		$found = get_posts( $query_args );
+		if ( ! is_array( $found ) || $found === array() ) {
+			return array();
+		}
+
+		return array_values( array_map( 'intval', $found ) );
+	}
+
+	/**
+	 * @param list<int> $ids
+	 * @return \Timber\PostQuery
+	 */
+	private static function query_related_by_ids( array $ids ): \Timber\PostQuery {
+		if ( $ids === array() ) {
+			return ImporterBridge::query_posts(
+				array(
+					'post__in'       => array( 0 ),
+					'posts_per_page' => 1,
+				)
+			);
 		}
 
 		return ImporterBridge::query_posts(
 			array(
-				'posts_per_page' => $limit,
-				'post__not_in'   => array( $post_id ),
+				'posts_per_page' => count( $ids ),
+				'post__in'       => $ids,
+				'orderby'        => 'post__in',
 			)
 		);
 	}

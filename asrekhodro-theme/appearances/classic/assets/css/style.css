@@ -6437,8 +6437,19 @@ body > .single-share-menu__panel {
 
 .single-article__social {
   display: flex;
-  justify-content: flex-end; /* visual left in RTL */
+  flex-direction: column;
+  align-items: flex-end; /* visual left in RTL */
+  gap: 0.65rem;
   margin: 1.5rem 0 0.5rem;
+}
+
+.single-article__social-label {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  line-height: 1.5;
+  text-align: end;
 }
 
 .single-article__social .footer-bottom__social a {
