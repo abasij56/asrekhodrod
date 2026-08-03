@@ -294,16 +294,65 @@ gtag('config', 'UA-107048289-1');
 			return null;
 		}
 
-		if ( is_array( $field ) && ! empty( $field['url'] ) ) {
-			return (string) $field['url'];
+		$url = null;
+		$id  = 0;
+
+		if ( is_array( $field ) ) {
+			if ( ! empty( $field['ID'] ) ) {
+				$id = (int) $field['ID'];
+			} elseif ( ! empty( $field['id'] ) ) {
+				$id = (int) $field['id'];
+			}
+			if ( ! empty( $field['url'] ) ) {
+				$url = (string) $field['url'];
+			}
+		} elseif ( is_numeric( $field ) ) {
+			$id = (int) $field;
+		} elseif ( is_string( $field ) ) {
+			$url = $field;
 		}
 
-		if ( is_numeric( $field ) ) {
-			$url = wp_get_attachment_url( (int) $field );
-			return $url ? (string) $url : null;
+		if ( $id > 0 ) {
+			$from_id = wp_get_attachment_url( $id );
+			if ( is_string( $from_id ) && $from_id !== '' ) {
+				$url = $from_id;
+			}
 		}
 
-		return is_string( $field ) ? $field : null;
+		return self::public_media_url( $url );
+	}
+
+	/**
+	 * Never emit loopback icon URLs on the public site (triggers Local Network Access prompts).
+	 */
+	private static function public_media_url( ?string $url ): ?string {
+		if ( $url === null || $url === '' ) {
+			return null;
+		}
+
+		$host = wp_parse_url( $url, PHP_URL_HOST );
+		if ( ! is_string( $host ) || $host === '' ) {
+			return $url;
+		}
+
+		$loopback = array( 'localhost', '127.0.0.1', '0.0.0.0', '[::1]' );
+		if ( ! in_array( strtolower( $host ), $loopback, true ) ) {
+			return $url;
+		}
+
+		$path = wp_parse_url( $url, PHP_URL_PATH );
+		if ( ! is_string( $path ) || $path === '' ) {
+			return null;
+		}
+
+		$uploads = wp_upload_dir();
+		$baseurl = isset( $uploads['baseurl'] ) ? (string) $uploads['baseurl'] : '';
+		$basepath = $baseurl !== '' ? (string) wp_parse_url( $baseurl, PHP_URL_PATH ) : '';
+		if ( $baseurl !== '' && $basepath !== '' && str_starts_with( $path, $basepath ) ) {
+			return $baseurl . substr( $path, strlen( $basepath ) );
+		}
+
+		return home_url( $path );
 	}
 
 	public static function filter_site_icon_url( $url, $size ) {
@@ -316,6 +365,8 @@ gtag('config', 'UA-107048289-1');
 			return $favicon;
 		}
 
-		return $url;
+		$safe = self::public_media_url( is_string( $url ) ? $url : null );
+
+		return $safe ?? $url;
 	}
 }

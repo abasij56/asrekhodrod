@@ -408,7 +408,7 @@ final class ExternalMedia {
 			return $file;
 		}
 
-		return is_string( $post->guid ) ? $post->guid : $file;
+		return is_string( $post->guid ) && ! self::is_loopback_host( $post->guid ) ? $post->guid : $file;
 	}
 
 	public static function is_external_attachment( int $attachment_id ): bool {
@@ -418,7 +418,8 @@ final class ExternalMedia {
 	/**
 	 * Ensure external / CDN-migrated attachments expose their remote URL.
 	 *
-	 * Prefer `_ak_cdn_migrated_url` / GUID over any local uploads URL WordPress may still build.
+	 * Prefer `_ak_cdn_migrated_url`, then remote GUID for true external items.
+	 * Normal library uploads keep WordPress' built URL (never override with stale GUID).
 	 *
 	 * @param string|false $url
 	 * @return string|false
@@ -443,7 +444,7 @@ final class ExternalMedia {
 		}
 
 		$guid = is_string( $post->guid ) ? $post->guid : '';
-		if ( $guid !== '' && (bool) preg_match( '#^https?://#i', $guid ) ) {
+		if ( $guid !== '' && (bool) preg_match( '#^https?://#i', $guid ) && ! self::is_loopback_host( $guid ) ) {
 			return $guid;
 		}
 
@@ -478,12 +479,59 @@ final class ExternalMedia {
 		return '';
 	}
 
+	/**
+	 * Older external-media rows may lack `_ak_external_media` but still have a remote GUID
+	 * and no real local uploads path. Must NOT match normal library files (every WP
+	 * attachment has an http(s) GUID — including ones created on localhost).
+	 */
 	private static function is_legacy_external_attachment( int $attachment_id ): bool {
 		$post = get_post( $attachment_id );
 		if ( ! $post instanceof \WP_Post || $post->post_type !== 'attachment' ) {
 			return false;
 		}
 
-		return is_string( $post->guid ) && (bool) preg_match( '#^https?://#i', $post->guid );
+		$guid = is_string( $post->guid ) ? $post->guid : '';
+		if ( $guid === '' || ! (bool) preg_match( '#^https?://#i', $guid ) || self::is_loopback_host( $guid ) ) {
+			return false;
+		}
+
+		$attached = get_post_meta( $attachment_id, '_wp_attached_file', true );
+		if ( is_string( $attached ) && $attached !== '' ) {
+			// Remote URL stored as attached file → external.
+			if ( (bool) preg_match( '#^https?://#i', $attached ) ) {
+				return ! self::is_loopback_host( $attached );
+			}
+
+			// Relative path under uploads → normal local attachment.
+			return false;
+		}
+
+		// No local file path: only treat as external when GUID is off this site.
+		$uploads = wp_upload_dir();
+		$baseurl = isset( $uploads['baseurl'] ) ? (string) $uploads['baseurl'] : '';
+		if ( $baseurl !== '' && str_starts_with( $guid, untrailingslashit( $baseurl ) ) ) {
+			return false;
+		}
+
+		$site_host = wp_parse_url( home_url(), PHP_URL_HOST );
+		$guid_host = wp_parse_url( $guid, PHP_URL_HOST );
+		if (
+			is_string( $site_host ) && $site_host !== ''
+			&& is_string( $guid_host ) && $guid_host !== ''
+			&& strcasecmp( $site_host, $guid_host ) === 0
+		) {
+			return false;
+		}
+
+		return true;
+	}
+
+	private static function is_loopback_host( string $url ): bool {
+		$host = wp_parse_url( $url, PHP_URL_HOST );
+		if ( ! is_string( $host ) || $host === '' ) {
+			return false;
+		}
+
+		return in_array( strtolower( $host ), array( 'localhost', '127.0.0.1', '0.0.0.0', '[::1]' ), true );
 	}
 }
