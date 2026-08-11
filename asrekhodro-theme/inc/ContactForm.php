@@ -10,7 +10,7 @@ final class ContactForm {
 
 	private const FORM_TITLE   = 'Asre Khodro — Contact';
 	private const FORM_ID_KEY  = 'ak_cf7_contact_form_id';
-	private const FORM_VERSION = '4';
+	private const FORM_VERSION = '5';
 
 	public static function init(): void {
 		add_action( 'init', array( self::class, 'ensure_form' ), 25 );
@@ -84,6 +84,7 @@ final class ContactForm {
 <div class="ak-contact-form__field">[select* department class:ak-contact-form__control "دپارتمان روابط عمومی|' . $default_email . '"]</div>
 <div class="ak-contact-form__field ak-contact-form__field--full">[textarea* message class:ak-contact-form__control rows:6 placeholder "پیام شما ..."]</div>
 </div>
+' . RecaptchaBranding::notice_html( 'ak-contact-form__recaptcha-note' ) . '
 <p class="ak-contact-form__submit">[submit class:ak-contact-form__button "ارسال پیام"]</p>'
 			),
 			'mail'     => array(

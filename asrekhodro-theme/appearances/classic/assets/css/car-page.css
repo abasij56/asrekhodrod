@@ -314,6 +314,49 @@
   border: 0;
 }
 
+@media (max-width: 768px) {
+  .car-lightbox {
+    padding: 3.25rem 0.35rem 1.25rem;
+  }
+
+  .car-lightbox__figure,
+  .car-lightbox__image {
+    max-width: calc(100vw - 5.25rem);
+    max-height: calc(100vh - 6.5rem);
+  }
+
+  .car-lightbox__nav {
+    width: 34px;
+    height: 34px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  }
+
+  .car-lightbox__nav-icon {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  .car-lightbox__nav--prev {
+    inset-inline-start: 0.3rem;
+  }
+
+  .car-lightbox__nav--next {
+    inset-inline-end: 0.3rem;
+  }
+
+  .car-lightbox__close {
+    top: 0.75rem;
+    inset-inline-end: 0.75rem;
+    width: 2.15rem;
+    height: 2.15rem;
+    font-size: 1.45rem;
+  }
+
+  .car-lightbox__hit {
+    width: 28%;
+  }
+}
+
 @media (max-width: 640px) {
   .car-specs__table {
     font-size: 0.85rem;

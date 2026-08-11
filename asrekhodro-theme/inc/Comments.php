@@ -214,7 +214,7 @@ final class Comments {
 			'class_form'           => 'ak-comments-form',
 			'class_submit'         => 'ak-comments-form__submit-btn',
 			'submit_button'        => '<button type="submit" name="%1$s" id="%2$s" class="%3$s"><span class="ak-comments-form__submit-icon" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span><span>%4$s</span></button>',
-			'submit_field'         => '<div class="ak-comments-form__submit-wrap form-submit">%1$s %2$s</div>',
+			'submit_field'         => RecaptchaBranding::notice_html( 'ak-comments-form__recaptcha-note' ) . '<div class="ak-comments-form__submit-wrap form-submit">%1$s %2$s</div>',
 			'comment_notes_before' => '',
 			'comment_notes_after'  => '',
 			'must_log_in'          => sprintf(

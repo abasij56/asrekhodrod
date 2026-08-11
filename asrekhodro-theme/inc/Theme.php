@@ -44,6 +44,7 @@ final class Theme {
 		require_once ASREKHODRO_THEME_DIR . '/inc/ContactForm.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/ContactPage.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/Comments.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/RecaptchaBranding.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/AboutPage.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/LoginPage.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/AcfFields.php';
@@ -104,6 +105,7 @@ final class Theme {
 		AdminCarSpecIconSelect::init();
 		ContactForm::init();
 		Comments::init();
+		RecaptchaBranding::init();
 		SinglePost::init();
 		PostOverTitleMeta::init();
 		AboutPage::init();
