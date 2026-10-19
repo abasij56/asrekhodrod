@@ -20,7 +20,7 @@ final class NewsArchive {
 			return true;
 		}
 
-		if ( is_category() || is_tag() || is_author() || is_date() ) {
+		if ( is_category() || is_tag() || is_author() || is_date() || PostCredits::is_archive_request() ) {
 			return true;
 		}
 
@@ -295,6 +295,12 @@ final class NewsArchive {
 
 		if ( is_tag() ) {
 			$link = get_term_link( get_queried_object_id(), 'post_tag' );
+
+			return is_string( $link ) && ! is_wp_error( $link ) ? $link : home_url( '/' );
+		}
+
+		if ( PostCredits::is_archive_request() ) {
+			$link = get_term_link( get_queried_object() );
 
 			return is_string( $link ) && ! is_wp_error( $link ) ? $link : home_url( '/' );
 		}

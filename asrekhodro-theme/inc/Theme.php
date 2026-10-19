@@ -14,6 +14,8 @@ final class Theme {
 		require_once ASREKHODRO_THEME_DIR . '/inc/Setup.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/AuthorAccess.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/PostTypes.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/PostCredits.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/PrimaryTag.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/MediaAlt.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/ImporterBridge.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/PersianDate.php';
@@ -41,6 +43,7 @@ final class Theme {
 		require_once ASREKHODRO_THEME_DIR . '/inc/PostViews.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/SidebarWidgets.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/AjaxSearch.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/CachePurge.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/ContactForm.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/ContactPage.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/Comments.php';
@@ -79,6 +82,8 @@ final class Theme {
 		Setup::init();
 		AuthorAccess::init();
 		PostTypes::init();
+		PostCredits::init();
+		PrimaryTag::init();
 		CarsInfo::init();
 		CarInfo3d::init();
 		CinfoToc::init();
@@ -97,6 +102,7 @@ final class Theme {
 		LegacyRedirects::init();
 		PostViews::init();
 		AjaxSearch::init();
+		CachePurge::init();
 		AdminPostList::init();
 		AdminNewsDateFilter::init();
 		AdminAds::init();

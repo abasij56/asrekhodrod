@@ -11,6 +11,7 @@ final class SinglePost {
 	private const UNDER_TITLE_BLOCK   = 'acf/ak-under-title';
 	private const RELATED_CACHE_GROUP = 'ak_related_posts';
 	private const RELATED_CACHE_TTL   = 43200; // 12 hours
+	private const PRIMARY_TAG_RELATED = 10;
 
 	/** @var array<int, string> */
 	private static array $under_title_cache = array();
@@ -142,6 +143,8 @@ final class SinglePost {
 		$context['post_lead']         = ImporterBridge::get_list_excerpt( $post, ImporterBridge::excerpt_max( 'single' ) );
 		$context['post_datetime']     = ImporterBridge::format_post_datetime( $post );
 		$context['post_tags']                  = self::get_tags_with_counts( $post );
+		$context['post_primary_tag_id']        = PrimaryTag::from_content( (string) $post->post_content );
+		$context['post_credits']               = PostCredits::for_post( $post_id );
 		$context['post_under_title']           = self::get_under_title_from_block( $post );
 		$context['post_has_under_title_block'] = self::has_under_title_block( $post );
 		$context['post_gallery_images']        = ImporterBridge::get_post_gallery_images( $post );
@@ -273,6 +276,7 @@ final class SinglePost {
 			}
 
 			$tags[] = array(
+				'id'    => (int) $term->term_id,
 				'name'  => $term->name,
 				'link'  => $link,
 				'count' => (int) $term->count,
@@ -294,11 +298,11 @@ final class SinglePost {
 	}
 
 	private static function related_cache_key( int $post_id ): string {
-		return 'ids_v2_' . $post_id;
+		return 'ids_v3_' . $post_id;
 	}
 
 	/**
-	 * Related posts: manual → tags (newest per tag, split quota) → same category → latest site-wide.
+	 * Related posts: manual → primary tag (up to 10) → other tags (newest per tag, split quota) → same category → latest site-wide.
 	 * ID collection is cached (object cache / Redis) so single views stay fast.
 	 *
 	 * @return \Timber\PostQuery
@@ -363,10 +367,24 @@ final class SinglePost {
 		$tag_ids = wp_get_post_terms( $post_id, 'post_tag', array( 'fields' => 'ids' ) );
 		if ( ! is_wp_error( $tag_ids ) && is_array( $tag_ids ) && $tag_ids !== array() ) {
 			$tag_ids = array_values( array_filter( array_map( 'intval', $tag_ids ) ) );
-			$n       = count( $tag_ids );
-			if ( $n > 0 ) {
-				$per_tag   = max( 1, (int) floor( $limit / $n ) );
-				$remainder = $limit - ( $per_tag * $n );
+
+			$primary_tag_id = PrimaryTag::from_content( (string) get_post_field( 'post_content', $post_id ) );
+			if ( $primary_tag_id > 0 && in_array( $primary_tag_id, $tag_ids, true ) ) {
+				$ids     = self::query_related_ids(
+					array(
+						'tag_id'         => $primary_tag_id,
+						'posts_per_page' => min( self::PRIMARY_TAG_RELATED, $limit ),
+						'post__not_in'   => array( $post_id ),
+					)
+				);
+				$tag_ids = array_values( array_diff( $tag_ids, array( $primary_tag_id ) ) );
+			}
+
+			$n         = count( $tag_ids );
+			$remaining = $limit - count( $ids );
+			if ( $n > 0 && $remaining > 0 ) {
+				$per_tag   = max( 1, (int) floor( $remaining / $n ) );
+				$remainder = $remaining - ( $per_tag * $n );
 
 				foreach ( $tag_ids as $index => $tag_id ) {
 					if ( count( $ids ) >= $limit ) {

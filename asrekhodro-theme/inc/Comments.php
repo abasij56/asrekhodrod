@@ -115,9 +115,10 @@ final class Comments {
 		return self::get_submission_notice( $post );
 	}
 
+	/**
+	 * No nonce check: public read-only endpoint, and cached page HTML outlives nonce lifetime.
+	 */
 	public static function ajax_load_more(): void {
-		check_ajax_referer( 'ak_comments', 'nonce' );
-
 		$post_id = isset( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0;
 		$offset  = isset( $_GET['offset'] ) ? absint( $_GET['offset'] ) : 0;
 

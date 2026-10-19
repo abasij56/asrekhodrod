@@ -151,6 +151,9 @@
       if (!marquee.querySelector(".ticker__list[aria-hidden='true']")) {
         var clone = list.cloneNode(true);
         clone.setAttribute("aria-hidden", "true");
+        clone.querySelectorAll("a, button, input, select, textarea, [tabindex]").forEach(function (el) {
+          el.setAttribute("tabindex", "-1");
+        });
         marquee.appendChild(clone);
       }
 

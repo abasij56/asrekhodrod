@@ -61,13 +61,26 @@
         <p class="single-under-title">{{ post.meta('_asrekhodro_under_title')|default(post.meta('under_title')) }}</p>
       {% endif %}
 
+      {% if post_credits|default([])|length > 0 %}
+        <div class="single-credits">
+          {% for group in post_credits %}
+            <p class="single-credits__item">
+              <span class="single-credits__label">{{ group.label }}:</span>
+              {% for person in group.items %}<a href="{{ person.link }}">{{ person.name }}</a>{% if not loop.last %}، {% endif %}{% endfor %}
+            </p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
       {% include 'partials/single-footer-social.twig' %}
 
       {% if post_tags|length > 0 %}
         <section class="single-tags" aria-labelledby="single-tags-heading">
           <h2 id="single-tags-heading" class="single-section-title">برچسب‌ها</h2>
           <ul class="single-tags__list">
-            {% for tag in post_tags %}
+            {% set fa_sort_key = { 'پ': 'ب•', 'چ': 'ج•', 'ژ': 'ز•', 'ک': 'ك', 'گ': 'ك•', 'ه': 'و•' } %}
+            {% set primary_tag_id = post_primary_tag_id|default(0) %}
+            {% for tag in post_tags|sort((a, b) => (a.id == primary_tag_id ? '' : (a.name|replace(fa_sort_key))) <=> (b.id == primary_tag_id ? '' : (b.name|replace(fa_sort_key)))) %}
               <li>
                 <a href="{{ tag.link }}">{{ tag.name }}{% if tag.count > 0 %} <strong>({{ tag.count }})</strong>{% endif %}</a>
               </li>

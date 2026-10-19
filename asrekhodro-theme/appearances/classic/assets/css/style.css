@@ -6604,6 +6604,29 @@ body > .single-share-menu__panel {
   color: var(--ink-muted);
 }
 
+.single-credits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.5rem;
+  margin: 1.25rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--ink-muted);
+}
+
+.single-credits__item {
+  margin: 0;
+}
+
+.single-credits__label {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.single-credits a {
+  color: var(--brand);
+}
+
 .single-related__list {
   list-style: none;
   padding: 0;

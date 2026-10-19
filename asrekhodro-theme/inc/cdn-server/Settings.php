@@ -120,7 +120,7 @@ final class Settings {
 				'ui_on_text'    => __( 'فعال', 'asrekhodro' ),
 				'ui_off_text'   => __( 'غیرفعال', 'asrekhodro' ),
 				'default_value' => 0,
-				'instructions'  => __( 'با فعال شدن، هنگام آپلود تصویر به CDN واترمارک روی عکس ادغام می‌شود.', 'asrekhodro' ),
+				'instructions'  => __( 'با فعال شدن: ۱) آپلود به CDN — واترمارک قبل از ارسال به CDN. ۲) آپلود از کتابخانه رسانه — واترمارک روی فایل اصلی، سپس ساخت تامبنیل و سایزها از همان نسخه. عکس‌های قبلی تغییر نمی‌کنند.', 'asrekhodro' ),
 			),
 			array(
 				'key'               => 'field_ak_site_watermark',

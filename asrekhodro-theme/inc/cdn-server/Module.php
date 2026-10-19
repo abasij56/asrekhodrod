@@ -20,6 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class Module {
 
 	public static function init(): void {
+		// Local Media Library uploads: watermark original before WP builds sizes.
+		Watermark::init();
+
 		// Core external-media attachment behaviour (works with or without CDN).
 		add_filter( 'get_attached_file', array( ExternalMedia::class, 'filter_attached_file' ), 10, 2 );
 		add_filter( 'wp_get_attachment_url', array( ExternalMedia::class, 'filter_attachment_url' ), 10, 2 );

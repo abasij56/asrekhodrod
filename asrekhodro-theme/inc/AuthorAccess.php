@@ -92,6 +92,8 @@ final class AuthorAccess {
 		'post_tag',
 		'ad_position',
 		'video_category',
+		PostCredits::WRITER,
+		PostCredits::PHOTOGRAPHER,
 	);
 
 	/**
@@ -377,6 +379,8 @@ final class AuthorAccess {
 				'post-new.php',
 				'edit-tags.php?taxonomy=category',
 				'edit-tags.php?taxonomy=post_tag',
+				'edit-tags.php?taxonomy=' . PostCredits::WRITER,
+				'edit-tags.php?taxonomy=' . PostCredits::PHOTOGRAPHER,
 			),
 			'upload.php' => array(
 				'upload.php',

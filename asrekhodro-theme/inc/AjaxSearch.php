@@ -26,11 +26,15 @@ final class AjaxSearch {
 		}
 
 		$query->set( 'post_type', self::SEARCH_POST_TYPES );
+		// Relevance ordering adds post_content LIKE to ORDER BY for multi-word queries.
+		$query->set( 'orderby', 'date' );
+		$query->set( 'order', 'DESC' );
 	}
 
+	/**
+	 * No nonce check: public read-only endpoint, and cached page HTML outlives nonce lifetime.
+	 */
 	public static function handle(): void {
-		check_ajax_referer( 'ak_search', 'nonce' );
-
 		$query = isset( $_GET['q'] ) ? sanitize_text_field( wp_unslash( $_GET['q'] ) ) : '';
 		if ( mb_strlen( $query ) < 2 ) {
 			wp_send_json_success(
@@ -87,8 +91,7 @@ final class AjaxSearch {
 	}
 
 	/**
-	 * Theme search: match title, excerpt, or content.
-	 * (Previously title-only for speed; body phrases were invisible in search.)
+	 * Theme search: match title only (content LIKE scans every post body and is too slow).
 	 *
 	 * @param string    $search SQL fragment.
 	 * @param \WP_Query $query  Current query.
@@ -107,16 +110,7 @@ final class AjaxSearch {
 
 		$like = '%' . $wpdb->esc_like( $term ) . '%';
 
-		return $wpdb->prepare(
-			" AND (
-				{$wpdb->posts}.post_title LIKE %s
-				OR {$wpdb->posts}.post_excerpt LIKE %s
-				OR {$wpdb->posts}.post_content LIKE %s
-			) ",
-			$like,
-			$like,
-			$like
-		);
+		return $wpdb->prepare( " AND {$wpdb->posts}.post_title LIKE %s ", $like );
 	}
 
 	private static function is_theme_search_query( \WP_Query $query ): bool {

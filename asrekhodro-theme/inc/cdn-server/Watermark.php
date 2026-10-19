@@ -7,9 +7,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Composites a theme-option watermark onto images before CDN upload.
+ * Composites a theme-option watermark onto images before CDN upload,
+ * and onto local Media Library uploads before WordPress generates sizes.
  *
  * Settings are read via get_option() — never get_field() — to avoid ACF re-entry.
+ * No post meta is written.
  */
 final class Watermark {
 
@@ -25,6 +27,102 @@ final class Watermark {
 		'top_left',
 		'top_right',
 	);
+
+	public static function init(): void {
+		// Run after the file is on disk, before attachment metadata / intermediate sizes.
+		add_filter( 'wp_handle_upload', array( self::class, 'filter_media_upload' ), 20 );
+		add_filter( 'wp_handle_sideload', array( self::class, 'filter_media_upload' ), 20 );
+	}
+
+	/**
+	 * Watermark the uploaded original in place so thumbnails are built from it.
+	 *
+	 * @param array<string, string> $upload
+	 * @return array<string, string>
+	 */
+	public static function filter_media_upload( array $upload ): array {
+		if ( ! empty( $upload['error'] ) ) {
+			return $upload;
+		}
+
+		$file = isset( $upload['file'] ) ? (string) $upload['file'] : '';
+		$mime = isset( $upload['type'] ) ? strtolower( (string) $upload['type'] ) : '';
+
+		if ( $file === '' || ! is_readable( $file ) || ! self::should_apply( $mime ) ) {
+			return $upload;
+		}
+
+		if ( self::is_watermark_stamp_file( $file ) ) {
+			return $upload;
+		}
+
+		/**
+		 * Soft-skip media watermark for a specific upload (e.g. tooling).
+		 *
+		 * @param bool                $skip
+		 * @param array<string, string> $upload
+		 */
+		if ( (bool) apply_filters( 'ak_cdn_skip_media_watermark', false, $upload ) ) {
+			return $upload;
+		}
+
+		$watermarked = self::apply( $file, $mime );
+		if ( is_wp_error( $watermarked ) ) {
+			return $upload;
+		}
+
+		if ( ! is_string( $watermarked ) || $watermarked === '' || $watermarked === $file ) {
+			return $upload;
+		}
+
+		$replaced = self::replace_file( $file, $watermarked );
+		self::cleanup_temp( $watermarked );
+
+		if ( ! $replaced ) {
+			return $upload;
+		}
+
+		return $upload;
+	}
+
+	/**
+	 * Avoid stamping the logo file itself when it is re-uploaded / re-saved.
+	 */
+	private static function is_watermark_stamp_file( string $file ): bool {
+		$settings = self::settings();
+		if ( $settings === null ) {
+			return false;
+		}
+
+		$stamp = get_attached_file( $settings['attachment_id'] );
+		if ( ! is_string( $stamp ) || $stamp === '' ) {
+			return false;
+		}
+
+		$file_real  = realpath( $file );
+		$stamp_real = realpath( $stamp );
+
+		return $file_real !== false && $stamp_real !== false && $file_real === $stamp_real;
+	}
+
+	private static function replace_file( string $destination, string $source ): bool {
+		if ( @copy( $source, $destination ) ) {
+			return true;
+		}
+
+		$contents = @file_get_contents( $source );
+		if ( ! is_string( $contents ) || $contents === '' ) {
+			return false;
+		}
+
+		return false !== @file_put_contents( $destination, $contents );
+	}
+
+	private static function cleanup_temp( string $path ): void {
+		if ( $path !== '' && is_file( $path ) ) {
+			@unlink( $path );
+		}
+	}
 
 	/**
 	 * @return array{attachment_id: int, opacity: int, margin: int, position: string}|null
