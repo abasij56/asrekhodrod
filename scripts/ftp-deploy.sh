@@ -52,15 +52,24 @@ ftp_cmd() {
   local mode="$1"
   local fail_exit=true
   [[ "$mode" == "nofail" ]] && fail_exit=false
+  local body
+  body="$(cat)"
+  set +e
   lftp -u "$FTP_USER","$FTP_PASSWORD" -p "$FTP_PORT" "ftp://$FTP_HOST" <<EOF
 set cmd:fail-exit $fail_exit
 set net:max-retries 2
 set net:timeout 60
 set mirror:parallel-transfer-count 4
 $SSL_OPTS
-$(cat)
+$body
 bye
 EOF
+  local rc=$?
+  set -e
+  if [[ "$mode" == "fail" && "$rc" -ne 0 ]]; then
+    return "$rc"
+  fi
+  return 0
 }
 
 health_ok() {
