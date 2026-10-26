@@ -32,12 +32,26 @@ LIVE="$FTP_REMOTE_THEMES/$THEME_NAME"
 NEW="$FTP_REMOTE_THEMES/${THEME_NAME}__new"
 PREV="$FTP_REMOTE_THEMES/${THEME_NAME}__prev"
 FAILED="$FTP_REMOTE_THEMES/${THEME_NAME}__failed"
-SHA_FILE="$FTP_REMOTE_THEMES/${THEME_NAME}-deploy-sha.txt"
+# Outside public_html so it is not web-accessible
+DEPLOY_STATE_DIR="${DEPLOY_STATE_DIR:-asrekhodro-deploy}"
+SHA_FILE="$DEPLOY_STATE_DIR/${THEME_NAME}-deploy-sha.txt"
 BACKUP_DIR="$(mktemp -d)"
 HEAD_SHA="$(git rev-parse HEAD)"
 
 log() { printf '[ftp-deploy] %s\n' "$*"; }
 die() { log "ERROR: $*"; exit 1; }
+
+# Remove leftover staging dirs / old SHA files that sat under the web root
+cleanup_web_root_artifacts() {
+  log "Cleaning leftover theme staging / old public SHA files"
+  ftp_cmd nofail <<EOF
+rm -r $NEW
+rm -r $PREV
+rm -r $FAILED
+rm $FTP_REMOTE_THEMES/${THEME_NAME}-deploy-sha.txt
+rm $FTP_REMOTE_THEMES/.${THEME_NAME}-deploy-sha
+EOF
+}
 
 cleanup() { rm -rf "$BACKUP_DIR"; }
 trap cleanup EXIT
@@ -94,10 +108,11 @@ write_remote_sha() {
   tmp="$(mktemp)"
   printf '%s\n' "$HEAD_SHA" >"$tmp"
   ftp_cmd fail <<EOF
+mkdir -p $DEPLOY_STATE_DIR
 put $tmp -o $SHA_FILE
 EOF
   rm -f "$tmp"
-  log "Wrote remote deploy SHA $HEAD_SHA"
+  log "Wrote remote deploy SHA $HEAD_SHA -> $SHA_FILE"
 }
 
 read_remote_sha() {
@@ -312,6 +327,8 @@ EOF
 }
 
 # ---------- choose mode ----------
+cleanup_web_root_artifacts
+
 REMOTE_SHA="$(read_remote_sha || true)"
 OLD_SHA="$REMOTE_SHA"
 if [[ -z "$OLD_SHA" && -n "$BEFORE_SHA" && "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ]]; then
