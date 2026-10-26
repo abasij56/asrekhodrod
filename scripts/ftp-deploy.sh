@@ -107,8 +107,11 @@ write_remote_sha() {
   local tmp
   tmp="$(mktemp)"
   printf '%s\n' "$HEAD_SHA" >"$tmp"
-  ftp_cmd fail <<EOF
+  # Directory may already exist (550 File exists) — ignore that, then put.
+  ftp_cmd nofail <<EOF
 mkdir -p $DEPLOY_STATE_DIR
+EOF
+  ftp_cmd fail <<EOF
 put $tmp -o $SHA_FILE
 EOF
   rm -f "$tmp"
@@ -116,8 +119,9 @@ EOF
 }
 
 read_remote_sha() {
+  # mktemp creates the file; lftp get fails with "File exists" — use a new path.
   local tmp
-  tmp="$(mktemp)"
+  tmp="$(mktemp -u)"
   set +e
   lftp <<EOF >/dev/null
 set cmd:fail-exit true
@@ -129,7 +133,7 @@ bye
 EOF
   local rc=$?
   set -e
-  if [[ "$rc" -ne 0 ]]; then
+  if [[ "$rc" -ne 0 || ! -f "$tmp" ]]; then
     rm -f "$tmp"
     echo ""
     return 0
