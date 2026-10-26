@@ -1,10 +1,12 @@
 .ak-skip-watermark-wrap {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   padding: 10px 12px;
   background: #f6f7f7;
   border: 1px solid #dcdcde;
   border-radius: 4px;
-  max-width: 420px;
+  max-width: 100%;
+  text-align: right;
+  clear: both;
 }
 
 .ak-skip-watermark-label {

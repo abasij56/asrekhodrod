@@ -66,9 +66,9 @@ final class Settings {
 				'testAction' => Ajax::TEST_ACTION,
 				'testNonce'  => wp_create_nonce( Ajax::TEST_NONCE ),
 				'i18n'       => array(
-					'testing'    => __( '?? ??? ????? ??????', 'asrekhodro' ),
-					'failed'     => __( '????? ?????? ???.', 'asrekhodro' ),
-					'debugTitle' => __( '?????? ????? ???????????', 'asrekhodro' ),
+					'testing'    => __( 'در حال بررسی اتصال…', 'asrekhodro' ),
+					'failed'     => __( 'اتصال ناموفق بود.', 'asrekhodro' ),
+					'debugTitle' => __( 'مشخصات اتصال استفاده‌شده', 'asrekhodro' ),
 				),
 			)
 		);
@@ -88,7 +88,7 @@ final class Settings {
 	}
 
 	/**
-	 * Watermark tab ? placed above CDN Server.
+	 * Watermark tab — placed above CDN Server.
 	 *
 	 * @return array<int, array<string, mixed>>
 	 */
@@ -106,43 +106,43 @@ final class Settings {
 		return array(
 			array(
 				'key'       => 'field_ak_watermark_tab',
-				'label'     => __( '????????', 'asrekhodro' ),
+				'label'     => __( 'واترمارک', 'asrekhodro' ),
 				'name'      => '',
 				'type'      => 'tab',
 				'placement' => 'left',
 			),
 			array(
 				'key'           => 'field_ak_site_watermark_enabled',
-				'label'         => __( '?????? ???????? ?? ??????', 'asrekhodro' ),
+				'label'         => __( 'افزودن واترمارک به تصاویر', 'asrekhodro' ),
 				'name'          => 'site_watermark_enabled',
 				'type'          => 'true_false',
 				'ui'            => 1,
-				'ui_on_text'    => __( '????', 'asrekhodro' ),
-				'ui_off_text'   => __( '???????', 'asrekhodro' ),
+				'ui_on_text'    => __( 'فعال', 'asrekhodro' ),
+				'ui_off_text'   => __( 'غیرفعال', 'asrekhodro' ),
 				'default_value' => 0,
-				'instructions'  => __( '?? ???? ???: ?) ????? ?? CDN ? ???????? ??? ?? ????? ?? CDN. ?) ????? ?? ???????? ????? ? ???????? ??? ???? ????? ??? ???? ??????? ? ?????? ?? ???? ????. ?? ????? ???? ????????? ??? ????? ???????? ????? ???? ?? ????? ?? ??? ???? ????? ???? ???????? ????. ??????? ???? ????? ????????.', 'asrekhodro' ),
+				'instructions'  => __( 'با فعال شدن: ۱) آپلود به CDN — واترمارک قبل از ارسال به CDN. ۲) آپلود از کتابخانه رسانه — واترمارک روی فایل اصلی، سپس ساخت تامبنیل و سایزها از همان نسخه. در آپلود مدیا می‌توانید تیک «بدون واترمارک آپلود شود» را بزنید تا فقط همان آپلود بدون واترمارک باشد. عکس‌های قبلی تغییر نمی‌کنند.', 'asrekhodro' ),
 			),
 			array(
 				'key'               => 'field_ak_site_watermark',
-				'label'             => __( '????? ????????', 'asrekhodro' ),
+				'label'             => __( 'تصویر واترمارک', 'asrekhodro' ),
 				'name'              => 'site_watermark',
 				'type'              => 'image',
 				'return_format'     => 'id',
 				'preview_size'      => 'medium',
 				'mime_types'        => 'png,webp',
-				'instructions'      => __( 'PNG ?? ???????? ???? ????? ??????.', 'asrekhodro' ),
+				'instructions'      => __( 'PNG با پس‌زمینه شفاف توصیه می‌شود.', 'asrekhodro' ),
 				'conditional_logic' => $when_enabled,
 			),
 			array(
 				'key'               => 'field_ak_site_watermark_position',
-				'label'             => __( '?????? ????????', 'asrekhodro' ),
+				'label'             => __( 'موقعیت واترمارک', 'asrekhodro' ),
 				'name'              => 'site_watermark_position',
 				'type'              => 'select',
 				'choices'           => array(
-					'bottom_left'  => __( '????? ??', 'asrekhodro' ),
-					'bottom_right' => __( '????? ????', 'asrekhodro' ),
-					'top_left'     => __( '???? ??', 'asrekhodro' ),
-					'top_right'    => __( '???? ????', 'asrekhodro' ),
+					'bottom_left'  => __( 'پایین چپ', 'asrekhodro' ),
+					'bottom_right' => __( 'پایین راست', 'asrekhodro' ),
+					'top_left'     => __( 'بالا چپ', 'asrekhodro' ),
+					'top_right'    => __( 'بالا راست', 'asrekhodro' ),
 				),
 				'default_value'     => 'bottom_left',
 				'ui'                => 1,
@@ -150,7 +150,7 @@ final class Settings {
 			),
 			array(
 				'key'               => 'field_ak_site_watermark_opacity',
-				'label'             => __( '?????? ???????? (%)', 'asrekhodro' ),
+				'label'             => __( 'شفافیت واترمارک (٪)', 'asrekhodro' ),
 				'name'              => 'site_watermark_opacity',
 				'type'              => 'number',
 				'default_value'     => 70,
@@ -161,7 +161,7 @@ final class Settings {
 			),
 			array(
 				'key'               => 'field_ak_site_watermark_margin',
-				'label'             => __( '????? ???????? ?? ??? (?????)', 'asrekhodro' ),
+				'label'             => __( 'فاصله واترمارک از لبه (پیکسل)', 'asrekhodro' ),
 				'name'              => 'site_watermark_margin',
 				'type'              => 'number',
 				'default_value'     => 16,
@@ -174,7 +174,7 @@ final class Settings {
 	}
 
 	/**
-	 * Image optimize tab ? resize + compress before watermark/upload.
+	 * Image optimize tab — resize + compress before watermark/upload.
 	 *
 	 * @return array<int, array<string, mixed>>
 	 */
@@ -192,49 +192,49 @@ final class Settings {
 		return array(
 			array(
 				'key'       => 'field_ak_cdn_image_optimize_tab',
-				'label'     => __( '?????????? ?????', 'asrekhodro' ),
+				'label'     => __( 'بهینه‌سازی تصویر', 'asrekhodro' ),
 				'name'      => '',
 				'type'      => 'tab',
 				'placement' => 'left',
 			),
 			array(
 				'key'           => 'field_ak_cdn_image_optimize_enabled',
-				'label'         => __( '????????? ?????????? ??? ?? ????? CDN', 'asrekhodro' ),
+				'label'         => __( 'فعال‌سازی بهینه‌سازی قبل از آپلود CDN', 'asrekhodro' ),
 				'name'          => 'cdn_image_optimize_enabled',
 				'type'          => 'true_false',
 				'ui'            => 1,
-				'ui_on_text'    => __( '????', 'asrekhodro' ),
-				'ui_off_text'   => __( '???????', 'asrekhodro' ),
+				'ui_on_text'    => __( 'فعال', 'asrekhodro' ),
+				'ui_off_text'   => __( 'غیرفعال', 'asrekhodro' ),
 				'default_value' => 1,
-				'instructions'  => __( '???? ????? ????? ?? CDN ? ?????? ????? ?? CDN: ????? ?? ???? ???? ???? ???? ??????? ??? ??????????? ??? ???????? ? ?? ????? ?????.', 'asrekhodro' ),
+				'instructions'  => __( 'برای آپلود رسانه به CDN و انتقال رسانه به CDN: ابتدا در صورت نیاز پهنا کوچک می‌شود، سپس فشرده‌سازی، بعد واترمارک و در نهایت آپلود.', 'asrekhodro' ),
 			),
 			array(
 				'key'               => 'field_ak_cdn_image_max_width',
-				'label'             => __( '?????? ????? ????? (?????)', 'asrekhodro' ),
+				'label'             => __( 'حداکثر پهنای تصویر (پیکسل)', 'asrekhodro' ),
 				'name'              => 'cdn_image_max_width',
 				'type'              => 'number',
 				'default_value'     => 1200,
 				'min'               => 100,
 				'max'               => 5000,
 				'step'              => 50,
-				'instructions'      => __( '??? ????? ????? ????? ?? ??? ????? ????? ?? ??? ???? ???? ??????. ?????? ???????? ?????????? ???????? (??? ????? ???????).', 'asrekhodro' ),
+				'instructions'      => __( 'اگر پهنای تصویر بیشتر از این مقدار باشد، با حفظ نسبت کوچک می‌شود. تصاویر باریک‌تر دست‌نخورده می‌مانند (فقط فشرده می‌شوند).', 'asrekhodro' ),
 				'conditional_logic' => $when_enabled,
 			),
 			array(
 				'key'               => 'field_ak_cdn_image_jpeg_quality',
-				'label'             => __( '????? JPEG', 'asrekhodro' ),
+				'label'             => __( 'کیفیت JPEG', 'asrekhodro' ),
 				'name'              => 'cdn_image_jpeg_quality',
 				'type'              => 'number',
 				'default_value'     => 88,
 				'min'               => 60,
 				'max'               => 95,
 				'step'              => 1,
-				'instructions'      => __( '?? ??????? ??????? ?????? = ??? ?????? ???????? = ????????.', 'asrekhodro' ),
+				'instructions'      => __( '۸۸ پیشنهاد می‌شود؛ بالاتر = حجم بیشتر، پایین‌تر = فشرده‌تر.', 'asrekhodro' ),
 				'conditional_logic' => $when_enabled,
 			),
 			array(
 				'key'               => 'field_ak_cdn_image_webp_quality',
-				'label'             => __( '????? WebP', 'asrekhodro' ),
+				'label'             => __( 'کیفیت WebP', 'asrekhodro' ),
 				'name'              => 'cdn_image_webp_quality',
 				'type'              => 'number',
 				'default_value'     => 85,
@@ -245,14 +245,14 @@ final class Settings {
 			),
 			array(
 				'key'               => 'field_ak_cdn_image_png_compression',
-				'label'             => __( '?????????? PNG (???)', 'asrekhodro' ),
+				'label'             => __( 'فشرده‌سازی PNG (۰–۹)', 'asrekhodro' ),
 				'name'              => 'cdn_image_png_compression',
 				'type'              => 'number',
 				'default_value'     => 6,
 				'min'               => 0,
 				'max'               => 9,
 				'step'              => 1,
-				'instructions'      => __( '??? ?????? = ???? ??????? ? ?????. ? ??????? ????? ???? ???.', 'asrekhodro' ),
+				'instructions'      => __( 'عدد بالاتر = فایل کوچک‌تر و کندتر. ۶ معمولاً تعادل خوبی است.', 'asrekhodro' ),
 				'conditional_logic' => $when_enabled,
 			),
 		);
@@ -266,54 +266,54 @@ final class Settings {
 		return array(
 			array(
 				'key'       => 'field_ak_cdn_tab',
-				'label'     => __( '???? CDN', 'asrekhodro' ),
+				'label'     => __( 'سرور CDN', 'asrekhodro' ),
 				'name'      => '',
 				'type'      => 'tab',
 				'placement' => 'left',
 			),
 			array(
 				'key'           => 'field_ak_cdn_enabled',
-				'label'         => __( '????????? ????? CDN', 'asrekhodro' ),
+				'label'         => __( 'فعال‌سازی آپلود CDN', 'asrekhodro' ),
 				'name'          => 'cdn_enabled',
 				'type'          => 'true_false',
 				'ui'            => 1,
 				'default_value' => (bool) ( $defaults['enabled'] ?? false ) ? 1 : 0,
-				'instructions'  => __( '?? ???? ??? ? ????? ??????? ???? ???? ?????? ?? CDN? ?? ??? ?????? ????? ????? ????? ???? ??????.', 'asrekhodro' ),
+				'instructions'  => __( 'با فعال شدن و تکمیل تنظیمات زیر، دکمه «آپلود به CDN» در بخش افزودن رسانه خارجی نمایش داده می‌شود.', 'asrekhodro' ),
 			),
 			array(
 				'key'          => 'field_ak_cdn_public_base_url',
-				'label'        => __( '????? ???? ?????', 'asrekhodro' ),
+				'label'        => __( 'نشانی پایه عمومی', 'asrekhodro' ),
 				'name'         => 'cdn_public_base_url',
 				'type'         => 'url',
 				'placeholder'  => 'http://media.asrekhodro.com/AsreKhodro',
-				'instructions' => __( '???? ????? ???????? ???? ????? ???? = ??? ????? + ???? ?????.', 'asrekhodro' ),
+				'instructions' => __( 'آدرس عمومی فایل‌ها؛ آدرس نهایی فایل = این نشانی + مسیر آپلود.', 'asrekhodro' ),
 			),
 			array(
 				'key'           => 'field_ak_cdn_protocol',
-				'label'         => __( '??????', 'asrekhodro' ),
+				'label'         => __( 'پروتکل', 'asrekhodro' ),
 				'name'          => 'cdn_protocol',
 				'type'          => 'select',
 				'choices'       => array(
-					'ftp'   => 'FTP (????)',
-					'ftps'  => 'FTPS (FTP ??? TLS)',
-					'sftp'  => 'SFTP (??????? ext-ssh2)',
-					'local' => '??? ???? (???? ???? ? ???? FTP)',
+					'ftp'   => 'FTP (ساده)',
+					'ftps'  => 'FTPS (FTP روی TLS)',
+					'sftp'  => 'SFTP (نیازمند ext-ssh2)',
+					'local' => 'کپی محلی (همان سرور — بدون FTP)',
 				),
 				'default_value' => (string) ( $defaults['protocol'] ?? 'ftp' ),
 				'ui'            => 1,
-				'instructions'  => __( '??? ?????? ? ???? ????? ??? ?? ???? ????? ? FTP ?? ???? ???? Connection refused ??????? ???? ????? ?? ?????? ????.', 'asrekhodro' ),
+				'instructions'  => __( 'اگر وردپرس و پوشه رسانه روی یک هاست هستند و FTP از داخل سرور Connection refused می‌دهد، «کپی محلی» را انتخاب کنید.', 'asrekhodro' ),
 			),
 			array(
 				'key'          => 'field_ak_cdn_host',
-				'label'        => __( '?????? (Host)', 'asrekhodro' ),
+				'label'        => __( 'میزبان (Host)', 'asrekhodro' ),
 				'name'         => 'cdn_host',
 				'type'         => 'text',
 				'placeholder'  => 'ftp.example.com',
-				'instructions' => __( '???? FTP ???? Host ??? ????/FileZilla ?? ??????? (?? ?????? ????? ?????). ???? ??? ???? ???? ????.', 'asrekhodro' ),
+				'instructions' => __( 'برای FTP همان Host پنل هاست/FileZilla را بگذارید (نه لزوماً دامنه رسانه). برای کپی محلی لازم نیست.', 'asrekhodro' ),
 			),
 			array(
 				'key'           => 'field_ak_cdn_port',
-				'label'         => __( '????', 'asrekhodro' ),
+				'label'         => __( 'پورت', 'asrekhodro' ),
 				'name'          => 'cdn_port',
 				'type'          => 'number',
 				'default_value' => (int) ( $defaults['port'] ?? 21 ),
@@ -321,29 +321,29 @@ final class Settings {
 			),
 			array(
 				'key'   => 'field_ak_cdn_user',
-				'label' => __( '??? ??????', 'asrekhodro' ),
+				'label' => __( 'نام کاربری', 'asrekhodro' ),
 				'name'  => 'cdn_user',
 				'type'  => 'text',
 			),
 			array(
 				'key'          => 'field_ak_cdn_pass',
-				'label'        => __( '??? ????', 'asrekhodro' ),
+				'label'        => __( 'رمز عبور', 'asrekhodro' ),
 				'name'         => 'cdn_pass',
 				'type'         => 'password',
-				'instructions' => __( '??? ?? ??????? ????? ??????. ??? ??????? ????? ?????? ??????? ?? ?? ??? ??? ?????? ?????.', 'asrekhodro' ),
+				'instructions' => __( 'رمز در دیتابیس ذخیره می‌شود. فقط مدیرانِ دارای دسترسی تنظیمات تم به این بخش دسترسی دارند.', 'asrekhodro' ),
 			),
 			array(
 				'key'           => 'field_ak_cdn_remote_base_path',
-				'label'         => __( '???? ???? ??? ????', 'asrekhodro' ),
+				'label'         => __( 'مسیر پایه روی سرور', 'asrekhodro' ),
 				'name'          => 'cdn_remote_base_path',
 				'type'          => 'text',
 				'default_value' => (string) ( $defaults['remote_base_path'] ?? '/' ),
 				'placeholder'   => '/domains/.../public_html/AsreKhodro/Uploaded',
-				'instructions'  => __( '???? ????? ??? ????/FTP. ???? ParsPack: /domains/xxx.parspack.net/public_html/AsreKhodro/Uploaded ? ??? ??? ???? ??? ???? ???? ?????? ???? ????? ????? ??? ?? ?????? FTP ?? ??? ???? ??????? ??????.', 'asrekhodro' ),
+				'instructions'  => __( 'مسیر واقعی روی دیسک/FTP. مثال ParsPack: /domains/xxx.parspack.net/public_html/AsreKhodro/Uploaded — اگر این مسیر روی همان سرور وردپرس وجود داشته باشد، حتی با پروتکل FTP هم کپی محلی استفاده می‌شود.', 'asrekhodro' ),
 			),
 			array(
 				'key'           => 'field_ak_cdn_max_upload_mb',
-				'label'         => __( '?????? ??? ???? (???????)', 'asrekhodro' ),
+				'label'         => __( 'حداکثر حجم فایل (مگابایت)', 'asrekhodro' ),
 				'name'          => 'cdn_max_upload_mb',
 				'type'          => 'number',
 				'default_value' => (int) ( $defaults['max_upload_mb'] ?? 50 ),
@@ -351,16 +351,16 @@ final class Settings {
 			),
 			array(
 				'key'           => 'field_ak_cdn_allowed_types',
-				'label'         => __( '????? ???? ???? (MIME)', 'asrekhodro' ),
+				'label'         => __( 'انواع مجاز فایل (MIME)', 'asrekhodro' ),
 				'name'          => 'cdn_allowed_types',
 				'type'          => 'textarea',
 				'rows'          => 6,
 				'default_value' => implode( "\n", (array) ( $defaults['allowed_types'] ?? array() ) ),
-				'instructions'  => __( '?? ??? ?? ?? ??. ????: image/jpeg ?? image/* ???? ??? ??????.', 'asrekhodro' ),
+				'instructions'  => __( 'هر نوع در یک خط. مثال: image/jpeg یا image/* برای همه تصاویر.', 'asrekhodro' ),
 			),
 			array(
 				'key'     => 'field_ak_cdn_test',
-				'label'   => __( '??? ?????', 'asrekhodro' ),
+				'label'   => __( 'تست اتصال', 'asrekhodro' ),
 				'name'    => '',
 				'type'    => 'message',
 				'message' => self::test_button_html(),
@@ -371,9 +371,9 @@ final class Settings {
 
 	private static function test_button_html(): string {
 		return '<button type="button" class="button" id="ak-cdn-test-btn">'
-			. esc_html__( '????? ????? ?? ????', 'asrekhodro' )
+			. esc_html__( 'بررسی اتصال به سرور', 'asrekhodro' )
 			. '</button> <span id="ak-cdn-test-result" style="margin-inline-start:8px;"></span>'
 			. '<div id="ak-cdn-test-details" class="ak-cdn-test-details" style="display:none;"></div>'
-			. '<p class="description">' . esc_html__( '?????? ???? ??? ???? ??? ??????? ?????? (????? ?? ????? ????). ??? ??? ?? ???? ???????? ??? ????????? ???? ??????? ??????.', 'asrekhodro' ) . '</p>';
+			. '<p class="description">' . esc_html__( 'مقادیر همین فرم برای تست استفاده می‌شود (نیازی به ذخیره نیست). اگر رمز را خالی بگذارید، رمز ذخیره‌شده قبلی استفاده می‌شود.', 'asrekhodro' ) . '</p>';
 	}
 }
