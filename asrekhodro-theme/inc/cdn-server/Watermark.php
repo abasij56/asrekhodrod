@@ -79,7 +79,7 @@ final class Watermark {
 		wp_enqueue_script(
 			'ak-media-watermark-skip',
 			ASREKHODRO_THEME_URI . '/inc/cdn-server/assets/js/media-watermark-skip.js',
-			array( 'jquery', 'wp-plupload', 'media-views' ),
+			array( 'jquery', 'wp-plupload', 'plupload-handlers', 'media-views' ),
 			is_readable( $js ) ? (string) filemtime( $js ) : ASREKHODRO_THEME_VERSION,
 			true
 		);
@@ -176,12 +176,22 @@ final class Watermark {
 	 */
 	private static function request_skips_watermark(): bool {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- upload pipeline; capability already checked by core.
-		if ( ! isset( $_REQUEST[ self::SKIP_REQUEST_KEY ] ) ) {
+		$raw = null;
+		if ( isset( $_POST[ self::SKIP_REQUEST_KEY ] ) ) {
+			$raw = wp_unslash( $_POST[ self::SKIP_REQUEST_KEY ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		} elseif ( isset( $_REQUEST[ self::SKIP_REQUEST_KEY ] ) ) {
+			$raw = wp_unslash( $_REQUEST[ self::SKIP_REQUEST_KEY ] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		}
+
+		if ( $raw === null ) {
 			return false;
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$value = strtolower( trim( (string) wp_unslash( $_REQUEST[ self::SKIP_REQUEST_KEY ] ) ) );
+		if ( is_array( $raw ) ) {
+			$raw = end( $raw );
+		}
+
+		$value = strtolower( trim( (string) $raw ) );
 
 		return in_array( $value, array( '1', 'true', 'yes', 'on' ), true );
 	}

@@ -1,0 +1,26 @@
+---
+description: After commit+push to main, report GitHub Actions deploy result and duration
+alwaysApply: true
+---
+
+# Report deploy after commit/push
+
+Whenever you **commit and push** to `main` (or trigger Deploy Live):
+
+1. Wait for the `Deploy Live (FTP + rollback)` workflow run for that push.
+2. Tell the user clearly:
+   - **نتیجه:** success / failure / cancelled
+   - **زمان:** duration in seconds (or minutes+seconds)
+   - **لینک:** Actions run URL
+   - One line from the log if useful (e.g. `incremental N files`, `Health HTTP 200`)
+3. If it failed, include the failing step / error line — do not stop at “failed”.
+4. Do this in the same turn when practical; if the run is still going, wait/poll then report.
+
+Example reply shape:
+
+```
+نتیجه: success
+زمان: 59s
+ران: https://github.com/.../actions/runs/...
+جزئیات: incremental 2 files, Health HTTP 200
+```
