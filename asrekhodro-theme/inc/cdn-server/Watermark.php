@@ -35,10 +35,8 @@ final class Watermark {
 		// Run after the file is on disk, before attachment metadata / intermediate sizes.
 		add_filter( 'wp_handle_upload', array( self::class, 'filter_media_upload' ), 20 );
 		add_filter( 'wp_handle_sideload', array( self::class, 'filter_media_upload' ), 20 );
-		// Do not put a default skip flag in plupload params — absence means watermark ON.
-		add_action( 'admin_enqueue_scripts', array( self::class, 'enqueue_skip_ui_assets' ) );
-		add_action( 'pre-plupload-upload-ui', array( self::class, 'render_skip_checkbox' ) );
-		add_action( 'post-html-upload-ui', array( self::class, 'render_skip_checkbox' ) );
+		// Skip-checkbox UI temporarily disabled — always watermark when theme setting is on.
+		// Re-enable enqueue_skip_ui_assets + render_skip_checkbox when skip flag is fixed.
 	}
 
 	public static function enqueue_skip_ui_assets( string $hook_suffix ): void {
@@ -128,19 +126,8 @@ final class Watermark {
 			return $upload;
 		}
 
-		if ( self::request_skips_watermark() ) {
-			return $upload;
-		}
-
-		/**
-		 * Soft-skip media watermark for a specific upload (e.g. tooling).
-		 *
-		 * @param bool                $skip
-		 * @param array<string, string> $upload
-		 */
-		if ( (bool) apply_filters( 'ak_cdn_skip_media_watermark', false, $upload ) ) {
-			return $upload;
-		}
+		// Per-upload checkbox skip is intentionally ignored until the plupload flag is fixed.
+		// Theme option still gates via should_apply() / settings() above.
 
 		$watermarked = self::apply( $file, $mime );
 		if ( is_wp_error( $watermarked ) ) {
@@ -163,23 +150,10 @@ final class Watermark {
 
 	/**
 	 * Per-upload skip from the Media Library checkbox (no post meta).
+	 * Temporarily always false — ignore request/checkbox until skip UI is fixed.
 	 */
 	private static function request_skips_watermark(): bool {
-		// Only an explicit "1" skips. Missing / "0" / anything else => watermark ON.
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- upload pipeline; capability already checked by core.
-		if ( ! isset( $_POST[ self::SKIP_REQUEST_KEY ] ) && ! isset( $_REQUEST[ self::SKIP_REQUEST_KEY ] ) ) {
-			return false;
-		}
-
-		// Prefer POST (async-upload / plupload).
-		$raw = $_POST[ self::SKIP_REQUEST_KEY ] ?? $_REQUEST[ self::SKIP_REQUEST_KEY ]; // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$raw = wp_unslash( $raw );
-
-		if ( is_array( $raw ) ) {
-			$raw = end( $raw );
-		}
-
-		return (string) $raw === '1';
+		return false;
 	}
 
 	/**
