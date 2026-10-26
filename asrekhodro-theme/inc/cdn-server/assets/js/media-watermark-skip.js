@@ -10,7 +10,7 @@
   var checkboxHtml =
     '<p class="ak-skip-watermark-wrap">' +
     '<label class="ak-skip-watermark-label">' +
-    '<input type="checkbox" class="ak-skip-watermark-input" value="1" /> ' +
+    '<input type="checkbox" class="ak-skip-watermark-input" value="1" autocomplete="off" /> ' +
     (cfg.label || '') +
     '</label>' +
     (cfg.help
@@ -18,56 +18,56 @@
       : '') +
     '</p>';
 
-  function isChecked() {
-    return $('.ak-skip-watermark-input:checked').length > 0;
-  }
-
-  function skipValue() {
-    return isChecked() ? '1' : '0';
-  }
-
-  function applyToMultipart(params) {
-    if (!params || typeof params !== 'object') {
-      return;
-    }
-    params[PARAM] = skipValue();
+  function wantsSkip() {
+    return $('.ak-skip-watermark-input').filter(':checked').length > 0;
   }
 
   /**
-   * Plupload copies multipart_params at init; updating defaults later is ignored.
-   * Set the flag on every file, right before the request is sent.
+   * Only send the flag when skipping. Absence of the flag = watermark ON.
+   * Always refresh on BeforeUpload so plupload does not keep a stale copy.
    */
+  function writeParams(params) {
+    if (!params || typeof params !== 'object') {
+      return;
+    }
+    if (wantsSkip()) {
+      params[PARAM] = '1';
+    } else {
+      delete params[PARAM];
+    }
+  }
+
   function bindBeforeUpload(pluploader) {
-    if (!pluploader || typeof pluploader.bind !== 'function' || pluploader.__akWmSkipBound) {
+    if (!pluploader || typeof pluploader.bind !== 'function') {
+      return;
+    }
+    if (pluploader.__akWmSkipBound) {
       return;
     }
     pluploader.__akWmSkipBound = true;
     pluploader.bind('BeforeUpload', function (up) {
       up.settings = up.settings || {};
       up.settings.multipart_params = up.settings.multipart_params || {};
-      applyToMultipart(up.settings.multipart_params);
+      writeParams(up.settings.multipart_params);
     });
   }
 
   function syncAllUploaders() {
-    var val = skipValue();
-
     if (window._wpPluploadSettings && _wpPluploadSettings.defaults) {
       _wpPluploadSettings.defaults.multipart_params =
         _wpPluploadSettings.defaults.multipart_params || {};
-      _wpPluploadSettings.defaults.multipart_params[PARAM] = val;
+      writeParams(_wpPluploadSettings.defaults.multipart_params);
     }
 
     if (window.wp && wp.Uploader && wp.Uploader.defaults) {
       wp.Uploader.defaults.multipart_params = wp.Uploader.defaults.multipart_params || {};
-      wp.Uploader.defaults.multipart_params[PARAM] = val;
+      writeParams(wp.Uploader.defaults.multipart_params);
     }
 
-    // media-new.php / upload.php legacy global plupload instance
     if (window.uploader) {
       if (window.uploader.settings) {
         window.uploader.settings.multipart_params = window.uploader.settings.multipart_params || {};
-        window.uploader.settings.multipart_params[PARAM] = val;
+        writeParams(window.uploader.settings.multipart_params);
       }
       bindBeforeUpload(window.uploader);
     }
@@ -76,20 +76,19 @@
       var frameUp = wp.media.frame.uploader.uploader;
       if (frameUp.settings) {
         frameUp.settings.multipart_params = frameUp.settings.multipart_params || {};
-        frameUp.settings.multipart_params[PARAM] = val;
+        writeParams(frameUp.settings.multipart_params);
       }
       bindBeforeUpload(frameUp);
     }
 
-    $('input[type="hidden"][name="' + PARAM + '"].ak-skip-watermark-hidden').val(val);
+    var $hidden = $('input[type="hidden"].ak-skip-watermark-hidden');
+    if ($hidden.length) {
+      $hidden.val(wantsSkip() ? '1' : '0');
+    }
   }
 
   function injectInto($root) {
-    if (!$root || !$root.length) {
-      return;
-    }
-
-    if ($root.find('.ak-skip-watermark-wrap').length) {
+    if (!$root || !$root.length || $root.find('.ak-skip-watermark-wrap').length) {
       return;
     }
 
@@ -106,6 +105,10 @@
     injectInto($('.uploader-inline'));
     injectInto($('.media-frame .uploader-inline'));
     injectInto($('#html-upload-ui'));
+    // Never leave a checked box from browser form restore.
+    if (!$('.ak-skip-watermark-input').filter(':checked').length) {
+      $('.ak-skip-watermark-input').prop('checked', false);
+    }
     syncAllUploaders();
   }
 
@@ -116,19 +119,20 @@
   });
 
   $(function () {
+    // Strip name from any PHP-rendered checkbox so it cannot leak into POST by itself.
+    $('.ak-skip-watermark-input').removeAttr('name').attr('autocomplete', 'off');
+
     var $htmlForm = $('#file-form, #html-upload-ui').closest('form');
     if ($htmlForm.length && !$htmlForm.find('input.ak-skip-watermark-hidden').length) {
       $htmlForm.prepend(
-        '<input type="hidden" class="ak-skip-watermark-hidden" name="' + PARAM + '" value="0" />'
+        '<input type="hidden" class="ak-skip-watermark-hidden" name="' + PARAM + '" value="0" autocomplete="off" />'
       );
     }
 
-    // PHP may already have rendered a checkbox; keep its class wiring.
     injectAll();
     bindBeforeUpload(window.uploader);
     syncAllUploaders();
 
-    // media-new.php creates the global plupload instance a moment later.
     var tries = 0;
     var timer = window.setInterval(function () {
       bindBeforeUpload(window.uploader);
@@ -140,9 +144,9 @@
     }, 250);
   });
 
-  if (window.wp && wp.Uploader && wp.Uploader.prototype) {
+  if (window.wp && wp.Uploader && wp.Uploader.prototype && !wp.Uploader.prototype.__akWmSkipPatched) {
     var originalInit = wp.Uploader.prototype.init;
-    if (typeof originalInit === 'function' && !wp.Uploader.prototype.__akWmSkipPatched) {
+    if (typeof originalInit === 'function') {
       wp.Uploader.prototype.__akWmSkipPatched = true;
       wp.Uploader.prototype.init = function () {
         originalInit.apply(this, arguments);
@@ -150,7 +154,7 @@
           bindBeforeUpload(this.uploader);
           if (this.uploader.settings) {
             this.uploader.settings.multipart_params = this.uploader.settings.multipart_params || {};
-            applyToMultipart(this.uploader.settings.multipart_params);
+            writeParams(this.uploader.settings.multipart_params);
           }
         }
       };
@@ -165,6 +169,7 @@
         originalReady.apply(this, arguments);
       }
       injectInto(this.$el);
+      this.$('.ak-skip-watermark-input').removeAttr('name').attr('autocomplete', 'off');
       if (this.controller && this.controller.uploader && this.controller.uploader.uploader) {
         bindBeforeUpload(this.controller.uploader.uploader);
       }

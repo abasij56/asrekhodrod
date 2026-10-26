@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Composites a theme-option watermark onto images before CDN upload,
  * and onto local Media Library uploads before WordPress generates sizes.
  *
- * Settings are read via get_option() ? never get_field() ? to avoid ACF re-entry.
+ * Settings are read via get_option() — never get_field() — to avoid ACF re-entry.
  * No post meta is written.
  */
 final class Watermark {
@@ -28,30 +28,16 @@ final class Watermark {
 		'top_right',
 	);
 
-	public const SKIP_REQUEST_KEY = 'ak_skip_watermark'; // media upload skip flag
+	public const SKIP_REQUEST_KEY = 'ak_skip_watermark';
 
 	public static function init(): void {
 		// Run after the file is on disk, before attachment metadata / intermediate sizes.
 		add_filter( 'wp_handle_upload', array( self::class, 'filter_media_upload' ), 20 );
 		add_filter( 'wp_handle_sideload', array( self::class, 'filter_media_upload' ), 20 );
-		add_filter( 'plupload_default_params', array( self::class, 'filter_plupload_params' ) );
+		// Do not put a default skip flag in plupload params — absence means watermark ON.
 		add_action( 'admin_enqueue_scripts', array( self::class, 'enqueue_skip_ui_assets' ) );
 		add_action( 'pre-plupload-upload-ui', array( self::class, 'render_skip_checkbox' ) );
 		add_action( 'post-html-upload-ui', array( self::class, 'render_skip_checkbox' ) );
-	}
-
-	/**
-	 * Default multipart param so async-upload always receives the flag.
-	 *
-	 * @param array<string, mixed> $params
-	 * @return array<string, mixed>
-	 */
-	public static function filter_plupload_params( array $params ): array {
-		if ( ! isset( $params[ self::SKIP_REQUEST_KEY ] ) ) {
-			$params[ self::SKIP_REQUEST_KEY ] = '0';
-		}
-
-		return $params;
 	}
 
 	public static function enqueue_skip_ui_assets( string $hook_suffix ): void {
@@ -108,9 +94,9 @@ final class Watermark {
 		}
 		$rendered = true;
 
+		// No name= on the checkbox — JS sends ak_skip_watermark only when checked.
 		printf(
-			'<p class="ak-skip-watermark-wrap ak-skip-watermark-wrap--php"><label for="ak-skip-watermark-php"><input type="checkbox" id="ak-skip-watermark-php" class="ak-skip-watermark-input" name="%1$s" value="1" /> %2$s</label><span class="ak-skip-watermark-help description">%3$s</span></p>',
-			esc_attr( self::SKIP_REQUEST_KEY ),
+			'<p class="ak-skip-watermark-wrap ak-skip-watermark-wrap--php"><label for="ak-skip-watermark-php"><input type="checkbox" id="ak-skip-watermark-php" class="ak-skip-watermark-input" value="1" autocomplete="off" /> %1$s</label><span class="ak-skip-watermark-help description">%2$s</span></p>',
 			esc_html( 'بدون واترمارک آپلود شود' ),
 			esc_html( 'فقط برای همین آپلود. اگر تیک نخورده باشد، واترمارک مثل قبل اعمال می‌شود.' )
 		);
@@ -175,25 +161,21 @@ final class Watermark {
 	 * Per-upload skip from the Media Library checkbox (no post meta).
 	 */
 	private static function request_skips_watermark(): bool {
+		// Only an explicit "1" skips. Missing / "0" / anything else => watermark ON.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- upload pipeline; capability already checked by core.
-		$raw = null;
-		if ( isset( $_POST[ self::SKIP_REQUEST_KEY ] ) ) {
-			$raw = wp_unslash( $_POST[ self::SKIP_REQUEST_KEY ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		} elseif ( isset( $_REQUEST[ self::SKIP_REQUEST_KEY ] ) ) {
-			$raw = wp_unslash( $_REQUEST[ self::SKIP_REQUEST_KEY ] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		}
-
-		if ( $raw === null ) {
+		if ( ! isset( $_POST[ self::SKIP_REQUEST_KEY ] ) && ! isset( $_REQUEST[ self::SKIP_REQUEST_KEY ] ) ) {
 			return false;
 		}
+
+		// Prefer POST (async-upload / plupload).
+		$raw = $_POST[ self::SKIP_REQUEST_KEY ] ?? $_REQUEST[ self::SKIP_REQUEST_KEY ]; // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$raw = wp_unslash( $raw );
 
 		if ( is_array( $raw ) ) {
 			$raw = end( $raw );
 		}
 
-		$value = strtolower( trim( (string) $raw ) );
-
-		return in_array( $value, array( '1', 'true', 'yes', 'on' ), true );
+		return (string) $raw === '1';
 	}
 
 	/**
