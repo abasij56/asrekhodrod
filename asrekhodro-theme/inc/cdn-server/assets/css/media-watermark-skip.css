@@ -29,8 +29,7 @@
 
 .media-frame .ak-skip-watermark-wrap,
 .uploader-inline .ak-skip-watermark-wrap {
+  display: inline-block;
   margin: 8px auto 12px;
 }
-
-/* deploy */
 

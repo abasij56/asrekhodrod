@@ -28,31 +28,35 @@ final class Watermark {
 		'top_right',
 	);
 
-	/** v2 name so stale cached JS sending ak_skip_watermark=1 cannot disable watermarking. */
+	/** Request field sent with each upload; only the exact value "1" skips the watermark. */
 	public const SKIP_REQUEST_KEY = 'ak_wm_skip_v2';
+
+	private const SKIP_LABEL = 'عدم درج واترمارک';
+	private const SKIP_HELP  = 'اگر تیک نخورد، واترمارک طبق تنظیمات تم روی عکس اعمال می‌شود.';
+
+	private const SKIP_UI_HOOKS = array( 'media-new.php', 'upload.php', 'post.php', 'post-new.php' );
 
 	public static function init(): void {
 		// Run after the file is on disk, before attachment metadata / intermediate sizes.
 		add_filter( 'wp_handle_upload', array( self::class, 'filter_media_upload' ), 20 );
 		add_filter( 'wp_handle_sideload', array( self::class, 'filter_media_upload' ), 20 );
-		// Skip-checkbox UI temporarily disabled — always watermark when theme setting is on.
-		// Re-enable enqueue_skip_ui_assets + render_skip_checkbox when skip flag is fixed.
+
+		add_action( 'admin_enqueue_scripts', array( self::class, 'enqueue_skip_ui_assets' ) );
+		add_action( 'pre-plupload-upload-ui', array( self::class, 'render_plupload_skip_checkbox' ) );
+		add_action( 'post-html-upload-ui', array( self::class, 'render_html_skip_checkbox' ) );
 	}
 
 	public static function enqueue_skip_ui_assets( string $hook_suffix ): void {
-		if ( ! current_user_can( 'upload_files' ) || self::settings() === null ) {
+		if ( ! in_array( $hook_suffix, self::SKIP_UI_HOOKS, true ) ) {
 			return;
 		}
 
-		$allowed = array( 'upload.php', 'media-new.php', 'post.php', 'post-new.php' );
-		if ( ! in_array( $hook_suffix, $allowed, true ) && ! str_starts_with( $hook_suffix, 'media_page_' ) ) {
+		if ( ! current_user_can( 'upload_files' ) || self::settings() === null ) {
 			return;
 		}
 
 		$css = ASREKHODRO_THEME_DIR . '/inc/cdn-server/assets/css/media-watermark-skip.css';
 		$js  = ASREKHODRO_THEME_DIR . '/inc/cdn-server/assets/js/media-watermark-skip.js';
-
-		wp_enqueue_media();
 
 		wp_enqueue_style(
 			'ak-media-watermark-skip',
@@ -61,14 +65,18 @@ final class Watermark {
 			is_readable( $css ) ? (string) filemtime( $css ) : ASREKHODRO_THEME_VERSION
 		);
 
-		// Hard cache-bust: skip-flag JS must not serve a stale always-skip build.
-		$js_ver = ( is_readable( $js ) ? (string) filemtime( $js ) : ASREKHODRO_THEME_VERSION ) . '-skip3';
+		// wp-plupload must load first so wp.Uploader can be wrapped before any instance exists;
+		// plupload-handlers creates window.uploader on media-new.php.
+		$deps = array( 'jquery', 'wp-plupload' );
+		if ( $hook_suffix === 'media-new.php' ) {
+			$deps[] = 'plupload-handlers';
+		}
 
 		wp_enqueue_script(
 			'ak-media-watermark-skip',
 			ASREKHODRO_THEME_URI . '/inc/cdn-server/assets/js/media-watermark-skip.js',
-			array( 'jquery', 'wp-plupload', 'plupload-handlers', 'media-views' ),
-			$js_ver,
+			$deps,
+			is_readable( $js ) ? (string) filemtime( $js ) : ASREKHODRO_THEME_VERSION,
 			true
 		);
 
@@ -77,30 +85,45 @@ final class Watermark {
 			'akMediaWatermarkSkip',
 			array(
 				'param' => self::SKIP_REQUEST_KEY,
-				'label' => 'بدون واترمارک آپلود شود',
-				'help'  => 'فقط برای همین آپلود. اگر تیک نخورده باشد، واترمارک مثل قبل اعمال می‌شود.',
+				'label' => self::SKIP_LABEL,
+				'help'  => self::SKIP_HELP,
 			)
 		);
 	}
 
-	public static function render_skip_checkbox(): void {
-		if ( ! current_user_can( 'upload_files' ) || self::settings() === null ) {
-			return;
-		}
-
-		// Markup is injected by JS into plupload/media modal; HTML uploader gets a noscript-friendly field via JS hidden input + this note is optional.
-		// Keep a static marker so PHP hook still runs for media-new.php before JS enhances it.
+	/**
+	 * media-new.php multi-file uploader. No name= — plupload does not post form fields;
+	 * the JS adds the value to each upload request in BeforeUpload.
+	 */
+	public static function render_plupload_skip_checkbox(): void {
 		static $rendered = false;
-		if ( $rendered ) {
+		if ( $rendered || ! wp_script_is( 'ak-media-watermark-skip', 'enqueued' ) ) {
 			return;
 		}
 		$rendered = true;
 
-		// No name= on the checkbox — JS sends ak_skip_watermark only when checked.
+		self::print_skip_checkbox( '' );
+	}
+
+	/**
+	 * Browser (non-JS) uploader: a real form field, so it works without the JS.
+	 */
+	public static function render_html_skip_checkbox(): void {
+		static $rendered = false;
+		if ( $rendered || ! current_user_can( 'upload_files' ) || self::settings() === null ) {
+			return;
+		}
+		$rendered = true;
+
+		self::print_skip_checkbox( self::SKIP_REQUEST_KEY );
+	}
+
+	private static function print_skip_checkbox( string $name ): void {
 		printf(
-			'<p class="ak-skip-watermark-wrap ak-skip-watermark-wrap--php"><label for="ak-skip-watermark-php"><input type="checkbox" id="ak-skip-watermark-php" class="ak-skip-watermark-input" value="1" autocomplete="off" /> %1$s</label><span class="ak-skip-watermark-help description">%2$s</span></p>',
-			esc_html( 'بدون واترمارک آپلود شود' ),
-			esc_html( 'فقط برای همین آپلود. اگر تیک نخورده باشد، واترمارک مثل قبل اعمال می‌شود.' )
+			'<p class="ak-skip-watermark-wrap"><label class="ak-skip-watermark-label"><input type="checkbox" class="ak-skip-watermark-input" value="1" autocomplete="off"%1$s /> %2$s</label><span class="ak-skip-watermark-help description">%3$s</span></p>',
+			$name !== '' ? ' name="' . esc_attr( $name ) . '"' : '',
+			esc_html( self::SKIP_LABEL ),
+			esc_html( self::SKIP_HELP )
 		);
 	}
 
@@ -126,34 +149,72 @@ final class Watermark {
 			return $upload;
 		}
 
-		// Per-upload checkbox skip is intentionally ignored until the plupload flag is fixed.
-		// Theme option still gates via should_apply() / settings() above.
+		if ( self::request_skips_watermark() ) {
+			self::log_upload( $file, 'skipped_checkbox' );
+			return $upload;
+		}
+
+		/**
+		 * Soft-skip media watermark for a specific upload (e.g. tooling).
+		 *
+		 * @param bool                $skip
+		 * @param array<string, string> $upload
+		 */
+		if ( (bool) apply_filters( 'ak_cdn_skip_media_watermark', false, $upload ) ) {
+			self::log_upload( $file, 'skipped_filter' );
+			return $upload;
+		}
 
 		$watermarked = self::apply( $file, $mime );
 		if ( is_wp_error( $watermarked ) ) {
+			self::log_upload( $file, 'failed_' . $watermarked->get_error_code() );
 			return $upload;
 		}
 
 		if ( ! is_string( $watermarked ) || $watermarked === '' || $watermarked === $file ) {
+			self::log_upload( $file, 'failed_no_output' );
 			return $upload;
 		}
 
 		$replaced = self::replace_file( $file, $watermarked );
 		self::cleanup_temp( $watermarked );
 
-		if ( ! $replaced ) {
-			return $upload;
-		}
+		self::log_upload( $file, $replaced ? 'applied' : 'failed_replace' );
 
 		return $upload;
 	}
 
 	/**
-	 * Per-upload skip from the Media Library checkbox (no post meta).
-	 * Temporarily always false — ignore request/checkbox until skip UI is fixed.
+	 * Per-upload skip from the media checkbox (no post meta). Missing / "0" / anything else => watermark.
 	 */
 	private static function request_skips_watermark(): bool {
-		return false;
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- upload pipeline; core already verified the upload nonce/capability.
+		if ( ! isset( $_POST[ self::SKIP_REQUEST_KEY ] ) ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$raw = wp_unslash( $_POST[ self::SKIP_REQUEST_KEY ] );
+
+		return is_string( $raw ) && $raw === '1';
+	}
+
+	/**
+	 * One line per admin media upload in the PHP error log (no DB writes), e.g.
+	 * [ak-watermark] photo.jpg skip_field=0 result=applied
+	 */
+	private static function log_upload( string $file, string $result ): void {
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$field = isset( $_POST[ self::SKIP_REQUEST_KEY ] ) && is_string( $_POST[ self::SKIP_REQUEST_KEY ] )
+			? sanitize_key( wp_unslash( $_POST[ self::SKIP_REQUEST_KEY ] ) )
+			: 'none';
+
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( sprintf( '[ak-watermark] %s skip_field=%s result=%s', wp_basename( $file ), $field, $result ) );
 	}
 
 	/**
