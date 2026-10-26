@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Composites a theme-option watermark onto images before CDN upload,
  * and onto local Media Library uploads before WordPress generates sizes.
  *
- * Settings are read via get_option() — never get_field() — to avoid ACF re-entry.
+ * Settings are read via get_option() � never get_field() � to avoid ACF re-entry.
  * No post meta is written.
  */
 final class Watermark {
@@ -28,7 +28,7 @@ final class Watermark {
 		'top_right',
 	);
 
-	public const SKIP_REQUEST_KEY = 'ak_skip_watermark';
+	public const SKIP_REQUEST_KEY = 'ak_skip_watermark'; // media upload flag
 
 	public static function init(): void {
 		// Run after the file is on disk, before attachment metadata / intermediate sizes.
@@ -89,8 +89,8 @@ final class Watermark {
 			'akMediaWatermarkSkip',
 			array(
 				'param' => self::SKIP_REQUEST_KEY,
-				'label' => __( 'بدون واترمارک آپلود شود', 'asrekhodro' ),
-				'help'  => __( 'فقط برای همین آپلود. اگر تیک نخورده باشد، واترمارک مثل قبل اعمال می‌شود.', 'asrekhodro' ),
+				'label' => __( '???? ???????? ????? ???', 'asrekhodro' ),
+				'help'  => __( '??? ???? ???? ?????. ??? ??? ?????? ????? ???????? ??? ??? ????? ??????.', 'asrekhodro' ),
 			)
 		);
 	}
@@ -111,8 +111,8 @@ final class Watermark {
 		printf(
 			'<p class="ak-skip-watermark-wrap ak-skip-watermark-wrap--php"><label for="ak-skip-watermark-php"><input type="checkbox" id="ak-skip-watermark-php" class="ak-skip-watermark-input" name="%1$s" value="1" /> %2$s</label><span class="ak-skip-watermark-help description">%3$s</span></p>',
 			esc_attr( self::SKIP_REQUEST_KEY ),
-			esc_html__( 'بدون واترمارک آپلود شود', 'asrekhodro' ),
-			esc_html__( 'فقط برای همین آپلود. اگر تیک نخورده باشد، واترمارک مثل قبل اعمال می‌شود.', 'asrekhodro' )
+			esc_html__( '???? ???????? ????? ???', 'asrekhodro' ),
+			esc_html__( '??? ???? ???? ?????. ??? ??? ?????? ????? ???????? ??? ??? ????? ??????.', 'asrekhodro' )
 		);
 	}
 
@@ -270,12 +270,12 @@ final class Watermark {
 		}
 
 		if ( ! is_readable( $source_path ) ) {
-			return new \WP_Error( 'ak_watermark_source', __( 'فایل منبع برای واترمارک خوانا نیست.', 'asrekhodro' ) );
+			return new \WP_Error( 'ak_watermark_source', __( '???? ???? ???? ???????? ????? ????.', 'asrekhodro' ) );
 		}
 
 		$watermark_path = get_attached_file( $settings['attachment_id'] );
 		if ( ! is_string( $watermark_path ) || $watermark_path === '' || ! is_readable( $watermark_path ) ) {
-			return new \WP_Error( 'ak_watermark_missing', __( 'فایل واترمارک در کتابخانه رسانه یافت نشد.', 'asrekhodro' ) );
+			return new \WP_Error( 'ak_watermark_missing', __( '???? ???????? ?? ???????? ????? ???? ???.', 'asrekhodro' ) );
 		}
 
 		$mime = strtolower( $mime );
@@ -288,7 +288,7 @@ final class Watermark {
 			return self::apply_with_gd( $source_path, $mime, $watermark_path, $settings );
 		}
 
-		return new \WP_Error( 'ak_watermark_no_engine', __( 'برای واترمارک به GD یا Imagick در PHP نیاز است.', 'asrekhodro' ) );
+		return new \WP_Error( 'ak_watermark_no_engine', __( '???? ???????? ?? GD ?? Imagick ?? PHP ???? ???.', 'asrekhodro' ) );
 	}
 
 	/**
@@ -330,7 +330,7 @@ final class Watermark {
 				'ak_watermark_imagick_failed',
 				sprintf(
 					/* translators: %s: error message */
-					__( 'اعمال واترمارک ناموفق بود: %s', 'asrekhodro' ),
+					__( '????? ???????? ?????? ???: %s', 'asrekhodro' ),
 					$exception->getMessage()
 				)
 			);
@@ -344,14 +344,14 @@ final class Watermark {
 	private static function apply_with_gd( string $source_path, string $mime, string $watermark_path, array $settings ): string|\WP_Error {
 		$base = self::gd_load( $source_path, $mime );
 		if ( $base === null ) {
-			return new \WP_Error( 'ak_watermark_base_load', __( 'بارگذاری تصویر اصلی برای واترمارک ناموفق بود.', 'asrekhodro' ) );
+			return new \WP_Error( 'ak_watermark_base_load', __( '???????? ????? ???? ???? ???????? ?????? ???.', 'asrekhodro' ) );
 		}
 
 		$stamp = self::gd_load_any( $watermark_path );
 		if ( $stamp === null ) {
 			imagedestroy( $base );
 
-			return new \WP_Error( 'ak_watermark_stamp_load', __( 'بارگذاری تصویر واترمارک ناموفق بود.', 'asrekhodro' ) );
+			return new \WP_Error( 'ak_watermark_stamp_load', __( '???????? ????? ???????? ?????? ???.', 'asrekhodro' ) );
 		}
 
 		$stamp = self::resize_stamp_gd( $stamp, imagesx( $base ) );
@@ -373,7 +373,7 @@ final class Watermark {
 		imagedestroy( $base );
 
 		if ( ! $saved ) {
-			return new \WP_Error( 'ak_watermark_save', __( 'ذخیره تصویر واترمارک‌شده ناموفق بود.', 'asrekhodro' ) );
+			return new \WP_Error( 'ak_watermark_save', __( '????? ????? ???????????? ?????? ???.', 'asrekhodro' ) );
 		}
 
 		return $output;
