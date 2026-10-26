@@ -28,7 +28,8 @@ final class Watermark {
 		'top_right',
 	);
 
-	public const SKIP_REQUEST_KEY = 'ak_skip_watermark';
+	/** v2 name so stale cached JS sending ak_skip_watermark=1 cannot disable watermarking. */
+	public const SKIP_REQUEST_KEY = 'ak_wm_skip_v2';
 
 	public static function init(): void {
 		// Run after the file is on disk, before attachment metadata / intermediate sizes.
@@ -62,11 +63,14 @@ final class Watermark {
 			is_readable( $css ) ? (string) filemtime( $css ) : ASREKHODRO_THEME_VERSION
 		);
 
+		// Hard cache-bust: skip-flag JS must not serve a stale always-skip build.
+		$js_ver = ( is_readable( $js ) ? (string) filemtime( $js ) : ASREKHODRO_THEME_VERSION ) . '-skip3';
+
 		wp_enqueue_script(
 			'ak-media-watermark-skip',
 			ASREKHODRO_THEME_URI . '/inc/cdn-server/assets/js/media-watermark-skip.js',
 			array( 'jquery', 'wp-plupload', 'plupload-handlers', 'media-views' ),
-			is_readable( $js ) ? (string) filemtime( $js ) : ASREKHODRO_THEME_VERSION,
+			$js_ver,
 			true
 		);
 
