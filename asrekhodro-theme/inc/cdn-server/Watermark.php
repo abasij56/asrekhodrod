@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Composites a theme-option watermark onto images before CDN upload,
  * and onto local Media Library uploads before WordPress generates sizes.
  *
- * Settings are read via get_option() — never get_field() — to avoid ACF re-entry.
+ * Settings are read via get_option() ? never get_field() ? to avoid ACF re-entry.
  * No post meta is written.
  */
 final class Watermark {
@@ -28,7 +28,7 @@ final class Watermark {
 		'top_right',
 	);
 
-	public const SKIP_REQUEST_KEY = 'ak_skip_watermark'; // media upload flag
+	public const SKIP_REQUEST_KEY = 'ak_skip_watermark'; // media upload skip flag
 
 	public static function init(): void {
 		// Run after the file is on disk, before attachment metadata / intermediate sizes.
