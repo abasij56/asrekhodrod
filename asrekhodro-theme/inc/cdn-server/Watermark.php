@@ -28,10 +28,92 @@ final class Watermark {
 		'top_right',
 	);
 
+	public const SKIP_REQUEST_KEY = 'ak_skip_watermark';
+
 	public static function init(): void {
 		// Run after the file is on disk, before attachment metadata / intermediate sizes.
 		add_filter( 'wp_handle_upload', array( self::class, 'filter_media_upload' ), 20 );
 		add_filter( 'wp_handle_sideload', array( self::class, 'filter_media_upload' ), 20 );
+		add_filter( 'plupload_default_params', array( self::class, 'filter_plupload_params' ) );
+		add_action( 'admin_enqueue_scripts', array( self::class, 'enqueue_skip_ui_assets' ) );
+		add_action( 'pre-plupload-upload-ui', array( self::class, 'render_skip_checkbox' ) );
+		add_action( 'post-html-upload-ui', array( self::class, 'render_skip_checkbox' ) );
+	}
+
+	/**
+	 * Default multipart param so async-upload always receives the flag.
+	 *
+	 * @param array<string, mixed> $params
+	 * @return array<string, mixed>
+	 */
+	public static function filter_plupload_params( array $params ): array {
+		if ( ! isset( $params[ self::SKIP_REQUEST_KEY ] ) ) {
+			$params[ self::SKIP_REQUEST_KEY ] = '0';
+		}
+
+		return $params;
+	}
+
+	public static function enqueue_skip_ui_assets( string $hook_suffix ): void {
+		if ( ! current_user_can( 'upload_files' ) || self::settings() === null ) {
+			return;
+		}
+
+		$allowed = array( 'upload.php', 'media-new.php', 'post.php', 'post-new.php' );
+		if ( ! in_array( $hook_suffix, $allowed, true ) && ! str_starts_with( $hook_suffix, 'media_page_' ) ) {
+			return;
+		}
+
+		$css = ASREKHODRO_THEME_DIR . '/inc/cdn-server/assets/css/media-watermark-skip.css';
+		$js  = ASREKHODRO_THEME_DIR . '/inc/cdn-server/assets/js/media-watermark-skip.js';
+
+		wp_enqueue_media();
+
+		wp_enqueue_style(
+			'ak-media-watermark-skip',
+			ASREKHODRO_THEME_URI . '/inc/cdn-server/assets/css/media-watermark-skip.css',
+			array(),
+			is_readable( $css ) ? (string) filemtime( $css ) : ASREKHODRO_THEME_VERSION
+		);
+
+		wp_enqueue_script(
+			'ak-media-watermark-skip',
+			ASREKHODRO_THEME_URI . '/inc/cdn-server/assets/js/media-watermark-skip.js',
+			array( 'jquery', 'wp-plupload', 'media-views' ),
+			is_readable( $js ) ? (string) filemtime( $js ) : ASREKHODRO_THEME_VERSION,
+			true
+		);
+
+		wp_localize_script(
+			'ak-media-watermark-skip',
+			'akMediaWatermarkSkip',
+			array(
+				'param' => self::SKIP_REQUEST_KEY,
+				'label' => __( 'بدون واترمارک آپلود شود', 'asrekhodro' ),
+				'help'  => __( 'فقط برای همین آپلود. اگر تیک نخورده باشد، واترمارک مثل قبل اعمال می‌شود.', 'asrekhodro' ),
+			)
+		);
+	}
+
+	public static function render_skip_checkbox(): void {
+		if ( ! current_user_can( 'upload_files' ) || self::settings() === null ) {
+			return;
+		}
+
+		// Markup is injected by JS into plupload/media modal; HTML uploader gets a noscript-friendly field via JS hidden input + this note is optional.
+		// Keep a static marker so PHP hook still runs for media-new.php before JS enhances it.
+		static $rendered = false;
+		if ( $rendered ) {
+			return;
+		}
+		$rendered = true;
+
+		printf(
+			'<p class="ak-skip-watermark-wrap ak-skip-watermark-wrap--php"><label for="ak-skip-watermark-php"><input type="checkbox" id="ak-skip-watermark-php" class="ak-skip-watermark-input" name="%1$s" value="1" /> %2$s</label><span class="ak-skip-watermark-help description">%3$s</span></p>',
+			esc_attr( self::SKIP_REQUEST_KEY ),
+			esc_html__( 'بدون واترمارک آپلود شود', 'asrekhodro' ),
+			esc_html__( 'فقط برای همین آپلود. اگر تیک نخورده باشد، واترمارک مثل قبل اعمال می‌شود.', 'asrekhodro' )
+		);
 	}
 
 	/**
@@ -53,6 +135,10 @@ final class Watermark {
 		}
 
 		if ( self::is_watermark_stamp_file( $file ) ) {
+			return $upload;
+		}
+
+		if ( self::request_skips_watermark() ) {
 			return $upload;
 		}
 
@@ -83,6 +169,21 @@ final class Watermark {
 		}
 
 		return $upload;
+	}
+
+	/**
+	 * Per-upload skip from the Media Library checkbox (no post meta).
+	 */
+	private static function request_skips_watermark(): bool {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- upload pipeline; capability already checked by core.
+		if ( ! isset( $_REQUEST[ self::SKIP_REQUEST_KEY ] ) ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$value = strtolower( trim( (string) wp_unslash( $_REQUEST[ self::SKIP_REQUEST_KEY ] ) ) );
+
+		return in_array( $value, array( '1', 'true', 'yes', 'on' ), true );
 	}
 
 	/**
