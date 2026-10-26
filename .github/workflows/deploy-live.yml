@@ -1,0 +1,45 @@
+name: Deploy Live (FTP + rollback)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'asrekhodro-theme/**'
+      - 'scripts/ftp-deploy.sh'
+      - '.github/workflows/deploy-live.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-live
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Deploy theme over FTP
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+          FTP_REMOTE_THEMES: ${{ secrets.FTP_REMOTE_THEMES }}
+          THEME_NAME: ${{ secrets.THEME_NAME }}
+          HEALTH_URL: ${{ secrets.HEALTH_URL }}
+          FTP_SSL: ${{ secrets.FTP_SSL }}
+        run: |
+          set -euo pipefail
+          export FTP_PORT="${FTP_PORT:-21}"
+          export FTP_REMOTE_THEMES="${FTP_REMOTE_THEMES:-public_html/wp-content/themes}"
+          export THEME_NAME="${THEME_NAME:-asrekhodro-theme}"
+          export LOCAL_THEME="./asrekhodro-theme"
+          export FTP_SSL="${FTP_SSL:-yes}"
+          chmod +x scripts/ftp-deploy.sh
+          bash scripts/ftp-deploy.sh
