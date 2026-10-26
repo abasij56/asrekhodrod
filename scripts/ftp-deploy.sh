@@ -295,7 +295,8 @@ EOF
   trap on_error_inc ERR
 
   log "Uploading changed files to live"
-  local put_cmds=""
+  # mkdir may return 550 "File exists" on cPanel even with -p; do it nofail first.
+  local mkdir_cmds="" put_cmds="" rm_cmds=""
   for item in "${mapfile_changes[@]}"; do
     status="${item%%|*}"
     rel="${item#*|}"
@@ -303,17 +304,25 @@ EOF
     case "$status" in
       A|M)
         [[ -f "$local_path" ]] || die "Missing local file: $local_path"
-        put_cmds+="mkdir -p $LIVE/$(dirname "$rel")"$'\n'
+        mkdir_cmds+="mkdir -p $LIVE/$(dirname "$rel")"$'\n'
         put_cmds+="put $local_path -o $LIVE/$rel"$'\n'
         ;;
       D)
-        put_cmds+="rm $LIVE/$rel"$'\n'
+        rm_cmds+="rm $LIVE/$rel"$'\n'
         ;;
     esac
   done
-  ftp_cmd fail <<EOF
-$put_cmds
+  if [[ -n "$mkdir_cmds" ]]; then
+    ftp_cmd nofail <<EOF
+$mkdir_cmds
 EOF
+  fi
+  if [[ -n "$put_cmds$rm_cmds" ]]; then
+    ftp_cmd fail <<EOF
+$put_cmds
+$rm_cmds
+EOF
+  fi
   deployed=1
 
   if ! health_ok; then
