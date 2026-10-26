@@ -49,18 +49,20 @@ fi
 
 ftp_cmd() {
   # usage: ftp_cmd "fail" | "nofail"   then lftp script body on stdin
+  # Avoid putting password in ftp:// URL (URL-encoding breaks GitHub secret masking).
   local mode="$1"
   local fail_exit=true
   [[ "$mode" == "nofail" ]] && fail_exit=false
   local body
   body="$(cat)"
   set +e
-  lftp -u "$FTP_USER","$FTP_PASSWORD" -p "$FTP_PORT" "ftp://$FTP_HOST" <<EOF
+  lftp <<EOF
 set cmd:fail-exit $fail_exit
 set net:max-retries 2
 set net:timeout 60
 set mirror:parallel-transfer-count 4
 $SSL_OPTS
+open -p $FTP_PORT -u "$FTP_USER","$FTP_PASSWORD" ftp://$FTP_HOST
 $body
 bye
 EOF
@@ -113,7 +115,7 @@ EOF
 log "Upload -> $NEW"
 ftp_cmd fail <<EOF
 mkdir -p $NEW
-mirror -R --delete --verbose=1 \
+mirror -R --delete \
   --exclude-glob .git/ \
   --exclude-glob .cursor/ \
   --exclude-glob tools/ \

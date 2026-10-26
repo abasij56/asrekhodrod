@@ -31,10 +31,11 @@ jobs:
             SSL_OPTS='set ftp:ssl-allow no;'
           fi
 
-          lftp -u "$FTP_USER","$FTP_PASSWORD" -p "$FTP_PORT" "ftp://$FTP_HOST" <<EOF
+          lftp <<EOF
           set cmd:fail-exit true
           set net:timeout 30
           $SSL_OPTS
+          open -p $FTP_PORT -u "$FTP_USER","$FTP_PASSWORD" ftp://$FTP_HOST
           pwd
           ls
           cd $FTP_REMOTE_THEMES
