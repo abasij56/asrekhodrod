@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
@@ -34,6 +36,8 @@ jobs:
           THEME_NAME: ${{ secrets.THEME_NAME }}
           HEALTH_URL: ${{ secrets.HEALTH_URL }}
           FTP_SSL: ${{ secrets.FTP_SSL }}
+          BEFORE_SHA: ${{ github.event.before }}
+          FORCE_FULL_DEPLOY: ${{ vars.FORCE_FULL_DEPLOY || '0' }}
         run: |
           set -euo pipefail
           export FTP_PORT="${FTP_PORT:-21}"
@@ -41,5 +45,7 @@ jobs:
           export THEME_NAME="${THEME_NAME:-asrekhodro-theme}"
           export LOCAL_THEME="./asrekhodro-theme"
           export FTP_SSL="${FTP_SSL:-yes}"
+          export BEFORE_SHA
+          export FORCE_FULL_DEPLOY="${FORCE_FULL_DEPLOY:-0}"
           chmod +x scripts/ftp-deploy.sh
           bash scripts/ftp-deploy.sh
