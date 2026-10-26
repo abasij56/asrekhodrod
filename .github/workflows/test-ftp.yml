@@ -1,0 +1,46 @@
+name: Test FTP Connection
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: FTP login + list theme folder (no upload)
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+          FTP_REMOTE_THEMES: ${{ secrets.FTP_REMOTE_THEMES }}
+          FTP_SSL: ${{ secrets.FTP_SSL }}
+        run: |
+          set -euo pipefail
+          FTP_PORT="${FTP_PORT:-21}"
+          FTP_REMOTE_THEMES="${FTP_REMOTE_THEMES:-public_html/wp-content/themes}"
+          FTP_SSL="${FTP_SSL:-yes}"
+
+          if [ "$FTP_SSL" = "yes" ]; then
+            SSL_OPTS='set ftp:ssl-force true; set ftp:ssl-protect-data true; set ssl:verify-certificate no;'
+          else
+            SSL_OPTS='set ftp:ssl-allow no;'
+          fi
+
+          lftp -u "$FTP_USER","$FTP_PASSWORD" -p "$FTP_PORT" "ftp://$FTP_HOST" <<EOF
+          set cmd:fail-exit true
+          set net:timeout 30
+          $SSL_OPTS
+          pwd
+          ls
+          cd $FTP_REMOTE_THEMES
+          pwd
+          ls
+          bye
+          EOF
+
+          echo "FTP_OK: connected and listed $FTP_REMOTE_THEMES"

@@ -1,12 +1,7 @@
 name: Deploy Live (FTP + rollback)
 
+# Manual only — does not run on push. Use "Test FTP Connection" to check secrets.
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'asrekhodro-theme/**'
-      - 'scripts/ftp-deploy.sh'
-      - '.github/workflows/deploy-live.yml'
   workflow_dispatch:
 
 concurrency:
