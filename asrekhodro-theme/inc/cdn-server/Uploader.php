@@ -120,15 +120,22 @@ final class Uploader {
 		$optimize_done   = false;
 
 		if ( ImageOptimize::should_apply( $mime_type ) ) {
-			$optimized = ImageOptimize::apply( $source_path, $mime_type );
+			$optimized = ImageOptimize::process( $source_path, $mime_type );
 			if ( is_wp_error( $optimized ) ) {
 				if ( apply_filters( 'ak_cdn_optimize_fail_upload', false, $optimized, $context ) ) {
 					return $optimized;
 				}
-			} elseif ( is_string( $optimized ) && $optimized !== '' && $optimized !== $source_path ) {
-				$upload_path   = $optimized;
-				$temp_opt_path = $optimized;
-				$optimize_done = true;
+			} elseif ( is_array( $optimized ) ) {
+				if ( $optimized['path'] !== '' && $optimized['path'] !== $source_path ) {
+					$upload_path   = $optimized['path'];
+					$temp_opt_path = $optimized['path'];
+					$optimize_done = true;
+				}
+				if ( $optimized['mime'] !== '' && $optimized['mime'] !== $mime_type ) {
+					$mime_type     = $optimized['mime'];
+					$original_name = ImageOptimize::filename_with_extension( $original_name, 'jpg' );
+					$optimize_done = true;
+				}
 			}
 		}
 

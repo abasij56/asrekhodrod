@@ -206,7 +206,7 @@ final class Settings {
 				'ui_on_text'    => __( 'فعال', 'asrekhodro' ),
 				'ui_off_text'   => __( 'غیرفعال', 'asrekhodro' ),
 				'default_value' => 1,
-				'instructions'  => __( 'برای آپلود کتابخانه رسانه، آپلود به CDN و انتقال رسانه به CDN: ابتدا در صورت نیاز پهنا کوچک می‌شود، سپس فشرده‌سازی، بعد واترمارک. عکس‌های قبلی تغییر نمی‌کنند.', 'asrekhodro' ),
+				'instructions'  => __( 'برای آپلود کتابخانه رسانه، آپلود به CDN و انتقال رسانه به CDN: ابتدا در صورت نیاز پهنا کوچک می‌شود، سپس فشرده‌سازی، بعد واترمارک. PNG بدون شفافیت واقعی به JPEG تبدیل می‌شود. عکس‌های قبلی تغییر نمی‌کنند.', 'asrekhodro' ),
 			),
 			array(
 				'key'               => 'field_ak_cdn_image_max_width',
@@ -252,7 +252,7 @@ final class Settings {
 				'min'               => 0,
 				'max'               => 9,
 				'step'              => 1,
-				'instructions'      => __( 'عدد بالاتر = فایل کوچک‌تر و کندتر. ۶ معمولاً تعادل خوبی است.', 'asrekhodro' ),
+				'instructions'      => __( 'فقط برای PNGهایی که شفافیت دارند. اگر شفافیت نباشد، فایل به JPEG تبدیل می‌شود.', 'asrekhodro' ),
 				'conditional_logic' => $when_enabled,
 			),
 		);
