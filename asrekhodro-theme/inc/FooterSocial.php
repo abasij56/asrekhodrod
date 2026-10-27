@@ -251,7 +251,6 @@ final class FooterSocial {
 				'width'       => true,
 				'height'      => true,
 				'aria-hidden' => true,
-				'role'        => true,
 				'class'       => true,
 				'focusable'   => true,
 			),
@@ -281,6 +280,10 @@ final class FooterSocial {
 		);
 
 		$svg = wp_kses( $svg, $allowed );
+		$svg = preg_replace( '/\srole=(["\'])[^"\']*\1/i', '', $svg ) ?? $svg;
+		if ( ! preg_match( '/\saria-hidden=/i', $svg ) ) {
+			$svg = preg_replace( '/<svg\b/i', '<svg aria-hidden="true"', $svg, 1 ) ?? $svg;
+		}
 
 		return self::normalize_svg_dimensions( $svg );
 	}

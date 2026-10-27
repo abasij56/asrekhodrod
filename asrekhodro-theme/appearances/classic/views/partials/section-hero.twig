@@ -21,7 +21,7 @@
       <article class="hero-text-item">
         <a href="{{ post.link }}">
           {% if post.meta('_asrekhodro_over_title') %}<span class="tag tag--breaking">{{ post.meta('_asrekhodro_over_title') }}</span>{% endif %}
-          <h3>{{ post.title }}</h3>
+          <span class="hero-text-item__title">{{ post.title }}</span>
           {% set side_under_title = ak_post_under_title(post)|default('')|trim %}
           {% if side_under_title %}<span class="tag tag--breaking">{{ side_under_title }}</span>{% endif %}
           <time datetime="{{ post.date('Y-m-d') }}">{{ ak_post_date(post) }}</time>

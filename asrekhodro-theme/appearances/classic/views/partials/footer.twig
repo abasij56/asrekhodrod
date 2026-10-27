@@ -37,7 +37,7 @@
       {% if show_about and (footer_about_title or about_links|length) %}
         <div class="footer-col footer-col--about">
           {% if footer_about_title %}
-            <h4>{{ footer_about_title }}</h4>
+            <h2>{{ footer_about_title }}</h2>
           {% endif %}
           {% if about_links|length %}
             <ul>
@@ -51,7 +51,7 @@
       {% if show_categories and (footer_categories_title or categories_links|length) %}
         <div class="footer-col footer-col--categories">
           {% if footer_categories_title %}
-            <h4>{{ footer_categories_title }}</h4>
+            <h2>{{ footer_categories_title }}</h2>
           {% endif %}
           {% if categories_links|length %}
             <ul>
@@ -65,7 +65,7 @@
       {% if show_contact_col and (footer_contact_title or has_contact_info or has_certificates) %}
         <div class="footer-col footer-col--contact">
           {% if footer_contact_title %}
-            <h4>{{ footer_contact_title }}</h4>
+            <h2>{{ footer_contact_title }}</h2>
           {% endif %}
           {% if has_contact_info %}
             <address>
