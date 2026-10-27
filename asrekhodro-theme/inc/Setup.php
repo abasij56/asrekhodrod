@@ -11,7 +11,6 @@ final class Setup {
 	public static function init(): void {
 		add_action( 'after_setup_theme', array( self::class, 'theme_setup' ) );
 		add_action( 'wp_enqueue_scripts', array( self::class, 'enqueue_assets' ) );
-		add_action( 'wp_head', array( self::class, 'preload_font' ), 1 );
 		add_action( 'wp_head', array( self::class, 'output_site_icons' ), 2 );
 		add_action( 'wp_head', array( self::class, 'output_google_site_verification' ), 1 );
 		add_action( 'wp_footer', array( self::class, 'output_google_analytics' ), 99 );
@@ -192,10 +191,6 @@ final class Setup {
 
 	public static function enqueue_assets(): void {
 		Appearance::enqueue_assets();
-	}
-
-	public static function preload_font(): void {
-		Appearance::preload_font();
 	}
 
 	public static function output_google_site_verification(): void {

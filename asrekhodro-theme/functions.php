@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ASREKHODRO_THEME_VERSION', '1.5.7' );
+define( 'ASREKHODRO_THEME_VERSION', '1.5.8' );
 define( 'ASREKHODRO_THEME_DIR', get_template_directory() );
 define( 'ASREKHODRO_THEME_URI', get_template_directory_uri() );
 

@@ -43,8 +43,9 @@ final class View {
 					'date_iso' => (string) $post->date( 'Y-m-d' ),
 				),
 				$post,
-				640,
-				360
+				300,
+				0,
+				'(max-width: 767px) 45vw, 200px'
 			);
 		}
 
