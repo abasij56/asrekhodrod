@@ -414,19 +414,6 @@ final class BlockDataResolver {
 	}
 
 	/**
-	 * @return array<string, mixed>
-	 */
-	public static function hero_context_for_front_page(): array {
-		foreach ( LayoutResolver::flat_placements( 'front_page' ) as $placement ) {
-			if ( ( $placement['block'] ?? '' ) === 'ak-hero' ) {
-				return self::resolve_hero( $placement, array() );
-			}
-		}
-
-		return array();
-	}
-
-	/**
 	 * Hero: query posts → main (image, excerpt, link) + side (badge, title, date).
 	 *
 	 * @param array<string, mixed> $placement
@@ -435,21 +422,6 @@ final class BlockDataResolver {
 	 */
 	private static function resolve_hero( array $placement, array $meta ): array {
 		require_once ASREKHODRO_THEME_DIR . '/inc/blocks/ak-hero/View.php';
-
-		static $cache = array();
-
-		$cache_key = wp_json_encode(
-			array(
-				$placement['post_type'] ?? '',
-				$placement['count'] ?? '',
-				$placement['category'] ?? '',
-				$placement['strategy'] ?? '',
-				$placement['manual_posts'] ?? array(),
-			)
-		);
-		if ( is_string( $cache_key ) && isset( $cache[ $cache_key ] ) ) {
-			return $cache[ $cache_key ];
-		}
 
 		$defaults  = is_array( $meta['defaults'] ?? null ) ? $meta['defaults'] : array();
 		$post_type = (string) ( $placement['post_type'] ?? $defaults['post_type'] ?? 'post' );
@@ -469,12 +441,7 @@ final class BlockDataResolver {
 			$posts = self::query_posts( $post_type, $count, $category, $strategy );
 		}
 
-		$context = \AsreKhodro\Theme\Blocks\AkHero\View::context( $posts );
-		if ( is_string( $cache_key ) ) {
-			$cache[ $cache_key ] = $context;
-		}
-
-		return $context;
+		return \AsreKhodro\Theme\Blocks\AkHero\View::context( $posts );
 	}
 
 	/**
