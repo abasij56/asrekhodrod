@@ -20,7 +20,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class Module {
 
 	public static function init(): void {
-		// Local Media Library uploads: watermark original before WP builds sizes.
+		// Local Media Library uploads: optimize, then watermark, before WP builds sizes.
+		ImageOptimize::init();
 		Watermark::init();
 
 		// Core external-media attachment behaviour (works with or without CDN).
