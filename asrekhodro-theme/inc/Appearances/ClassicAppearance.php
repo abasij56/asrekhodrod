@@ -8,6 +8,7 @@ use AsreKhodro\Theme\CarInfo3d;
 use AsreKhodro\Theme\CarsInfoDirectory;
 use AsreKhodro\Theme\CinfoBlocks;
 use AsreKhodro\Theme\Comments;
+use AsreKhodro\Theme\LayoutResolver;
 use AsreKhodro\Theme\Setup;
 use AsreKhodro\Theme\SinglePost;
 
@@ -204,7 +205,7 @@ class ClassicAppearance {
 			wp_script_add_data( 'asrekhodro-carinfo3d-scene', 'type', 'module' );
 		}
 
-		if ( is_front_page() ) {
+		if ( self::needs_magazine_flip() ) {
 			wp_enqueue_style(
 				'st-page-flip',
 				Appearance::asset_url( 'vendor/stPageFlip.css' ),
@@ -255,6 +256,31 @@ class ClassicAppearance {
 				'homeUrl'     => home_url( '/' ),
 			)
 		);
+	}
+
+	/**
+	 * StPageFlip is only used by featured magazine blocks, not by the homepage itself.
+	 */
+	private static function needs_magazine_flip(): bool {
+		$page_key = '';
+
+		if ( is_front_page() ) {
+			$page_key = 'front_page';
+		}
+
+		if ( $page_key === '' ) {
+			return false;
+		}
+
+		$flip_blocks = array( 'ak-asrekhodro-featured', 'ak-featured-grid' );
+
+		foreach ( LayoutResolver::flat_placements( $page_key ) as $placement ) {
+			if ( in_array( $placement['block'] ?? '', $flip_blocks, true ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public static function preload_font(): void {
