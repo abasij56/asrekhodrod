@@ -20,16 +20,9 @@ class ClassicAppearance {
 
 	public static function enqueue_assets(): void {
 		wp_enqueue_style(
-			'asrekhodro-fonts',
-			Appearance::asset_url( 'css/fonts.css' ),
-			array(),
-			ASREKHODRO_THEME_VERSION
-		);
-
-		wp_enqueue_style(
 			'asrekhodro-style',
 			Appearance::asset_url( 'css/style.css' ),
-			array( 'asrekhodro-fonts' ),
+			array(),
 			ASREKHODRO_THEME_VERSION
 		);
 

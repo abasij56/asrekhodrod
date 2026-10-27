@@ -3,6 +3,17 @@
    Premium Persian automotive media platform
    ========================================================================== */
 
+/* Self-hosted Vazirmatn — SIL Open Font License 1.1 */
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("../fonts/Vazirmatn-Variable.woff2") format("woff2-variations"),
+       url("../fonts/Vazirmatn-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+200C-200E, U+2060, U+0030-0039, U+0041-005A, U+0061-007A;
+}
+
 :root {
   --brand: #e10600;
   --brand-dark: #b80500;
@@ -750,10 +761,12 @@ address {
 
 .logo__image {
   display: block;
-  width: auto;
   height: 60px;
+  width: auto;
   max-width: min(260px, 100%);
+  max-height: 60px;
   object-fit: contain;
+  flex-shrink: 0;
 }
 
 .nav-toggle {

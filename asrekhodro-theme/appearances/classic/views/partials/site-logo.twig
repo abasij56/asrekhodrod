@@ -9,6 +9,7 @@
       class="logo__image"
       {% if logo_image.width %}width="{{ logo_image.width }}"{% endif %}
       {% if logo_image.height %}height="{{ logo_image.height }}"{% endif %}
+      {% if logo_image.width and logo_image.height %}style="aspect-ratio: {{ logo_image.width }} / {{ logo_image.height }}"{% endif %}
     />
   {% else %}
     <div class="logo__mark" aria-hidden="true">AK</div>

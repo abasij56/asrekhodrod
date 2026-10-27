@@ -2,6 +2,7 @@
 
 namespace AsreKhodro\Theme\Blocks\AkHero;
 
+use AsreKhodro\Theme\BlockDataResolver;
 use AsreKhodro\Theme\ImporterBridge;
 use AsreKhodro\Theme\PostImage;
 use AsreKhodro\Theme\SinglePost;
@@ -18,7 +19,32 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class View {
 
-	private const HERO_IMAGE_SIZES = '(max-width: 1100px) 100vw, 884px';
+	private const HERO_IMAGE_SIZES = '(max-width: 1023px) calc(100vw - 2rem), calc(min(100vw - 2rem, 1200px) - 316px)';
+
+	public static function print_lcp_preload(): void {
+		if ( is_admin() || ! is_front_page() ) {
+			return;
+		}
+
+		$context = BlockDataResolver::hero_context_for_front_page();
+		$main    = is_array( $context['hero_main'] ?? null ) ? $context['hero_main'] : array();
+		$src     = trim( (string) ( $main['image'] ?? '' ) );
+		if ( $src === '' ) {
+			return;
+		}
+
+		$srcset = trim( (string) ( $main['image_srcset'] ?? '' ) );
+		$sizes  = trim( (string) ( $main['image_sizes'] ?? '' ) );
+
+		echo '<link rel="preload" as="image" fetchpriority="high" href="' . esc_url( $src ) . '"';
+		if ( $srcset !== '' ) {
+			echo ' imagesrcset="' . esc_attr( $srcset ) . '"';
+		}
+		if ( $sizes !== '' ) {
+			echo ' imagesizes="' . esc_attr( $sizes ) . '"';
+		}
+		echo ">\n";
+	}
 
 	/**
 	 * @param iterable<int, \Timber\Post>|null $posts
