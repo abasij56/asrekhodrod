@@ -15,6 +15,81 @@ final class ContactForm {
 	public static function init(): void {
 		add_action( 'init', array( self::class, 'ensure_form' ), 25 );
 		add_filter( 'wpcf7_autop_or_not', array( self::class, 'disable_autop' ), 10, 2 );
+		add_filter( 'wpcf7_load_js', array( self::class, 'allow_assets' ) );
+		add_filter( 'wpcf7_load_css', array( self::class, 'allow_assets' ) );
+		add_action( 'wp_enqueue_scripts', array( self::class, 'dequeue_unused_assets' ), 20 );
+	}
+
+	/**
+	 * Keep CF7 CSS/JS off pages that do not render a form (homepage included).
+	 *
+	 * @param bool $load
+	 */
+	public static function allow_assets( $load ): bool {
+		if ( ! $load ) {
+			return false;
+		}
+
+		if ( is_admin() ) {
+			return true;
+		}
+
+		return self::page_needs_form();
+	}
+
+	public static function dequeue_unused_assets(): void {
+		if ( self::page_needs_form() ) {
+			return;
+		}
+
+		wp_dequeue_style( 'contact-form-7' );
+		wp_dequeue_style( 'contact-form-7-rtl' );
+		wp_dequeue_script( 'contact-form-7' );
+		wp_dequeue_script( 'swv' );
+	}
+
+	private static function page_needs_form(): bool {
+		if ( is_page_template( 'page-contact.php' ) ) {
+			return true;
+		}
+
+		if ( is_singular() ) {
+			$post = get_queried_object();
+			if ( $post instanceof \WP_Post ) {
+				$content = (string) $post->post_content;
+				if ( has_shortcode( $content, 'contact-form-7' ) ) {
+					return true;
+				}
+
+				if ( function_exists( 'has_block' ) && has_block( 'contact-form-7/contact-form-selector', $post ) ) {
+					return true;
+				}
+			}
+		}
+
+		return self::layout_has_contact_block();
+	}
+
+	private static function layout_has_contact_block(): bool {
+		$page_key = '';
+
+		if ( is_front_page() ) {
+			$page_key = 'front_page';
+		} elseif ( is_page_template( 'page-contact.php' ) ) {
+			$page_key = 'page_contact';
+		}
+
+		if ( $page_key === '' ) {
+			return false;
+		}
+
+		foreach ( LayoutResolver::flat_placements( $page_key ) as $placement ) {
+			if ( ( $placement['block'] ?? '' ) === 'ak-contact-page' ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public static function ensure_form(): void {

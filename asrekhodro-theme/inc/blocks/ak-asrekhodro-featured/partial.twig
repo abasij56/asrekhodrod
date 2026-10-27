@@ -12,7 +12,15 @@
     <article class="card card--lead card--featured-lead">
       <a href="{{ featured_lead.link }}">
         <div class="card__media">
-          <img src="{{ featured_lead.image }}" width="800" height="600" alt="{{ featured_lead.title }}" loading="eager" decoding="async" />
+          {% include 'partials/responsive-img.twig' with {
+            src: featured_lead.image,
+            srcset: featured_lead.image_srcset|default(''),
+            sizes: featured_lead.image_sizes|default(''),
+            width: 800,
+            height: 600,
+            alt: featured_lead.title,
+            loading: 'eager'
+          } %}
           {% if featured_lead.badge %}
             <span class="tag tag--market">{{ featured_lead.badge }}</span>
           {% endif %}

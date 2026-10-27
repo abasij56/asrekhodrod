@@ -17,6 +17,7 @@ final class Theme {
 		require_once ASREKHODRO_THEME_DIR . '/inc/PostCredits.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/PrimaryTag.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/MediaAlt.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/PostImage.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/ImporterBridge.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/PersianDate.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/PersianDigits.php';

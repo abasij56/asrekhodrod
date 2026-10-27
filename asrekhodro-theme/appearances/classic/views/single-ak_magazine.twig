@@ -14,7 +14,7 @@
         <time datetime="{{ post.date('c') }}">{{ ak_post_date(post) }}</time>
       </header>
       <figure class="magazine-single__cover">
-        <img src="{{ ak_post_image_url(post) }}" alt="{{ post.title }}" width="800" height="1066" loading="eager" decoding="async" />
+        {{ ak.post_image(post, 800, 1066, 'eager') }}
       </figure>
     </article>
   {% endblock %}

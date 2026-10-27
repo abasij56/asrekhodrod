@@ -3,6 +3,7 @@
 namespace AsreKhodro\Theme\Blocks\AkHero;
 
 use AsreKhodro\Theme\ImporterBridge;
+use AsreKhodro\Theme\PostImage;
 use AsreKhodro\Theme\SinglePost;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -16,6 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Side: badge, title, date.
  */
 final class View {
+
+	private const HERO_IMAGE_SIZES = '(max-width: 1100px) 100vw, 884px';
 
 	/**
 	 * @param iterable<int, \Timber\Post>|null $posts
@@ -112,13 +115,17 @@ final class View {
 	 * @return array{id: int, link: string, title: string, excerpt: string, image: string}
 	 */
 	private static function map_main( \Timber\Post $main, \Timber\Post $visual ): array {
+		$image = PostImage::attrs( $visual, 1200, 800, self::HERO_IMAGE_SIZES );
+
 		return array(
-			'id'          => (int) $main->ID,
-			'link'        => (string) $main->link(),
-			'title'       => trim( (string) $main->title() ),
-			'under_title' => SinglePost::get_under_title_from_block( $main ),
-			'excerpt'     => ImporterBridge::get_list_excerpt( $main, ImporterBridge::excerpt_max( 'hero' ) ),
-			'image'       => ImporterBridge::get_post_image_url( $visual ),
+			'id'           => (int) $main->ID,
+			'link'         => (string) $main->link(),
+			'title'        => trim( (string) $main->title() ),
+			'under_title'  => SinglePost::get_under_title_from_block( $main ),
+			'excerpt'      => ImporterBridge::get_list_excerpt( $main, ImporterBridge::excerpt_max( 'hero' ) ),
+			'image'        => $image['src'],
+			'image_srcset' => $image['srcset'],
+			'image_sizes'  => $image['sizes'],
 		);
 	}
 
@@ -143,16 +150,19 @@ final class View {
 				? $visual_for_first
 				: $post;
 
+			$image   = PostImage::attrs( $image_post, 1200, 800, self::HERO_IMAGE_SIZES );
 			$items[] = array(
-				'id'          => (int) $post->ID,
-				'badge'       => trim( (string) $post->meta( '_asrekhodro_over_title' ) ),
-				'title'       => $title,
-				'under_title' => SinglePost::get_under_title_from_block( $post ),
-				'date'        => ImporterBridge::format_post_date( $post ),
-				'date_iso'    => (string) $post->date( 'Y-m-d' ),
-				'link'        => (string) $post->link(),
-				'excerpt'     => ImporterBridge::get_list_excerpt( $post, ImporterBridge::excerpt_max( 'hero' ) ),
-				'image'       => ImporterBridge::get_post_image_url( $image_post ),
+				'id'           => (int) $post->ID,
+				'badge'        => trim( (string) $post->meta( '_asrekhodro_over_title' ) ),
+				'title'        => $title,
+				'under_title'  => SinglePost::get_under_title_from_block( $post ),
+				'date'         => ImporterBridge::format_post_date( $post ),
+				'date_iso'     => (string) $post->date( 'Y-m-d' ),
+				'link'         => (string) $post->link(),
+				'excerpt'      => ImporterBridge::get_list_excerpt( $post, ImporterBridge::excerpt_max( 'hero' ) ),
+				'image'        => $image['src'],
+				'image_srcset' => $image['srcset'],
+				'image_sizes'  => $image['sizes'],
 			);
 		}
 
@@ -167,12 +177,14 @@ final class View {
 
 		foreach ( $side_items as $item ) {
 			$panels[] = array(
-				'id'          => (int) ( $item['id'] ?? 0 ),
-				'title'       => (string) ( $item['title'] ?? '' ),
-				'under_title' => (string) ( $item['under_title'] ?? '' ),
-				'excerpt'     => (string) ( $item['excerpt'] ?? '' ),
-				'image'       => (string) ( $item['image'] ?? '' ),
-				'link'        => (string) ( $item['link'] ?? '' ),
+				'id'           => (int) ( $item['id'] ?? 0 ),
+				'title'        => (string) ( $item['title'] ?? '' ),
+				'under_title'  => (string) ( $item['under_title'] ?? '' ),
+				'excerpt'      => (string) ( $item['excerpt'] ?? '' ),
+				'image'        => (string) ( $item['image'] ?? '' ),
+				'image_srcset' => (string) ( $item['image_srcset'] ?? '' ),
+				'image_sizes'  => (string) ( $item['image_sizes'] ?? '' ),
+				'link'         => (string) ( $item['link'] ?? '' ),
 			);
 		}
 

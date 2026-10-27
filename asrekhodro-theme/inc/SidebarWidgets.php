@@ -224,17 +224,19 @@ final class SidebarWidgets {
 				continue;
 			}
 
-			$image = ImporterBridge::get_post_image_url( $video );
-			if ( $image === '' ) {
+			$image = PostImage::attrs( $video, 220, 140 );
+			if ( $image['src'] === '' ) {
 				continue;
 			}
 
 			$title = trim( (string) $video->title() );
 			$items[] = array(
-				'title' => $title,
-				'link'  => (string) $video->link(),
-				'image' => $image,
-				'alt'   => $title !== '' ? $title : __( 'ویدیو', 'asrekhodro' ),
+				'title'        => $title,
+				'link'         => (string) $video->link(),
+				'image'        => $image['src'],
+				'image_srcset' => $image['srcset'],
+				'image_sizes'  => $image['sizes'],
+				'alt'          => $title !== '' ? $title : __( 'ویدیو', 'asrekhodro' ),
 			);
 		}
 

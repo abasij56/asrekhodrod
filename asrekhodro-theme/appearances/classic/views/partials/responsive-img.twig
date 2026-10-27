@@ -1,0 +1,11 @@
+<img
+  src="{{ src }}"
+  {% if srcset|default('') %}srcset="{{ srcset }}" sizes="{{ sizes|default('') }}"{% endif %}
+  width="{{ width }}"
+  height="{{ height }}"
+  alt="{{ alt }}"
+  loading="{{ loading|default('lazy') }}"
+  decoding="async"
+  {% if fetchpriority|default('') %}fetchpriority="{{ fetchpriority }}"{% endif %}
+  {% if attr|default('') %}{{ attr|raw }}{% endif %}
+/>

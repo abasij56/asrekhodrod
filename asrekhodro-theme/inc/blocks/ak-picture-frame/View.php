@@ -4,6 +4,7 @@ namespace AsreKhodro\Theme\Blocks\AkPictureFrame;
 
 use AsreKhodro\Theme\ImporterBridge;
 use AsreKhodro\Theme\MediaAlt;
+use AsreKhodro\Theme\PostImage;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -44,31 +45,29 @@ final class View {
 			}
 
 			$title = trim( (string) $post->title() );
-			$image = ImporterBridge::get_post_image_url( $post );
-			$thumb = $image;
-			if ( $post->thumbnail ) {
-				$medium = $post->thumbnail->src( 'medium' );
-				if ( is_string( $medium ) && $medium !== '' ) {
-					$thumb = $medium;
-				}
-			}
+			$full  = PostImage::attrs( $post, 1200, 800, '100vw' );
+			$thumb = PostImage::attrs( $post, 120, 80, '120px' );
 
-			if ( $title === '' || $image === '' ) {
+			if ( $title === '' || $full['src'] === '' ) {
 				continue;
 			}
 
 			$image_alt = MediaAlt::from_post_thumbnail( (int) $post->ID );
 			if ( $image_alt === '' ) {
-				$image_alt = MediaAlt::from_url( $image );
+				$image_alt = MediaAlt::from_url( $full['src'] );
 			}
 
 			$items[] = array(
-				'title'     => $title,
-				'image'     => $image,
-				'thumb'     => $thumb !== '' ? $thumb : $image,
-				'image_alt' => $image_alt,
-				'link'      => (string) $post->link(),
-				'caption'   => ImporterBridge::get_list_excerpt( $post, ImporterBridge::excerpt_max( 'list' ) ),
+				'title'         => $title,
+				'image'         => $full['src'],
+				'image_srcset'  => $full['srcset'],
+				'image_sizes'   => $full['sizes'],
+				'thumb'         => $thumb['src'] !== '' ? $thumb['src'] : $full['src'],
+				'thumb_srcset'  => $thumb['srcset'],
+				'thumb_sizes'   => $thumb['sizes'],
+				'image_alt'     => $image_alt,
+				'link'          => (string) $post->link(),
+				'caption'       => ImporterBridge::get_list_excerpt( $post, ImporterBridge::excerpt_max( 'list' ) ),
 			);
 		}
 

@@ -4,7 +4,15 @@
     <div class="picture-frame__backdrops" aria-hidden="true">
       {% for item in picture_frame_items %}
         <div class="picture-frame__backdrop{{ loop.last ? ' is-active' : '' }}" data-pf-backdrop>
-          <img src="{{ item.image }}" alt="{{ item.image_alt|default('')|e('html_attr') }}" width="1920" height="1080" loading="{{ loop.last ? 'eager' : 'lazy' }}" decoding="async" />
+          {% include 'partials/responsive-img.twig' with {
+            src: item.image,
+            srcset: item.image_srcset|default(''),
+            sizes: item.image_sizes|default(''),
+            width: 1200,
+            height: 800,
+            alt: item.image_alt|default(''),
+            loading: loop.last ? 'eager' : 'lazy'
+          } %}
         </div>
       {% endfor %}
     </div>
@@ -82,7 +90,15 @@
                 aria-label="اسلاید {{ item.rank|persian_digits }}: {{ item.title }}"
               >
                 <span class="picture-frame__thumb-frame">
-                  <img src="{{ item.thumb }}" alt="{{ item.image_alt|default('')|e('html_attr') }}" width="120" height="80" loading="lazy" decoding="async" />
+                  {% include 'partials/responsive-img.twig' with {
+                    src: item.thumb,
+                    srcset: item.thumb_srcset|default(''),
+                    sizes: item.thumb_sizes|default(''),
+                    width: 120,
+                    height: 80,
+                    alt: item.image_alt|default(''),
+                    loading: 'lazy'
+                  } %}
                 </span>
                 <span class="picture-frame__thumb-label">{{ item.rank|persian_digits }}</span>
               </button>

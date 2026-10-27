@@ -1515,6 +1515,16 @@
         }
 
         if (image && slide.image) {
+          if (slide.image_srcset) {
+            image.srcset = slide.image_srcset;
+          } else {
+            image.removeAttribute("srcset");
+          }
+          if (slide.image_sizes) {
+            image.sizes = slide.image_sizes;
+          } else {
+            image.removeAttribute("sizes");
+          }
           image.src = slide.image;
           image.alt = slide.title || "";
         }

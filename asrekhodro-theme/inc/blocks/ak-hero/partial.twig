@@ -4,7 +4,17 @@
 {% endif %}
 <section class="hero" data-hero-slider data-hero-interval="15000" aria-labelledby="hero-heading">
   <article class="hero__main" data-hero-main>
-    <img data-hero-image src="{{ hero_main.image }}" width="1200" height="800" alt="{{ hero_main.title }}" loading="eager" decoding="async" />
+    {% include 'partials/responsive-img.twig' with {
+      src: hero_main.image,
+      srcset: hero_main.image_srcset|default(''),
+      sizes: hero_main.image_sizes|default(''),
+      width: 1200,
+      height: 800,
+      alt: hero_main.title,
+      loading: 'eager',
+      fetchpriority: 'high',
+      attr: 'data-hero-image'
+    } %}
     <div class="hero__content">
       <h1 id="hero-heading"><a data-hero-title-link href="{{ hero_main.link }}"><span data-hero-title>{{ hero_main.title }}</span></a></h1>
       <span class="tag tag--ev" data-hero-under-title{% if not hero_main.under_title %} hidden{% endif %}>{{ hero_main.under_title }}</span>

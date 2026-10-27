@@ -12,7 +12,15 @@
           <li class="kiosk-carousel__slide">
             <a href="{{ item.link }}">
               <span class="kiosk-carousel__cover">
-                <img src="{{ item.image }}" alt="{{ item.alt }}" loading="lazy" decoding="async" />
+                {% include 'partials/responsive-img.twig' with {
+                  src: item.image,
+                  srcset: item.image_srcset|default(''),
+                  sizes: item.image_sizes|default(''),
+                  width: 220,
+                  height: 140,
+                  alt: item.alt,
+                  loading: 'lazy'
+                } %}
                 {% include 'partials/video-card-play.twig' %}
               </span>
             </a>

@@ -14,7 +14,15 @@
             <li class="magazine-item magazines-carousel__slide">
               <a href="{{ item.link }}">
                 <div class="magazine-item__cover">
-                  <img src="{{ item.image }}" width="640" height="360" alt="{{ item.title }}" loading="lazy" decoding="async" />
+                  {% include 'partials/responsive-img.twig' with {
+                    src: item.image,
+                    srcset: item.image_srcset|default(''),
+                    sizes: item.image_sizes|default(''),
+                    width: 640,
+                    height: 360,
+                    alt: item.title,
+                    loading: 'lazy'
+                  } %}
                 </div>
                 <h3>{{ item.title }}</h3>
                 <time datetime="{{ item.date_iso }}">{{ item.date }}</time>

@@ -3,6 +3,7 @@
 namespace AsreKhodro\Theme\Blocks\AkAsrekhodroFeatured;
 
 use AsreKhodro\Theme\ImporterBridge;
+use AsreKhodro\Theme\PostImage;
 use AsreKhodro\Theme\SinglePost;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -108,16 +109,20 @@ final class View {
 			$badge = trim( (string) $post->meta( '_asrekhodro_over_title' ) );
 		}
 
-		return array(
-			'id'       => (int) $post->ID,
-			'link'     => (string) $post->link(),
-			'title'    => $title,
-			'excerpt'  => ImporterBridge::get_list_excerpt( $post, ImporterBridge::excerpt_max( 'hero' ) ),
-			'image'    => ImporterBridge::get_post_image_url( $post ),
-			'badge'    => $badge,
-			'under_title' => SinglePost::get_under_title_from_block( $post ),
-			'date'     => ImporterBridge::format_post_date( $post ),
-			'date_iso' => (string) $post->date( 'Y-m-d' ),
+		return PostImage::merge(
+			array(
+				'id'          => (int) $post->ID,
+				'link'        => (string) $post->link(),
+				'title'       => $title,
+				'excerpt'     => ImporterBridge::get_list_excerpt( $post, ImporterBridge::excerpt_max( 'hero' ) ),
+				'badge'       => $badge,
+				'under_title' => SinglePost::get_under_title_from_block( $post ),
+				'date'        => ImporterBridge::format_post_date( $post ),
+				'date_iso'    => (string) $post->date( 'Y-m-d' ),
+			),
+			$post,
+			800,
+			600
 		);
 	}
 }

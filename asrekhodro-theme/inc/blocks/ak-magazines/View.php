@@ -3,6 +3,7 @@
 namespace AsreKhodro\Theme\Blocks\AkMagazines;
 
 use AsreKhodro\Theme\ImporterBridge;
+use AsreKhodro\Theme\PostImage;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -33,13 +34,17 @@ final class View {
 				continue;
 			}
 
-			$items[] = array(
-				'id'       => (int) $post->ID,
-				'link'     => (string) $post->link(),
-				'title'    => $title,
-				'image'    => ImporterBridge::get_post_image_url( $post ),
-				'date'     => ImporterBridge::format_post_date( $post ),
-				'date_iso' => (string) $post->date( 'Y-m-d' ),
+			$items[] = PostImage::merge(
+				array(
+					'id'       => (int) $post->ID,
+					'link'     => (string) $post->link(),
+					'title'    => $title,
+					'date'     => ImporterBridge::format_post_date( $post ),
+					'date_iso' => (string) $post->date( 'Y-m-d' ),
+				),
+				$post,
+				300,
+				400
 			);
 		}
 

@@ -1,5 +1,6 @@
 {% macro post_image(post, width, height, loading) %}
-  <img src="{{ ak_post_image_url(post) }}" width="{{ width }}" height="{{ height }}" alt="{{ post.title }}" loading="{{ loading|default('lazy') }}" decoding="async" />
+  {% set img = ak_post_image_attrs(post, width, height) %}
+  <img src="{{ img.src }}"{% if img.srcset %} srcset="{{ img.srcset }}" sizes="{{ img.sizes }}"{% endif %} width="{{ width }}" height="{{ height }}" alt="{{ post.title }}" loading="{{ loading|default('lazy') }}" decoding="async" />
 {% endmacro %}
 
 {% macro list_excerpt(post, context) %}

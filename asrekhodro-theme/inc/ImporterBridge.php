@@ -32,6 +32,9 @@ final class ImporterBridge {
 		$functions['ak_post_image_url'] = array(
 			'callable' => array( self::class, 'get_post_image_url' ),
 		);
+		$functions['ak_post_image_attrs'] = array(
+			'callable' => array( PostImage::class, 'attrs' ),
+		);
 		$functions['ak_post_date']      = array(
 			'callable' => array( self::class, 'format_post_date' ),
 		);
@@ -333,42 +336,12 @@ final class ImporterBridge {
 	/**
 	 * Resolve image URL: featured image → meta → body HTML → placeholder.
 	 *
+	 * Read-only. Pass $width to pick an already-generated size for that container.
+	 *
 	 * @param \Timber\Post|\WP_Post|int $post
 	 */
-	public static function get_post_image_url( $post ): string {
-		$post_id = self::resolve_post_id( $post );
-
-		if ( $post_id <= 0 ) {
-			return self::placeholder_image_url();
-		}
-
-		$content = self::get_post_raw_content( $post );
-
-		if ( has_post_thumbnail( $post_id ) ) {
-			$src = self::get_featured_image_url( $post_id, 'large' );
-			if ( $src !== '' ) {
-				if ( (string) get_post_meta( $post_id, '_asrekhodro_image_url', true ) === '' ) {
-					update_post_meta( $post_id, '_asrekhodro_image_url', $src );
-				}
-
-				return $src;
-			}
-		}
-
-		$from_meta = self::resolve_any_image_url( (string) get_post_meta( $post_id, '_asrekhodro_image_url', true ) );
-		if ( $from_meta !== '' ) {
-			return $from_meta;
-		}
-
-		$from_body = self::extract_image_from_html( $content );
-		if ( $from_body !== '' ) {
-			$resolved = self::resolve_any_image_url( $from_body );
-			if ( $resolved !== '' ) {
-				return $resolved;
-			}
-		}
-
-		return self::placeholder_image_url();
+	public static function get_post_image_url( $post, int $width = 1024 ): string {
+		return PostImage::url( $post, $width );
 	}
 
 	public static function extract_image_from_html( string $html ): string {
