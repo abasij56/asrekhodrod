@@ -8,16 +8,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class AjaxSearch {
 
-	private const CACHE_GROUP     = 'ak_ajax_search';
-	private const CACHE_TTL       = 120;
-	private const DROPDOWN_LIMIT  = 8;
+	private const CACHE_GROUP       = 'ak_ajax_search';
+	private const CACHE_TTL         = 120;
+	private const DROPDOWN_LIMIT    = 8;
 	private const SEARCH_POST_TYPES = array( 'post', 'ak_video', 'ak_review' );
 
 	public static function init(): void {
 		add_action( 'wp_ajax_ak_search', array( self::class, 'handle' ) );
 		add_action( 'wp_ajax_nopriv_ak_search', array( self::class, 'handle' ) );
 		add_action( 'pre_get_posts', array( self::class, 'adjust_search_query' ) );
-		add_filter( 'posts_search', array( self::class, 'limit_search_to_title' ), 10, 2 );
+		add_filter( 'posts_join', array( SearchIndex::class, 'posts_join' ), 10, 2 );
+		add_filter( 'posts_search', array( self::class, 'filter_posts_search' ), 10, 2 );
 	}
 
 	public static function adjust_search_query( \WP_Query $query ): void {
@@ -45,7 +46,8 @@ final class AjaxSearch {
 			);
 		}
 
-		$cache_key = 'q3_' . md5( mb_strtolower( $query ) );
+		$engine    = SearchIndex::is_enabled() ? 'ft' : 'title';
+		$cache_key = $engine . '_q3_' . md5( mb_strtolower( $query ) );
 		$cached    = wp_cache_get( $cache_key, self::CACHE_GROUP );
 		if ( is_array( $cached ) && isset( $cached['items'] ) ) {
 			if ( ! isset( $cached['has_more'] ) ) {
@@ -54,6 +56,65 @@ final class AjaxSearch {
 			wp_send_json_success( $cached );
 		}
 
+		if ( SearchIndex::is_enabled() ) {
+			$payload = self::handle_via_index( $query );
+		} else {
+			$payload = self::handle_via_title( $query );
+		}
+
+		wp_cache_set( $cache_key, $payload, self::CACHE_GROUP, self::CACHE_TTL );
+
+		wp_send_json_success( $payload );
+	}
+
+	/**
+	 * @return array{items: list<array<string, mixed>>, has_more: bool}
+	 */
+	private static function handle_via_index( string $query ): array {
+		$ids = SearchIndex::find_ids( $query, self::DROPDOWN_LIMIT + 1, 0 );
+		if ( $ids === array() ) {
+			return array(
+				'items'    => array(),
+				'has_more' => false,
+			);
+		}
+
+		$has_more = count( $ids ) > self::DROPDOWN_LIMIT;
+		$ids      = array_slice( $ids, 0, self::DROPDOWN_LIMIT );
+
+		$posts = get_posts(
+			array(
+				'post_type'              => self::SEARCH_POST_TYPES,
+				'post_status'            => 'publish',
+				'post__in'               => $ids,
+				'orderby'                => 'post__in',
+				'posts_per_page'         => count( $ids ),
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => true,
+				'update_post_term_cache' => false,
+			)
+		);
+
+		$items = array();
+		foreach ( $posts as $post ) {
+			$items[] = array(
+				'title' => get_the_title( $post ),
+				'url'   => get_permalink( $post ),
+				'type'  => $post->post_type,
+				'image' => self::preview_image_url( (int) $post->ID ),
+			);
+		}
+
+		return array(
+			'items'    => $items,
+			'has_more' => $has_more,
+		);
+	}
+
+	/**
+	 * @return array{items: list<array<string, mixed>>, has_more: bool}
+	 */
+	private static function handle_via_title( string $query ): array {
 		$posts = new \WP_Query(
 			array(
 				'post_type'              => self::SEARCH_POST_TYPES,
@@ -80,14 +141,24 @@ final class AjaxSearch {
 			);
 		}
 
-		$payload = array(
+		return array(
 			'items'    => $items,
-			'has_more' => count( $items ) >= self::DROPDOWN_LIMIT,
+			'has_more' => count( $posts->posts ) > self::DROPDOWN_LIMIT,
 		);
+	}
 
-		wp_cache_set( $cache_key, $payload, self::CACHE_GROUP, self::CACHE_TTL );
+	/**
+	 * Theme search SQL: FULLTEXT when enabled, otherwise title-only LIKE.
+	 *
+	 * @param string    $search SQL fragment.
+	 * @param \WP_Query $query  Current query.
+	 */
+	public static function filter_posts_search( string $search, \WP_Query $query ): string {
+		if ( SearchIndex::should_filter_query( $query ) ) {
+			return SearchIndex::posts_search( $search, $query );
+		}
 
-		wp_send_json_success( $payload );
+		return self::limit_search_to_title( $search, $query );
 	}
 
 	/**

@@ -44,6 +44,8 @@ final class Theme {
 		require_once ASREKHODRO_THEME_DIR . '/inc/PostViews.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/SidebarWidgets.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/AjaxSearch.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/SearchIndex.php';
+		require_once ASREKHODRO_THEME_DIR . '/inc/SearchIndexAdmin.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/CachePurge.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/ContactForm.php';
 		require_once ASREKHODRO_THEME_DIR . '/inc/ContactPage.php';
@@ -79,6 +81,7 @@ final class Theme {
 		LayoutBuilderAdmin::init();
 		IconGalleryAdmin::init();
 		NewsSlugRepairAdmin::init();
+		SearchIndexAdmin::init();
 
 		Setup::init();
 		AuthorAccess::init();
@@ -102,6 +105,7 @@ final class Theme {
 		\AsreKhodro\Theme\CdnServer\Module::init();
 		LegacyRedirects::init();
 		PostViews::init();
+		SearchIndex::init();
 		AjaxSearch::init();
 		CachePurge::init();
 		AdminPostList::init();

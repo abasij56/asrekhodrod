@@ -1,0 +1,29 @@
+---
+description: When user says کپم — commit, push, merge to main for CI/CD, keep branch, report deploy
+alwaysApply: true
+---
+
+# کپم = commit → push → merge main → wait deploy
+
+When the user message is **کپم** (alone or clearly that command), treat it as an explicit request to ship:
+
+1. **Commit** all relevant local changes (follow the repo commit protocol; skip secrets).
+2. **Push** the current branch to origin.
+3. **Merge into `main`** so Deploy Live / CI-CD runs:
+   - If already on `main`: push alone is enough (no extra merge).
+   - If on another branch: merge that branch into `main` (PR merge or local checkout `main` + merge + push `main`). Prefer the repo’s usual path (often `gh pr create` + merge, or merge locally then push).
+4. **Do NOT delete** the current/feature branch (local or remote).
+5. **Wait** until the `Deploy Live (FTP + rollback)` workflow for that `main` push finishes (poll; do not return early while `in_progress` / `queued`).
+6. **Final reply** in this shape (Persian labels OK):
+
+```
+تموم شد
+نتیجه: success | failure | cancelled
+زمان: Xs (or Xm Ys)
+ران: <Actions run URL>
+جزئیات: <one useful log line if available>
+```
+
+On failure, include the failing step / error line.
+
+This command authorizes commit, push, and merge to `main`. It does **not** authorize deleting branches or force-push.
