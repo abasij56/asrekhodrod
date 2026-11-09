@@ -23,7 +23,9 @@ final class SearchIndex {
 	public const SEARCH_POST_TYPES = array( 'post', 'ak_video', 'ak_review' );
 
 	public static function init(): void {
-		add_action( 'init', array( self::class, 'maybe_install' ), 5 );
+		// Never run CREATE TABLE / dbDelta on the public front: first-request DDL
+		// can 500 the health check right after deploy. Admin installs explicitly.
+		add_action( 'admin_init', array( self::class, 'maybe_install' ), 5 );
 		add_action( 'save_post', array( self::class, 'on_save_post' ), 30, 2 );
 		add_action( 'before_delete_post', array( self::class, 'on_before_delete_post' ), 10, 1 );
 		add_action( 'transition_post_status', array( self::class, 'on_transition_post_status' ), 10, 3 );
@@ -72,8 +74,9 @@ final class SearchIndex {
 			PRIMARY KEY  (post_id),
 			KEY type_status_date (post_type, post_status, post_date),
 			FULLTEXT KEY ft_search (search_text)
-		) {$charset_collate};";
+		) ENGINE=InnoDB {$charset_collate};";
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
 		dbDelta( $sql );
 	}
 

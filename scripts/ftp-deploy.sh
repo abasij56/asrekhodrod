@@ -103,6 +103,19 @@ health_ok() {
   [[ "$code" =~ ^(200|301|302)$ ]]
 }
 
+# OpCache / first-request warmups can briefly 500 right after file puts.
+health_ok_retry() {
+  local attempt
+  for attempt in 1 2 3 4 5; do
+    if health_ok; then
+      return 0
+    fi
+    log "Health not ready (attempt ${attempt}/5); sleeping 5s"
+    sleep 5
+  done
+  return 1
+}
+
 write_remote_sha() {
   local tmp
   tmp="$(mktemp)"
@@ -194,7 +207,10 @@ mv $NEW $LIVE
 EOF
   SWAPPED=1
 
-  if ! health_ok; then
+  if ! health_ok_retry; then
+    log "Health check failed after retries; rolling back full swap"
+    rollback_full
+    SWAPPED=0
     die "Health check failed"
   fi
 
@@ -300,16 +316,22 @@ EOF
 
   log "Uploading changed files to live"
   # mkdir may return 550 "File exists" on cPanel even with -p; do it nofail first.
-  local mkdir_cmds="" put_cmds="" rm_cmds=""
+  # Put brand-new files before modified ones so requires cannot race mid-upload.
+  local mkdir_cmds="" put_new_cmds="" put_mod_cmds="" rm_cmds=""
   for item in "${mapfile_changes[@]}"; do
     status="${item%%|*}"
     rel="${item#*|}"
     local_path="$LOCAL_THEME/$rel"
     case "$status" in
-      A|M)
+      A)
         [[ -f "$local_path" ]] || die "Missing local file: $local_path"
         mkdir_cmds+="mkdir -p $LIVE/$(dirname "$rel")"$'\n'
-        put_cmds+="put $local_path -o $LIVE/$rel"$'\n'
+        put_new_cmds+="put $local_path -o $LIVE/$rel"$'\n'
+        ;;
+      M)
+        [[ -f "$local_path" ]] || die "Missing local file: $local_path"
+        mkdir_cmds+="mkdir -p $LIVE/$(dirname "$rel")"$'\n'
+        put_mod_cmds+="put $local_path -o $LIVE/$rel"$'\n'
         ;;
       D)
         rm_cmds+="rm $LIVE/$rel"$'\n'
@@ -321,15 +343,19 @@ EOF
 $mkdir_cmds
 EOF
   fi
-  if [[ -n "$put_cmds$rm_cmds" ]]; then
+  if [[ -n "$put_new_cmds$put_mod_cmds$rm_cmds" ]]; then
     ftp_cmd fail <<EOF
-$put_cmds
+$put_new_cmds
+$put_mod_cmds
 $rm_cmds
 EOF
   fi
   deployed=1
 
-  if ! health_ok; then
+  if ! health_ok_retry; then
+    log "Health check failed after retries; rolling back"
+    rollback_inc
+    deployed=0
     die "Health check failed"
   fi
 
